@@ -64,7 +64,6 @@
 
 ## Progresso
 
-
 - [ ] Estrutura inicial do projeto ASP.NET MVC 8.0
 - [ ] Implementação da autenticação nativa
 - [ ] Cadastro e gestão de usuários e níveis de acesso
@@ -77,6 +76,10 @@
 - [ ] Painel administrativo
 - [ ] Interface responsiva com Bootstrap
 - [ ] Integração com pagamentos
+
+### Progresso Atual: 0% concluído
+
+> O progresso é calculado automaticamente com base nas tarefas marcadas como concluídas.
 
 ---
 
