@@ -3,6 +3,7 @@
 ## Tecnologias
 - ASP.NET MVC 8.0
 - Autenticação nativa ASP.NET
+- Data Annotations (validação e metadados)
 - Bootstrap (UI responsiva)
 
 
