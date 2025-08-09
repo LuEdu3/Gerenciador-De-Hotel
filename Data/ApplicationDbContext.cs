@@ -4,7 +4,7 @@ using GerenciadorHotel.Models;
 
 namespace GerenciadorHotel.Data;
 
-public class ApplicationDbContext : IdentityDbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -56,6 +56,13 @@ public class ApplicationDbContext : IdentityDbContext
 
         builder.Entity<Acomodacao>()
             .HasIndex(a => a.Status);
+
+        // Configurações para ApplicationUser
+        builder.Entity<ApplicationUser>()
+            .HasIndex(u => u.NivelAcesso);
+
+        builder.Entity<ApplicationUser>()
+            .HasIndex(u => u.Ativo);
 
         // Seed data inicial pode ser adicionado aqui no futuro
     }

@@ -1,0 +1,141 @@
+@model IEnumerable<GerenciadorHotel.ViewModels.UsuarioListViewModel>
+
+@{
+    ViewData["Title"] = "Gerenciar Usuários";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-people"></i> @ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Novo Usuário
+    </a>
+</div>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["Sucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["Erro"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome Completo</th>
+                        <th>Email</th>
+                        <th>Nível de Acesso</th>
+                        <th>Status</th>
+                        <th>Data de Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="@(item.Ativo ? "" : "table-secondary")">
+                            <td>
+                                <strong>@item.NomeCompleto</strong>
+                                @if (!item.Ativo)
+                                {
+                                    <span class="badge bg-secondary ms-2">Inativo</span>
+                                }
+                            </td>
+                            <td>@item.Email</td>
+                            <td>
+                                <span class="badge @(item.NivelAcesso switch {
+                                    GerenciadorHotel.Models.NivelAcesso.Administrador => "bg-danger",
+                                    GerenciadorHotel.Models.NivelAcesso.Recepcionista => "bg-warning text-dark",
+                                    _ => "bg-info"
+                                })">
+                                    @item.NivelAcesso.ToString()
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.Ativo)
+                                {
+                                    <span class="badge bg-success">Ativo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inativo</span>
+                                }
+                            </td>
+                            <td>@item.DataCadastro.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn @(item.Ativo ? "btn-outline-warning" : "btn-outline-success")" 
+                                                title="@(item.Ativo ? "Desativar" : "Ativar")"
+                                                onclick="return confirm('@(item.Ativo ? "Desativar" : "Ativar") usuário @item.NomeCompleto?')">
+                                            <i class="bi @(item.Ativo ? "bi-pause" : "bi-play")"></i>
+                                        </button>
+                                    </form>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Excluir">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-4">
+                <i class="bi bi-people display-1 text-muted"></i>
+                <h4 class="text-muted mt-3">Nenhum usuário encontrado</h4>
+                <p class="text-muted">Clique em "Novo Usuário" para cadastrar o primeiro usuário.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5><i class="bi bi-people"></i> Total de Usuários</h5>
+                    <h2>@Model.Count()</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5><i class="bi bi-person-check"></i> Usuários Ativos</h5>
+                    <h2>@Model.Count(u => u.Ativo)</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5><i class="bi bi-shield-exclamation"></i> Administradores</h5>
+                    <h2>@Model.Count(u => u.NivelAcesso == GerenciadorHotel.Models.NivelAcesso.Administrador)</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
