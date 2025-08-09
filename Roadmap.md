@@ -4,6 +4,8 @@
 - ASP.NET MVC 8.0
 - Autenticação nativa ASP.NET
 - Data Annotations (validação e metadados)
+- MySQL (banco de dados)
+- Entity Framework Core (ORM)
 - Bootstrap (UI responsiva)
 
 
@@ -65,7 +67,10 @@
 
 ## Progresso
 
-- [ ] Estrutura inicial do projeto ASP.NET MVC 8.0
+- [x] Estrutura inicial do projeto ASP.NET MVC 8.0
+- [x] Configuração do MySQL e Entity Framework
+- [x] Criação dos Models com Data Annotations
+- [x] Migrations criadas para o banco de dados
 - [ ] Implementação da autenticação nativa
 - [ ] Cadastro e gestão de usuários e níveis de acesso
 - [ ] Cadastro e gestão de acomodações
@@ -78,7 +83,7 @@
 - [ ] Interface responsiva com Bootstrap
 - [ ] Integração com pagamentos
 
-### Progresso Atual: 0% concluído
+### Progresso Atual: 33% concluído
 
 > O progresso é calculado automaticamente com base nas tarefas marcadas como concluídas.
 
