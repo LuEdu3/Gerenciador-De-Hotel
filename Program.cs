@@ -22,6 +22,14 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => {
 })
     .AddRoles<IdentityRole>() // Adicionar suporte a roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+// Configurar autorização
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrador"));
+    options.AddPolicy("AdminOrReceptionist", policy => policy.RequireRole("Administrador", "Recepcionista"));
+});
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

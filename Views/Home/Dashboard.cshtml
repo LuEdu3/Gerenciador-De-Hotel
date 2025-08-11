@@ -1,0 +1,217 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </h1>
+                <div class="text-muted">
+                    Bem-vindo, <strong>@User.Identity?.Name</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+        @if (User.IsInRole("Administrador") || User.IsInRole("Recepcionista"))
+        {
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Reservas Hoje
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-calendar-check fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Quartos Ocupados
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-building fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Check-ins Hoje
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-box-arrow-in-right fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Check-outs Hoje
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="bi bi-box-arrow-right fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="bi bi-lightning"></i> Ações Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @if (User.IsInRole("Administrador") || User.IsInRole("Recepcionista"))
+                        {
+                            <div class="col-md-4 mb-3">
+                                <a href="@Url.Action("Create", "Reservas")" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-plus-circle"></i><br>
+                                    Nova Reserva
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <a href="@Url.Action("Index", "Reservas")" class="btn btn-info btn-lg w-100">
+                                    <i class="bi bi-list"></i><br>
+                                    Ver Reservas
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <a href="@Url.Action("Index", "Acomodacoes")" class="btn btn-success btn-lg w-100">
+                                    <i class="bi bi-building"></i><br>
+                                    Acomodações
+                                </a>
+                            </div>
+                        }
+
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <div class="col-md-4 mb-3">
+                                <a href="@Url.Action("Index", "Usuarios")" class="btn btn-warning btn-lg w-100">
+                                    <i class="bi bi-people"></i><br>
+                                    Gerenciar Usuários
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <a href="#" class="btn btn-secondary btn-lg w-100">
+                                    <i class="bi bi-graph-up"></i><br>
+                                    Relatórios
+                                </a>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <a href="#" class="btn btn-dark btn-lg w-100">
+                                    <i class="bi bi-gear"></i><br>
+                                    Configurações
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Hospede"))
+    {
+        <!-- Área do Hóspede -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="bi bi-person"></i> Área do Hóspede
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-calendar-check fa-3x text-primary mb-3"></i>
+                                        <h5>Minhas Reservas</h5>
+                                        <p class="text-muted">Veja suas reservas ativas e histórico</p>
+                                        <a href="#" class="btn btn-primary">Ver Reservas</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-person-circle fa-3x text-success mb-3"></i>
+                                        <h5>Meu Perfil</h5>
+                                        <p class="text-muted">Atualize suas informações pessoais</p>
+                                        <a href="#" class="btn btn-success">Editar Perfil</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .fa-2x {
+        font-size: 2em;
+    }
+    .fa-3x {
+        font-size: 3em;
+    }
+</style>
