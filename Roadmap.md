@@ -71,8 +71,10 @@
 - [x] Configuração do MySQL e Entity Framework
 - [x] Criação dos Models com Data Annotations
 - [x] Migrations criadas para o banco de dados
-- [ ] Implementação da autenticação nativa
-- [ ] Cadastro e gestão de usuários e níveis de acesso
+- [x] Implementação da autenticação nativa
+- [x] Cadastro e gestão de usuários e níveis de acesso
+- [x] Controllers com autorização por roles
+- [x] Dashboard com controle de acesso
 - [ ] Cadastro e gestão de acomodações
 - [ ] Cadastro e associação de amenidades
 - [ ] Sistema de reservas (com país do hóspede)
@@ -83,7 +85,7 @@
 - [ ] Interface responsiva com Bootstrap
 - [ ] Integração com pagamentos
 
-### Progresso Atual: 33% concluído
+### Progresso Atual: 50% concluído
 
 > O progresso é calculado automaticamente com base nas tarefas marcadas como concluídas.
 
