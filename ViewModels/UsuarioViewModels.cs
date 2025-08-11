@@ -12,8 +12,9 @@ namespace GerenciadorHotel.ViewModels
         public NivelAcesso NivelAcesso { get; set; }
         public bool Ativo { get; set; }
         public DateTime DataCadastro { get; set; }
-        public string Roles { get; set; } = string.Empty;
-        public string NomeCompleto => $"{Nome} {Sobrenome}";
+    public string Roles { get; set; } = string.Empty;
+    public DateTime? UltimoLogin { get; set; }
+    public string NomeCompleto => $"{Nome} {Sobrenome}";
     }
 
     public class UsuarioDetailsViewModel
@@ -27,7 +28,8 @@ namespace GerenciadorHotel.ViewModels
         public DateTime DataCadastro { get; set; }
         public DateTime? UltimaAtualizacao { get; set; }
         public List<string> Roles { get; set; } = new List<string>();
-        public string NomeCompleto => $"{Nome} {Sobrenome}";
+    public string NomeCompleto => $"{Nome} {Sobrenome}";
+    public DateTime? UltimoLogin { get; set; }
     }
 
     public class CriarUsuarioViewModel

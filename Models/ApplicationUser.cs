@@ -37,8 +37,11 @@ namespace GerenciadorHotel.Models
         [Display(Name = "Última Atualização")]
         public DateTime? UltimaAtualizacao { get; set; }
 
-        // Propriedade calculada para nome completo
-        [Display(Name = "Nome Completo")]
-        public string NomeCompleto => $"{Nome} {Sobrenome}";
+    // Propriedade calculada para nome completo
+    [Display(Name = "Nome Completo")]
+    public string NomeCompleto => $"{Nome} {Sobrenome}";
+
+    [Display(Name = "Último Login")]
+    public DateTime? UltimoLogin { get; set; }
     }
 }

@@ -1,0 +1,61 @@
+@model GerenciadorHotel.ViewModels.UsuarioDetailsViewModel
+@{
+    ViewData["Title"] = "Detalhes do Usuário";
+}
+<h2>Detalhes do Usuário</h2>
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Nome</dt>
+            <dd class="col-sm-9">@Model.Nome</dd>
+            <dt class="col-sm-3">Sobrenome</dt>
+            <dd class="col-sm-9">@Model.Sobrenome</dd>
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+            <dt class="col-sm-3">Nível de Acesso</dt>
+            <dd class="col-sm-9">@Model.NivelAcesso</dd>
+            <dt class="col-sm-3">Ativo</dt>
+            <dd class="col-sm-9">@(Model.Ativo ? "Sim" : "Não")</dd>
+            <dt class="col-sm-3">Data de Cadastro</dt>
+            <dd class="col-sm-9">@Model.DataCadastro.ToString("dd/MM/yyyy HH:mm")</dd>
+            <dt class="col-sm-3">Última Atualização</dt>
+            <dd class="col-sm-9">@(Model.UltimaAtualizacao?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
+            <dt class="col-sm-3">Funções</dt>
+            <dd class="col-sm-9">@string.Join(", ", Model.Roles)</dd>
+            <dt class="col-sm-3">Último Login</dt>
+            <dd class="col-sm-9">@(Model.UltimoLogin?.ToString("dd/MM/yyyy HH:mm") ?? "-")</dd>
+        </dl>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a>
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalResetSenha">
+                        <i class="bi bi-key"></i> Resetar Senha
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                <!-- Modal Reset Senha -->
+                <div class="modal fade" id="modalResetSenha" tabindex="-1" aria-labelledby="modalResetSenhaLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalResetSenhaLabel">Resetar Senha</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <form asp-action="ResetSenha" asp-route-id="@Model.Id" method="post">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="novaSenha" class="form-label">Nova Senha</label>
+                                        <input type="password" class="form-control" id="novaSenha" name="novaSenha" required minlength="6" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="confirmarSenha" class="form-label">Confirmar Nova Senha</label>
+                                        <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha" required minlength="6" />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Resetar Senha</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+    </div>
+</div>
