@@ -116,13 +116,13 @@ namespace GerenciadorHotel.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    
+
                     // Redirecionar para o Dashboard após login bem-sucedido
                     if (returnUrl == null || returnUrl == "/")
                     {
                         return RedirectToAction("Dashboard", "Home");
                     }
-                    
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
