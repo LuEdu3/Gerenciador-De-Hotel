@@ -83,7 +83,42 @@
         </div>
     <!-- Removido campo de busca duplicado -->
     </div>
+
 </form>
+<script>
+    // AJAX para filtro em tempo real sem recarregar a página
+    const filtroForm = document.querySelector('form[method="get"]');
+    const buscaInput = filtroForm.querySelector('input[name="busca"]');
+    let debounceTimer;
+    function atualizarTabelaUsuarios(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const novaTabela = doc.querySelector('.table-responsive');
+        const tabelaAtual = document.querySelector('.table-responsive');
+        if (novaTabela && tabelaAtual) {
+            tabelaAtual.innerHTML = novaTabela.innerHTML;
+        }
+    }
+    function enviarFiltroAjax() {
+        const url = filtroForm.action + '?' + new URLSearchParams(new FormData(filtroForm)).toString();
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(resp => resp.text())
+            .then(html => atualizarTabelaUsuarios(html));
+    }
+    if (buscaInput) {
+        buscaInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                enviarFiltroAjax();
+            }, 400);
+        });
+    }
+    filtroForm.querySelectorAll('select').forEach(function (select) {
+        select.addEventListener('change', function () {
+            enviarFiltroAjax();
+        });
+    });
+</script>
 
 <div class="card">
     <div class="card-body">
