@@ -1,0 +1,27 @@
+@model GerenciadorHotel.ViewModels.UsuarioDetailsViewModel
+@{
+    ViewData["Title"] = "Excluir Usuário";
+}
+<h2>Excluir Usuário</h2>
+<div class="alert alert-danger">Tem certeza que deseja excluir este usuário?</div>
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Nome</dt>
+            <dd class="col-sm-9">@Model.Nome</dd>
+            <dt class="col-sm-3">Sobrenome</dt>
+            <dd class="col-sm-9">@Model.Sobrenome</dd>
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+            <dt class="col-sm-3">Nível de Acesso</dt>
+            <dd class="col-sm-9">@Model.NivelAcesso</dd>
+            <dt class="col-sm-3">Ativo</dt>
+            <dd class="col-sm-9">@(Model.Ativo ? "Sim" : "Não")</dd>
+        </dl>
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Excluir</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>

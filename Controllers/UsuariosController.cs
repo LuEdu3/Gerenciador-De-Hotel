@@ -25,11 +25,31 @@ namespace GerenciadorHotel.Controllers
         }
 
         // GET: Usuarios
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string busca, string nivelAcesso, string status)
         {
-            var usuarios = await _userManager.Users
-                .OrderBy(u => u.Nome)
-                .ToListAsync();
+            var query = _userManager.Users.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(busca))
+            {
+                var buscaNormalizada = busca.Trim().ToLower();
+                query = query.Where(u =>
+                    u.Nome.ToLower().Contains(buscaNormalizada) ||
+                    u.Sobrenome.ToLower().Contains(buscaNormalizada) ||
+                    u.Email.ToLower().Contains(buscaNormalizada)
+                );
+            }
+            if (!string.IsNullOrWhiteSpace(nivelAcesso))
+            {
+                if (Enum.TryParse<NivelAcesso>(nivelAcesso, out var nivel))
+                {
+                    query = query.Where(u => u.NivelAcesso == nivel);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                if (status == "ativo") query = query.Where(u => u.Ativo);
+                else if (status == "inativo") query = query.Where(u => !u.Ativo);
+            }
+            var usuarios = await query.OrderBy(u => u.Nome).ToListAsync();
 
             var usuariosViewModel = new List<UsuarioListViewModel>();
 
@@ -45,7 +65,8 @@ namespace GerenciadorHotel.Controllers
                     NivelAcesso = user.NivelAcesso,
                     Ativo = user.Ativo,
                     DataCadastro = user.DataCadastro,
-                    Roles = string.Join(", ", roles)
+                    Roles = string.Join(", ", roles),
+                    UltimoLogin = user.UltimoLogin
                 });
             }
 
@@ -78,7 +99,8 @@ namespace GerenciadorHotel.Controllers
                 Ativo = user.Ativo,
                 DataCadastro = user.DataCadastro,
                 UltimaAtualizacao = user.UltimaAtualizacao,
-                Roles = roles.ToList()
+                Roles = roles.ToList(),
+                UltimoLogin = user.UltimoLogin
             };
 
             return View(viewModel);
@@ -262,8 +284,14 @@ namespace GerenciadorHotel.Controllers
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            var currentUserId = _userManager.GetUserId(User);
             if (user != null)
             {
+                if (user.Id == currentUserId)
+                {
+                    TempData["Erro"] = "Você não pode excluir o próprio usuário logado.";
+                    return RedirectToAction(nameof(Index));
+                }
                 var result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
@@ -275,8 +303,35 @@ namespace GerenciadorHotel.Controllers
                     TempData["Erro"] = "Erro ao remover usuário.";
                 }
             }
-
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetSenha(string id, string novaSenha, string confirmarSenha)
+        {
+            if (string.IsNullOrWhiteSpace(novaSenha) || novaSenha.Length < 6 || novaSenha != confirmarSenha)
+            {
+                TempData["Erro"] = "A senha deve ter pelo menos 6 caracteres e coincidir com a confirmação.";
+                return RedirectToAction("Details", new { id });
+            }
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                TempData["Erro"] = "Usuário não encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, novaSenha);
+            if (result.Succeeded)
+            {
+                TempData["Sucesso"] = "Senha redefinida com sucesso!";
+            }
+            else
+            {
+                TempData["Erro"] = string.Join("; ", result.Errors.Select(e => e.Description));
+            }
+            return RedirectToAction("Details", new { id });
         }
 
         // POST: Usuarios/ToggleStatus/5

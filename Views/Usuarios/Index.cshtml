@@ -27,6 +27,99 @@
     </div>
 }
 
+<form method="get" class="mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <input type="text" name="busca" value="@Context.Request.Query["busca"]" class="form-control" placeholder="Buscar por nome ou email..." />
+        </div>
+        <div class="col-md-2">
+            @{
+                var nivelAcessoSel = Context.Request.Query["nivelAcesso"].ToString();
+            }
+            <select name="nivelAcesso" class="form-select">
+                @if (string.IsNullOrEmpty(nivelAcessoSel)) {
+                    <option value="" selected>Todos os níveis</option>
+                } else {
+                    <option value="">Todos os níveis</option>
+                }
+                @if (nivelAcessoSel == "Administrador") {
+                    <option value="Administrador" selected>Administrador</option>
+                } else {
+                    <option value="Administrador">Administrador</option>
+                }
+                @if (nivelAcessoSel == "Recepcionista") {
+                    <option value="Recepcionista" selected>Recepcionista</option>
+                } else {
+                    <option value="Recepcionista">Recepcionista</option>
+                }
+                @if (nivelAcessoSel == "Hospede") {
+                    <option value="Hospede" selected>Hóspede</option>
+                } else {
+                    <option value="Hospede">Hóspede</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            @{
+                var statusSel = Context.Request.Query["status"].ToString();
+            }
+            <select name="status" class="form-select">
+                @if (string.IsNullOrEmpty(statusSel)) {
+                    <option value="" selected>Todos</option>
+                } else {
+                    <option value="">Todos</option>
+                }
+                @if (statusSel == "ativo") {
+                    <option value="ativo" selected>Ativo</option>
+                } else {
+                    <option value="ativo">Ativo</option>
+                }
+                @if (statusSel == "inativo") {
+                    <option value="inativo" selected>Inativo</option>
+                } else {
+                    <option value="inativo">Inativo</option>
+                }
+            </select>
+        </div>
+    <!-- Removido campo de busca duplicado -->
+    </div>
+
+</form>
+<script>
+    // AJAX para filtro em tempo real sem recarregar a página
+    const filtroForm = document.querySelector('form[method="get"]');
+    const buscaInput = filtroForm.querySelector('input[name="busca"]');
+    let debounceTimer;
+    function atualizarTabelaUsuarios(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const novaTabela = doc.querySelector('.table-responsive');
+        const tabelaAtual = document.querySelector('.table-responsive');
+        if (novaTabela && tabelaAtual) {
+            tabelaAtual.innerHTML = novaTabela.innerHTML;
+        }
+    }
+    function enviarFiltroAjax() {
+        const url = filtroForm.action + '?' + new URLSearchParams(new FormData(filtroForm)).toString();
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(resp => resp.text())
+            .then(html => atualizarTabelaUsuarios(html));
+    }
+    if (buscaInput) {
+        buscaInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                enviarFiltroAjax();
+            }, 400);
+        });
+    }
+    filtroForm.querySelectorAll('select').forEach(function (select) {
+        select.addEventListener('change', function () {
+            enviarFiltroAjax();
+        });
+    });
+</script>
+
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
@@ -38,6 +131,7 @@
                         <th>Nível de Acesso</th>
                         <th>Status</th>
                         <th>Data de Cadastro</th>
+                        <th>Último Login</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -73,6 +167,7 @@
                                 }
                             </td>
                             <td>@item.DataCadastro.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.UltimoLogin?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Detalhes">
@@ -85,13 +180,55 @@
                                         @Html.AntiForgeryToken()
                                         <button type="submit" class="btn @(item.Ativo ? "btn-outline-warning" : "btn-outline-success")" 
                                                 title="@(item.Ativo ? "Desativar" : "Ativar")"
-                                                onclick="return confirm('@(item.Ativo ? "Desativar" : "Ativar") usuário @item.NomeCompleto?')">
+                                                data-bs-toggle="modal" data-bs-target="#modalToggleStatus-@item.Id" type="button">
                                             <i class="bi @(item.Ativo ? "bi-pause" : "bi-play")"></i>
                                         </button>
                                     </form>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Excluir">
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Excluir" data-bs-toggle="modal" data-bs-target="#modalDelete-@item.Id">
                                         <i class="bi bi-trash"></i>
                                     </a>
+                                </div>
+                                <!-- Modal Toggle Status -->
+                                <div class="modal fade" id="modalToggleStatus-@item.Id" tabindex="-1" aria-labelledby="modalToggleStatusLabel-@item.Id" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="modalToggleStatusLabel-@item.Id">Confirmação</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        Tem certeza que deseja @(item.Ativo ? "desativar" : "ativar") o usuário <strong>@item.NomeCompleto</strong>?
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn @(item.Ativo ? "btn-warning" : "btn-success")">Sim, @(item.Ativo ? "Desativar" : "Ativar")</button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- Modal Delete -->
+                                <div class="modal fade" id="modalDelete-@item.Id" tabindex="-1" aria-labelledby="modalDeleteLabel-@item.Id" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="modalDeleteLabel-@item.Id">Confirmação de Exclusão</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        Tem certeza que deseja excluir o usuário <strong>@item.NomeCompleto</strong>?
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
                             </td>
                         </tr>
