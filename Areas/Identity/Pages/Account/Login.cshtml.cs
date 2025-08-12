@@ -119,7 +119,7 @@ namespace GerenciadorHotel.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
+                    _logger.LogInformation("User logged in.");<<<<<<< feature/gestao-de-usuarios
                     // Atualizar data/hora do último login
                     var user = await _userManager.FindByEmailAsync(Input.Email);
                     if (user != null)
@@ -128,11 +128,7 @@ namespace GerenciadorHotel.Areas.Identity.Pages.Account
                         _db.Users.Update(user);
                         await _db.SaveChangesAsync();
                     }
-                    // Redirecionar para o Dashboard após login bem-sucedido
-                    if (returnUrl == null || returnUrl == "/")
-                    {
-                        return RedirectToAction("Dashboard", "Home");
-                    }
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

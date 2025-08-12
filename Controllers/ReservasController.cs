@@ -170,7 +170,7 @@ namespace GerenciadorHotel.Controllers
             {
                 reserva.Status = StatusReserva.CheckInRealizado;
                 reserva.DataCheckInReal = DateTime.Now;
-                
+
                 // Atualizar status da acomodação
                 reserva.Acomodacao.Status = StatusAcomodacao.Ocupada;
 
@@ -200,7 +200,7 @@ namespace GerenciadorHotel.Controllers
             {
                 reserva.Status = StatusReserva.CheckOutRealizado;
                 reserva.DataCheckOutReal = DateTime.Now;
-                
+
                 // Liberar acomodação
                 reserva.Acomodacao.Status = StatusAcomodacao.Disponivel;
 
