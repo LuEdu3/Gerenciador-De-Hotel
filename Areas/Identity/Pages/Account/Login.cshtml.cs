@@ -21,11 +21,15 @@ namespace GerenciadorHotel.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly GerenciadorHotel.Data.ApplicationDbContext _db;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, GerenciadorHotel.Data.ApplicationDbContext db, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
+            _db = db;
             _logger = logger;
         }
 
@@ -116,13 +120,19 @@ namespace GerenciadorHotel.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    
+                    // Atualizar data/hora do último login
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    if (user != null)
+                    {
+                        user.UltimoLogin = DateTime.Now;
+                        _db.Users.Update(user);
+                        await _db.SaveChangesAsync();
+                    }
                     // Redirecionar para o Dashboard após login bem-sucedido
                     if (returnUrl == null || returnUrl == "/")
                     {
                         return RedirectToAction("Dashboard", "Home");
                     }
-                    
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
