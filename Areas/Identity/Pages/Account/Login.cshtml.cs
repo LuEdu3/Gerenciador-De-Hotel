@@ -119,7 +119,7 @@ namespace GerenciadorHotel.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");<<<<<<< feature/gestao-de-usuarios
+                    _logger.LogInformation("User logged in.");
                     // Atualizar data/hora do último login
                     var user = await _userManager.FindByEmailAsync(Input.Email);
                     if (user != null)
@@ -128,7 +128,6 @@ namespace GerenciadorHotel.Areas.Identity.Pages.Account
                         _db.Users.Update(user);
                         await _db.SaveChangesAsync();
                     }
-
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
