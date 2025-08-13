@@ -1,0 +1,88 @@
+@model GerenciadorHotel.Models.Reserva
+@{
+    ViewData["Title"] = "Editar Reserva";
+}
+<h2>Editar Reserva</h2>
+<hr />
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="NomeHospede" class="control-label"></label>
+                <input asp-for="NomeHospede" class="form-control" />
+                <span asp-validation-for="NomeHospede" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SobrenomeHospede" class="control-label"></label>
+                <input asp-for="SobrenomeHospede" class="form-control" />
+                <span asp-validation-for="SobrenomeHospede" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Telefone" class="control-label"></label>
+                <input asp-for="Telefone" class="form-control" />
+                <span asp-validation-for="Telefone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PaisId" class="control-label"></label>
+                <select asp-for="PaisId" class="form-control" asp-items="ViewBag.PaisId"></select>
+                <span asp-validation-for="PaisId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="AcomodacaoId" class="control-label"></label>
+                <select asp-for="AcomodacaoId" class="form-control" asp-items="ViewBag.AcomodacaoId"></select>
+                <span asp-validation-for="AcomodacaoId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DataCheckIn" class="control-label"></label>
+                <input asp-for="DataCheckIn" class="form-control" type="date" />
+                <span asp-validation-for="DataCheckIn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DataCheckOut" class="control-label"></label>
+                <input asp-for="DataCheckOut" class="form-control" type="date" />
+                <span asp-validation-for="DataCheckOut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumeroHospedes" class="control-label"></label>
+                <input asp-for="NumeroHospedes" class="form-control" type="number" min="1" max="10" />
+                <span asp-validation-for="NumeroHospedes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PedidosEspeciais" class="control-label"></label>
+                <textarea asp-for="PedidosEspeciais" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="PedidosEspeciais" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                    <label asp-for="Status" class="control-label"></label>
+                    <select asp-for="Status" class="form-control">
+                        @foreach (GerenciadorHotel.Models.StatusReserva status in Enum.GetValues(typeof(GerenciadorHotel.Models.StatusReserva)))
+                        {
+                            var displayName = GerenciadorHotel.Extensions.EnumExtensions.GetDisplayName(status);
+                            <option value="@((int)status)" selected="@(Model.Status == status ? "selected" : null)">@displayName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Observacoes" class="control-label"></label>
+                <textarea asp-for="Observacoes" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="Observacoes" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

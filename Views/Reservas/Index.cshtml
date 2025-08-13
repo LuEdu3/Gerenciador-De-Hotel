@@ -1,0 +1,56 @@
+@model IEnumerable<GerenciadorHotel.Models.Reserva>
+@{
+    ViewData["Title"] = "Reservas";
+}
+<h2>Reservas</h2>
+<hr />
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<a asp-action="Create" class="btn btn-primary mb-3">Nova Reserva</a>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Hóspede</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Acomodação</th>
+            <th>País</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Status</th>
+            <th>Valor Total</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.NomeCompleto</td>
+            <td>@item.Email</td>
+            <td>@item.Telefone</td>
+            <td>@item.Acomodacao?.Nome</td>
+            <td>@item.Pais?.Nome</td>
+            <td>@item.DataCheckIn.ToString("dd/MM/yyyy")</td>
+            <td>@item.DataCheckOut.ToString("dd/MM/yyyy")</td>
+            <td>@item.Status.GetDisplayName()</td>
+                <td>@item.Status.GetDisplayName()</td>
+            <td>@item.ValorTotal.ToString("C")</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalhes</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Excluir</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
