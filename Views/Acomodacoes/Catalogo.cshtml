@@ -1,0 +1,29 @@
+@model IEnumerable<GerenciadorHotel.Models.Acomodacao>
+@{
+    ViewData["Title"] = "Acomodações";
+}
+<h2>Acomodações Disponíveis</h2>
+<hr />
+<div class="row">
+    @foreach (var acomodacao in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="@acomodacao.ImagemPrincipalUrl" class="card-img-top" alt="Imagem da acomodação" style="max-height:200px;object-fit:cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">@acomodacao.Nome</h5>
+                    <p class="card-text">@acomodacao.Descricao</p>
+                    <ul class="list-unstyled">
+                        <li><strong>Preço:</strong> @acomodacao.Preco.ToString("C")</li>
+                        <li><strong>Quantidade de Camas:</strong> @acomodacao.QuantidadeCamas</li>
+                        <li><strong>Status:</strong> @acomodacao.Status</li>
+                    </ul>
+                    <a asp-controller="Reservas" asp-action="Create" asp-route-acomodacaoId="@acomodacao.Id" class="btn btn-primary">Reservar</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

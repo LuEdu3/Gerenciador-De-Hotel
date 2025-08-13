@@ -6,9 +6,18 @@ using GerenciadorHotel.Models;
 
 namespace GerenciadorHotel.Controllers
 {
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [AllowAnonymous]
     public class AcomodacoesController : Controller
     {
+        // GET: Acomodacoes/Catalogo
+        [AllowAnonymous]
+        public async Task<IActionResult> Catalogo()
+        {
+            var acomodacoes = await _context.Acomodacoes
+                .Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel)
+                .ToListAsync();
+            return View(acomodacoes);
+        }
         private readonly ApplicationDbContext _context;
 
         public AcomodacoesController(ApplicationDbContext context)

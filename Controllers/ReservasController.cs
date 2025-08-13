@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GerenciadorHotel.Controllers
 {
-    [Authorize(Roles = "Administrador,Recepcionista")]
+     [Authorize]
     public class ReservasController : Controller
     {
         private readonly ApplicationDbContext _context;

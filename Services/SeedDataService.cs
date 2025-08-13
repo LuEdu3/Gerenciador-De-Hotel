@@ -74,5 +74,24 @@ namespace GerenciadorHotel.Services
                 }
             }
         }
+
+        public static async Task SeedPaises(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            if (!context.Paises.Any())
+            {
+                var paises = new List<GerenciadorHotel.Models.Pais>
+                {
+                    new GerenciadorHotel.Models.Pais { Nome = "Brasil" },
+                    new GerenciadorHotel.Models.Pais { Nome = "Argentina" },
+                    new GerenciadorHotel.Models.Pais { Nome = "Estados Unidos" },
+                    new GerenciadorHotel.Models.Pais { Nome = "Portugal" },
+                    new GerenciadorHotel.Models.Pais { Nome = "França" }
+                };
+                context.Paises.AddRange(paises);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 }
