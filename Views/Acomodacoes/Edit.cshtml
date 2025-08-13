@@ -1,0 +1,173 @@
+@model GerenciadorHotel.Models.Acomodacao
+
+@{
+    ViewData["Title"] = "Editar Acomodação";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-pencil"></i> @ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-house-door"></i> Informações da Acomodação</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="DataCriacao" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Nome" class="form-control" placeholder="Nome da Acomodação" />
+                                <label asp-for="Nome"></label>
+                                <span asp-validation-for="Nome" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorHotel.Models.StatusAcomodacao>()">
+                                </select>
+                                <label asp-for="Status"></label>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea asp-for="Descricao" class="form-control" placeholder="Descrição" style="height: 100px"></textarea>
+                        <label asp-for="Descricao"></label>
+                        <span asp-validation-for="Descricao" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="QuantidadeCamas" class="form-control" placeholder="Quantidade de Camas" />
+                                <label asp-for="QuantidadeCamas"></label>
+                                <span asp-validation-for="QuantidadeCamas" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Preco" class="form-control" placeholder="Preço por Noite" />
+                                <label asp-for="Preco"></label>
+                                <span asp-validation-for="Preco" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="MinimoNoites" class="form-control" placeholder="Mínimo de Noites" />
+                                <label asp-for="MinimoNoites"></label>
+                                <span asp-validation-for="MinimoNoites" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="ImagemPrincipalUrl" class="form-control" placeholder="URL da Imagem Principal" />
+                        <label asp-for="ImagemPrincipalUrl"></label>
+                        <span asp-validation-for="ImagemPrincipalUrl" class="text-danger"></span>
+                        <div class="form-text">Cole a URL de uma imagem para a acomodação</div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" asp-for="Ativa" />
+                        <label class="form-check-label" asp-for="Ativa">
+                            Acomodação Ativa
+                        </label>
+                        <span asp-validation-for="Ativa" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info me-md-2">
+                            <i class="bi bi-eye"></i> Visualizar
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-x"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-camera"></i> Preview da Imagem</h5>
+            </div>
+            <div class="card-body text-center">
+                @if (!string.IsNullOrEmpty(Model.ImagemPrincipalUrl))
+                {
+                    <img src="@Model.ImagemPrincipalUrl" alt="Preview" class="img-fluid rounded" style="max-height: 200px;" id="image-preview">
+                }
+                else
+                {
+                    <div class="bg-light border rounded p-4" id="image-preview">
+                        <i class="bi bi-image display-4 text-muted"></i>
+                        <p class="text-muted mt-2">Preview da imagem aparecerá aqui</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="bi bi-info-circle"></i> Informações</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info small">
+                    <strong>Dicas:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Use imagens com boa qualidade e resolução adequada</li>
+                        <li>O preço será exibido por noite</li>
+                        <li>Status "Manutenção" impede novas reservas</li>
+                        <li>Acomodações inativas não aparecem para hóspedes</li>
+                    </ul>
+                </div>
+
+                <div class="mb-2">
+                    <small><strong>Criado em:</strong></small><br>
+                    <small class="text-muted">@Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+
+                @if (Model.DataAtualizacao.HasValue)
+                {
+                    <div>
+                        <small><strong>Última atualização:</strong></small><br>
+                        <small class="text-muted">@Model.DataAtualizacao.Value.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Preview da imagem quando a URL é alterada
+        document.getElementById('ImagemPrincipalUrl').addEventListener('input', function() {
+            var url = this.value;
+            var preview = document.getElementById('image-preview');
+            
+            if (url) {
+                preview.innerHTML = '<img src="' + url + '" alt="Preview" class="img-fluid rounded" style="max-height: 200px;" onerror="this.style.display=\'none\'">';
+            } else {
+                preview.innerHTML = '<div class="bg-light border rounded p-4"><i class="bi bi-image display-4 text-muted"></i><p class="text-muted mt-2">Preview da imagem aparecerá aqui</p></div>';
+            }
+        });
+    </script>
+}

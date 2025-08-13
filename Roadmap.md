@@ -75,7 +75,7 @@
 - [x] Cadastro e gestão de usuários e níveis de acesso
 - [x] Controllers com autorização por roles
 - [x] Dashboard com controle de acesso
-- [ ] Cadastro e gestão de acomodações
+- [x] Cadastro e gestão de acomodações (CRUD completo com views modernas)
 - [ ] Cadastro e associação de amenidades
 - [ ] Sistema de reservas (com país do hóspede)
 - [ ] Gestão de países
@@ -85,7 +85,7 @@
 - [ ] Interface responsiva com Bootstrap
 - [ ] Integração com pagamentos
 
-### Progresso Atual: 50% concluído
+### Progresso Atual: 56% concluído
 
 > O progresso é calculado automaticamente com base nas tarefas marcadas como concluídas.
 

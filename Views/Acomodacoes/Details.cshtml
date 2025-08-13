@@ -1,0 +1,180 @@
+@model GerenciadorHotel.Models.Acomodacao
+
+@{
+    ViewData["Title"] = "Detalhes da Acomodação";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-house-door"></i> @ViewData["Title"]</h1>
+    <div>
+        @if (User.IsInRole("Administrador"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+        }
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-info-circle"></i> Informações da Acomodação</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="text-primary">@Model.Nome</h5>
+                        <p class="text-muted">@Model.Descricao</p>
+                        
+                        <div class="mb-3">
+                            <strong>Status:</strong>
+                            <span class="badge @(Model.Status switch {
+                                GerenciadorHotel.Models.StatusAcomodacao.Disponivel => "bg-success",
+                                GerenciadorHotel.Models.StatusAcomodacao.Ocupada => "bg-danger",
+                                GerenciadorHotel.Models.StatusAcomodacao.Manutencao => "bg-warning text-dark",
+                                _ => "bg-secondary"
+                            })">
+                                @Model.Status.ToString()
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Preço por Noite:</strong>
+                            <span class="fs-4 text-success">@Model.Preco.ToString("C")</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong><i class="bi bi-bed"></i> Quantidade de Camas:</strong>
+                            <span class="badge bg-info fs-6">@Model.QuantidadeCamas</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong><i class="bi bi-calendar"></i> Mínimo de Noites:</strong>
+                            <span class="badge bg-primary fs-6">@Model.MinimoNoites</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Status Geral:</strong>
+                            @if (Model.Ativa)
+                            {
+                                <span class="badge bg-success">Ativa</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inativa</span>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Data de Criação:</strong>
+                            <span class="text-muted">@Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+
+                        @if (Model.DataAtualizacao.HasValue)
+                        {
+                            <div class="mb-3">
+                                <strong>Última Atualização:</strong>
+                                <span class="text-muted">@Model.DataAtualizacao.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.AcomodacaoAmenidades.Any())
+        {
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5><i class="bi bi-star"></i> Amenidades</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var amenidade in Model.AcomodacaoAmenidades.Select(aa => aa.Amenidade))
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="d-flex align-items-center">
+                                    @if (!string.IsNullOrEmpty(amenidade.ImagemUrl))
+                                    {
+                                        <img src="@amenidade.ImagemUrl" alt="@amenidade.Nome" class="me-2" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px;">
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star me-2"></i>
+                                    }
+                                    <span>@amenidade.Nome</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-camera"></i> Imagem Principal</h5>
+            </div>
+            <div class="card-body text-center">
+                @if (!string.IsNullOrEmpty(Model.ImagemPrincipalUrl))
+                {
+                    <img src="@Model.ImagemPrincipalUrl" alt="@Model.Nome" class="img-fluid rounded" style="max-height: 300px;">
+                }
+                else
+                {
+                    <div class="bg-light border rounded p-5">
+                        <i class="bi bi-image display-1 text-muted"></i>
+                        <p class="text-muted mt-2">Nenhuma imagem disponível</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (Model.Imagens.Any())
+        {
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="bi bi-images"></i> Galeria (@Model.Imagens.Count() fotos)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var imagem in Model.Imagens.Where(i => i.Ativa).OrderBy(i => i.Ordem))
+                        {
+                            <div class="col-6 mb-2">
+                                <img src="@imagem.ImagemUrl" alt="@imagem.Titulo" class="img-thumbnail" style="width: 100%; height: 80px; object-fit: cover;">
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="bi bi-graph-up"></i> Estatísticas</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <small>Reservas Ativas:</small>
+                    <span class="badge bg-primary">@Model.Reservas.Count(r => r.Status == GerenciadorHotel.Models.StatusReserva.Confirmada)</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <small>Total de Reservas:</small>
+                    <span class="badge bg-info">@Model.Reservas.Count()</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <small>Amenidades:</small>
+                    <span class="badge bg-success">@Model.AcomodacaoAmenidades.Count()</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

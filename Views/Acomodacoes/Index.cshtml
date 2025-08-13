@@ -88,3 +88,220 @@
 		}
 	</div>
 </div>
+
+
+<!-- Estatísticas Rápidas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">@Model.Count(a => a.Status == GerenciadorHotel.Models.StatusAcomodacao.Disponivel)</h4>
+                        <small>Disponíveis</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-check-circle-fill display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">@Model.Count(a => a.Status == GerenciadorHotel.Models.StatusAcomodacao.Ocupada)</h4>
+                        <small>Ocupadas</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person-fill display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">@Model.Count(a => a.Status == GerenciadorHotel.Models.StatusAcomodacao.ForaDeServico)</h4>
+                        <small>Fora de Serviço</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-x-circle-fill display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="mb-0">@Model.Count(a => a.Status == GerenciadorHotel.Models.StatusAcomodacao.Manutencao)</h4>
+                        <small>Manutenção</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-tools display-6"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <!-- Grid de Acomodações -->
+    <div class="row" id="accommodationsGrid">
+        @foreach (var item in Model)
+        {
+            <div class="col-lg-4 col-md-6 mb-4 accommodation-card" 
+                 data-name="@item.Nome.ToLower()" 
+                 data-status="@item.Status" 
+                 data-active="@item.Ativa.ToString().ToLower()">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrEmpty(item.ImagemPrincipalUrl))
+                    {
+                        <img src="@item.ImagemPrincipalUrl" class="card-img-top" alt="@item.Nome" style="height: 200px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="bi bi-image display-4 text-muted"></i>
+                        </div>
+                    }
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">@item.Nome</h5>
+                            @{
+                                var statusClass = item.Status switch
+                                {
+                                    GerenciadorHotel.Models.StatusAcomodacao.Disponivel => "success",
+                                    GerenciadorHotel.Models.StatusAcomodacao.Ocupada => "danger",
+                                    GerenciadorHotel.Models.StatusAcomodacao.Manutencao => "warning",
+                                    GerenciadorHotel.Models.StatusAcomodacao.ForaDeServico => "dark",
+                                    _ => "secondary"
+                                };
+                            }
+                            <span class="badge bg-@statusClass">@item.Status</span>
+                        </div>
+                        
+                        <p class="card-text text-muted small flex-grow-1">
+                            @(item.Descricao?.Length > 80 ? item.Descricao.Substring(0, 80) + "..." : item.Descricao)
+                        </p>
+                        
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <i class="bi bi-bed text-muted"></i><br>
+                                    <small>@item.QuantidadeCamas cama(s)</small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="bi bi-currency-dollar text-muted"></i><br>
+                                    <small><strong>@item.Preco.ToString("C")</strong></small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="bi bi-calendar-range text-muted"></i><br>
+                                    <small>Min. @item.MinimoNoites noite(s)</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            @if (item.Ativa)
+                            {
+                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Ativa</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Inativa</span>
+                            }
+                            
+                            <div class="btn-group" role="group">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Ver Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent border-top-0">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar-plus"></i> Criado em @item.DataCriacao.ToString("dd/MM/yyyy")
+                        </small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="bi bi-house-door display-1 text-muted"></i>
+        <h3 class="mt-3">Nenhuma acomodação encontrada</h3>
+        <p class="text-muted">Comece criando sua primeira acomodação.</p>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Criar Primeira Acomodação
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Filtro de pesquisa
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterAccommodations();
+        });
+
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            filterAccommodations();
+        });
+
+        document.getElementById('activeFilter').addEventListener('change', function() {
+            filterAccommodations();
+        });
+
+        function filterAccommodations() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const activeFilter = document.getElementById('activeFilter').value;
+            const cards = document.querySelectorAll('.accommodation-card');
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                const status = card.getAttribute('data-status');
+                const active = card.getAttribute('data-active');
+
+                const matchesSearch = !searchTerm || name.includes(searchTerm);
+                const matchesStatus = !statusFilter || status === statusFilter;
+                const matchesActive = !activeFilter || active === activeFilter;
+
+                if (matchesSearch && matchesStatus && matchesActive) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('activeFilter').value = '';
+            filterAccommodations();
+        }
+    </script>
+}
