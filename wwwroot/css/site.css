@@ -1,22 +1,191 @@
-html {
-  font-size: 14px;
+:root {
+    --primary-color: #7e2726;
+    --secondary-color: #f5f5dc;
+    --accent-color: #d4af37;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* Base Styles */
 body {
-  margin-bottom: 60px;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--dark-color);
+    line-height: 1.6;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+}
+
+.section-title {
+    position: relative;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--accent-color);
+}
+
+.section-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+/* Colors */
+.bg-primary-color {
+    background-color: var(--primary-color) !important;
+}
+
+.text-primary-color {
+    color: var(--primary-color) !important;
+}
+
+.btn-primary-color {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary-color:hover {
+    background-color: #6a1f1e;
+    border-color: #6a1f1e;
+    color: white;
+}
+
+.btn-outline-primary-color {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline-primary-color:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.bg-secondary-color {
+    background-color: var(--secondary-color) !important;
+}
+
+.text-secondary-color {
+    color: var(--secondary-color) !important;
+}
+
+.accent-color {
+    color: var(--accent-color) !important;
+}
+
+.bg-accent-color {
+    background-color: var(--accent-color) !important;
+}
+
+.btn-accent-color {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #000;
+    font-weight: 500;
+}
+
+.btn-accent-color:hover {
+    background-color: #c19b2f;
+    border-color: #c19b2f;
+    color: #000;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    height: 90vh;
+    min-height: 600px;
+    background: url('https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.search-box {
+    position: relative;
+    z-index: 1;
+}
+
+/* Feature Cards */
+.feature-card {
+    transition: transform 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    background-color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+/* Accommodation Cards */
+.accommodation-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.accommodation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.accommodation-card img {
+    height: 220px;
+    object-fit: cover;
+}
+
+.accommodation-price {
+    line-height: 1.2;
+}
+
+/* Testimonial Cards */
+.testimonial-card {
+    transition: transform 0.3s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        height: auto;
+        padding: 100px 0;
+    }
+    
+    .search-box {
+        margin-top: 30px;
+    }
+    
+    .section-title:after {
+        width: 60px;
+    }
 }
