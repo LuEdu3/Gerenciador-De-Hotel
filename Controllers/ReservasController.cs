@@ -4,17 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using GerenciadorHotel.Data;
 using GerenciadorHotel.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 
 namespace GerenciadorHotel.Controllers
 {
-     [Authorize]
+    [Authorize]
     public class ReservasController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReservasController(ApplicationDbContext context)
+        public ReservasController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Reservas
@@ -26,6 +29,58 @@ namespace GerenciadorHotel.Controllers
                 .OrderByDescending(r => r.DataReserva)
                 .ToListAsync();
             return View(reservas);
+        }
+
+        // GET: Minhas Reservas (para hóspedes)
+        [Authorize(Roles = "Hospede")]
+        public async Task<IActionResult> MinhasReservas()
+        {
+            var userId = _userManager.GetUserId(User);
+            var reservas = await _context.Reservas
+                .Include(r => r.Acomodacao)
+                .ThenInclude(a => a!.Imagens)
+                .Include(r => r.Pais)
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(r => r.DataReserva)
+                .ToListAsync();
+
+            return View(reservas);
+        }
+
+        // POST: Cancelar Reserva (para hóspedes)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Hospede")]
+        public async Task<IActionResult> CancelarReserva(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var reserva = await _context.Reservas
+                .Include(r => r.Acomodacao)
+                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+
+            if (reserva == null)
+            {
+                return NotFound();
+            }
+
+            if (reserva.Status != StatusReserva.Pendente)
+            {
+                TempData["ErrorMessage"] = "Só é possível cancelar reservas com status 'Pendente'.";
+                return RedirectToAction(nameof(MinhasReservas));
+            }
+
+            // Verificar se a data de check-in não é hoje ou já passou
+            if (reserva.DataCheckIn <= DateTime.Today)
+            {
+                TempData["ErrorMessage"] = "Não é possível cancelar reservas com check-in para hoje ou que já passaram.";
+                return RedirectToAction(nameof(MinhasReservas));
+            }
+
+            reserva.Status = StatusReserva.Cancelada;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Reserva cancelada com sucesso!";
+            return RedirectToAction(nameof(MinhasReservas));
         }
 
         // GET: Reservas/Details/5
@@ -86,14 +141,35 @@ namespace GerenciadorHotel.Controllers
                         reserva.DataReserva = DateTime.Now;
                         reserva.Status = StatusReserva.Pendente;
 
+                        // Associar a reserva ao usuário logado se for um hóspede
+                        if (User.IsInRole("Hospede"))
+                        {
+                            reserva.UserId = _userManager.GetUserId(User);
+                        }
+
                         _context.Add(reserva);
                         await _context.SaveChangesAsync();
+
                         TempData["SuccessMessage"] = "Reserva criada com sucesso!";
-                        return RedirectToAction(nameof(Index));
+
+                        // Redirecionar baseado no role do usuário
+                        if (User.IsInRole("Hospede"))
+                        {
+                            return RedirectToAction(nameof(MinhasReservas));
+                        }
+                        else
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("AcomodacaoId", "Acomodação não encontrada.");
                     }
                 }
             }
 
+            // Se chegou até aqui, há erros no formulário
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome", reserva.AcomodacaoId);
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
             return View(reserva);
@@ -172,7 +248,10 @@ namespace GerenciadorHotel.Controllers
                 reserva.DataCheckInReal = DateTime.Now;
 
                 // Atualizar status da acomodação
-                reserva.Acomodacao.Status = StatusAcomodacao.Ocupada;
+                if (reserva.Acomodacao != null)
+                {
+                    reserva.Acomodacao.Status = StatusAcomodacao.Ocupada;
+                }
 
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Check-in realizado com sucesso!";
@@ -202,7 +281,10 @@ namespace GerenciadorHotel.Controllers
                 reserva.DataCheckOutReal = DateTime.Now;
 
                 // Liberar acomodação
-                reserva.Acomodacao.Status = StatusAcomodacao.Disponivel;
+                if (reserva.Acomodacao != null)
+                {
+                    reserva.Acomodacao.Status = StatusAcomodacao.Disponivel;
+                }
 
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Check-out realizado com sucesso!";
