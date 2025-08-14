@@ -1,4 +1,3 @@
-
 @model GerenciadorHotel.Models.Reserva
 @{
     ViewData["Title"] = "Criar Reserva";
@@ -7,27 +6,30 @@
     .reserva-container {
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
         padding: 32px;
         max-width: 950px;
         margin: 40px auto;
         display: flex;
         flex-wrap: wrap;
     }
+
     .reserva-form {
         flex: 2;
         min-width: 320px;
         margin-right: 32px;
     }
+
     .reserva-resumo {
         flex: 1;
         min-width: 260px;
         background: #fafafa;
         border-radius: 8px;
         padding: 24px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
         height: fit-content;
     }
+
     .btn-checkout {
         background: #2d9cdb;
         color: #fff;
@@ -38,8 +40,33 @@
         margin-top: 16px;
         transition: background 0.2s;
     }
+
     .btn-checkout:hover {
         background: #217dbb;
+    }
+
+    /* Melhorias no select de países */
+    #country-select {
+        height: 45px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+
+    #country-select:focus {
+        border-color: #2d9cdb;
+        box-shadow: 0 0 0 0.2rem rgba(45, 156, 219, 0.25);
+    }
+
+    #country-select option {
+        padding: 8px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
     }
 </style>
 <div class="reserva-container">
@@ -73,7 +100,7 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label asp-for="PaisId" class="form-label"></label>
-                    <select asp-for="PaisId" class="form-select" asp-items="ViewBag.PaisId">
+                    <select asp-for="PaisId" class="form-select" asp-items="ViewBag.PaisId" id="country-select">
                         <option value="">Selecionar País</option>
                     </select>
                     <span asp-validation-for="PaisId" class="text-danger"></span>
@@ -115,7 +142,8 @@
                 <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
             </div>
             <div class="mt-3" style="font-size:0.95em;color:#888;">
-                * Ao finalizar esta reserva, eu reconheço que li e aceito a <a href="#" target="_blank">Política da Propriedade</a>.
+                * Ao finalizar esta reserva, eu reconheço que li e aceito a <a href="#" target="_blank">Política da
+                    Propriedade</a>.
             </div>
         </form>
     </div>
@@ -123,9 +151,11 @@
         <h5 class="mb-3">Resumo Da Reserva</h5>
         @if (ViewBag.AcomodacaoSelecionada != null)
         {
-            <img src="@ViewBag.AcomodacaoSelecionada.ImagemPrincipalUrl" alt="Imagem da acomodação" class="img-fluid rounded mb-3" style="max-height:160px;object-fit:cover;" />
+            <img src="@ViewBag.AcomodacaoSelecionada.ImagemPrincipalUrl" alt="Imagem da acomodação"
+                class="img-fluid rounded mb-3" style="max-height:160px;object-fit:cover;" />
             <div><strong>Tipo de Acomodação:</strong> @ViewBag.AcomodacaoSelecionada.Nome</div>
-            <div><strong>Datas:</strong> @Model.DataCheckIn.ToString("dd/MM/yyyy") - @Model.DataCheckOut.ToString("dd/MM/yyyy")</div>
+            <div><strong>Datas:</strong> @Model.DataCheckIn.ToString("dd/MM/yyyy") -
+                @Model.DataCheckOut.ToString("dd/MM/yyyy")</div>
             <div><strong>Nº de noites:</strong> @Model.QuantidadeNoites</div>
             <div><strong>Hóspedes:</strong> @Model.NumeroHospedes</div>
             <hr />
@@ -140,5 +170,29 @@
     </div>
 </div>
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            // Adicionar filtro de busca no select de países
+            var countriesSelect = $('#country-select');
+
+            // Melhorar a usabilidade do select de países
+            countriesSelect.on('change', function () {
+                var selectedText = $(this).find('option:selected').text();
+                console.log('País selecionado:', selectedText);
+            });
+
+            // Destacar Brasil como primeira opção
+            var brasilOption = countriesSelect.find('option').filter(function () {
+                return $(this).text().toLowerCase().includes('brasil');
+            });
+
+            if (brasilOption.length > 0) {
+                brasilOption.remove();
+                countriesSelect.find('option:first').after(brasilOption);
+            }
+        });
+    </script>
 }
