@@ -204,45 +204,59 @@ namespace GerenciadorHotel.Controllers
 
             if (ModelState.IsValid)
             {
-                // Atualiza apenas os campos permitidos
-                reservaOriginal.NomeHospede = reserva.NomeHospede;
-                reservaOriginal.SobrenomeHospede = reserva.SobrenomeHospede;
-                reservaOriginal.Email = reserva.Email;
-                reservaOriginal.Telefone = reserva.Telefone;
-                reservaOriginal.DataCheckIn = reserva.DataCheckIn;
-                reservaOriginal.DataCheckOut = reserva.DataCheckOut;
-                reservaOriginal.NumeroHospedes = reserva.NumeroHospedes;
-                reservaOriginal.PedidosEspeciais = reserva.PedidosEspeciais;
-                reservaOriginal.Status = reserva.Status;
-                reservaOriginal.ValorTotal = reserva.ValorTotal;
-                reservaOriginal.DataReserva = reserva.DataReserva;
-                reservaOriginal.DataCheckInReal = reserva.DataCheckInReal;
-                reservaOriginal.DataCheckOutReal = reserva.DataCheckOutReal;
-                reservaOriginal.Observacoes = reserva.Observacoes;
-                reservaOriginal.AcomodacaoId = reserva.AcomodacaoId;
-                reservaOriginal.PaisId = reserva.PaisId;
+                // Validação de conflito de datas (ignora a própria reserva)
+                var conflito = await _context.Reservas
+                    .Where(r => r.AcomodacaoId == reserva.AcomodacaoId && r.Id != reserva.Id && r.Status != StatusReserva.Cancelada)
+                    .Where(r =>
+                        (reserva.DataCheckIn < r.DataCheckOut && reserva.DataCheckOut > r.DataCheckIn)
+                    )
+                    .AnyAsync();
+                if (conflito)
+                {
+                    ModelState.AddModelError("AcomodacaoId", "Já existe uma reserva para este quarto no período selecionado. Escolha outra acomodação ou datas.");
+                }
+                else
+                {
+                    // Atualiza apenas os campos permitidos
+                    reservaOriginal.NomeHospede = reserva.NomeHospede;
+                    reservaOriginal.SobrenomeHospede = reserva.SobrenomeHospede;
+                    reservaOriginal.Email = reserva.Email;
+                    reservaOriginal.Telefone = reserva.Telefone;
+                    reservaOriginal.DataCheckIn = reserva.DataCheckIn;
+                    reservaOriginal.DataCheckOut = reserva.DataCheckOut;
+                    reservaOriginal.NumeroHospedes = reserva.NumeroHospedes;
+                    reservaOriginal.PedidosEspeciais = reserva.PedidosEspeciais;
+                    reservaOriginal.Status = reserva.Status;
+                    reservaOriginal.ValorTotal = reserva.ValorTotal;
+                    reservaOriginal.DataReserva = reserva.DataReserva;
+                    reservaOriginal.DataCheckInReal = reserva.DataCheckInReal;
+                    reservaOriginal.DataCheckOutReal = reserva.DataCheckOutReal;
+                    reservaOriginal.Observacoes = reserva.Observacoes;
+                    reservaOriginal.AcomodacaoId = reserva.AcomodacaoId;
+                    reservaOriginal.PaisId = reserva.PaisId;
 
-                try
-                {
-                    _context.Update(reservaOriginal);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Reserva atualizada com sucesso!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ReservaExists(reservaOriginal.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(reservaOriginal);
+                        await _context.SaveChangesAsync();
+                        TempData["SuccessMessage"] = "Reserva atualizada com sucesso!";
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!ReservaExists(reservaOriginal.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    // Redireciona para MinhasReservas se hóspede
+                    if (User.IsInRole("Hospede"))
+                        return RedirectToAction("MinhasReservas");
+                    return RedirectToAction(nameof(Index));
                 }
-                // Redireciona para MinhasReservas se hóspede
-                if (User.IsInRole("Hospede"))
-                    return RedirectToAction("MinhasReservas");
-                return RedirectToAction(nameof(Index));
             }
 
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa), "Id", "Nome", reserva.AcomodacaoId);
