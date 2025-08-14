@@ -68,6 +68,34 @@ namespace GerenciadorHotel.Controllers
         {
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome");
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome");
+
+            // Buscar datas ocupadas por acomodação
+            var reservas = _context.Reservas
+                .Where(r => r.Status != StatusReserva.Cancelada)
+                .Select(r => new {
+                    r.AcomodacaoId,
+                    r.DataCheckIn,
+                    r.DataCheckOut
+                })
+                .ToList();
+
+            // Agrupar por acomodação
+            var datasOcupadasPorAcomodacao = reservas
+                .GroupBy(r => r.AcomodacaoId)
+                .ToDictionary(g => g.Key, g => g.Select(r => new { inicio = r.DataCheckIn, fim = r.DataCheckOut }).ToList());
+            
+                // LOG TEMPORÁRIO PARA DEBUG
+                System.Diagnostics.Debug.WriteLine("[DEBUG] Datas ocupadas por acomodação:");
+                foreach (var kvp in datasOcupadasPorAcomodacao)
+                {
+                    System.Diagnostics.Debug.WriteLine($"AcomodacaoId: {kvp.Key}");
+                    foreach (var intervalo in kvp.Value)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"  Início: {intervalo.inicio}, Fim: {intervalo.fim}");
+                    }
+                }
+
+            ViewBag.DatasOcupadasPorAcomodacao = datasOcupadasPorAcomodacao;
             return View();
         }
 
@@ -172,6 +200,22 @@ namespace GerenciadorHotel.Controllers
 
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa), "Id", "Nome", reserva.AcomodacaoId);
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
+
+            // Buscar datas ocupadas por acomodação (ignora a própria reserva)
+            var reservas = _context.Reservas
+                .Where(r => r.Status != StatusReserva.Cancelada && r.Id != reserva.Id)
+                .Select(r => new {
+                    r.AcomodacaoId,
+                    r.DataCheckIn,
+                    r.DataCheckOut
+                })
+                .ToList();
+
+            var datasOcupadasPorAcomodacao = reservas
+                .GroupBy(r => r.AcomodacaoId)
+                .ToDictionary(g => g.Key, g => g.Select(r => new { inicio = r.DataCheckIn, fim = r.DataCheckOut }).ToList());
+
+            ViewBag.DatasOcupadasPorAcomodacao = datasOcupadasPorAcomodacao;
             return View(reserva);
         }
 

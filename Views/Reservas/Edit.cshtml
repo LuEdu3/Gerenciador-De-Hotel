@@ -42,12 +42,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="DataCheckIn" class="control-label"></label>
-                <input asp-for="DataCheckIn" class="form-control" type="date" />
+                <input asp-for="DataCheckIn" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="DataCheckIn" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DataCheckOut" class="control-label"></label>
-                <input asp-for="DataCheckOut" class="form-control" type="date" />
+                <input asp-for="DataCheckOut" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="DataCheckOut" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -96,4 +96,59 @@
 </form>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            var datasOcupadasPorAcomodacao = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.DatasOcupadasPorAcomodacao ?? new Dictionary<int, object>()));
+            var acomodacaoSelect = $('select[name="AcomodacaoId"]');
+            var checkInInput = $('input[name="DataCheckIn"]');
+            var checkOutInput = $('input[name="DataCheckOut"]');
+
+            function bloquearDatas(acomodacaoId) {
+                checkInInput.removeAttr('disabled');
+                checkOutInput.removeAttr('disabled');
+                checkInInput.find('option').removeAttr('disabled');
+                checkOutInput.find('option').removeAttr('disabled');
+
+                var datas = datasOcupadasPorAcomodacao[acomodacaoId];
+                if (!datas) return;
+
+                var hoje = new Date();
+                checkInInput[0].min = hoje.toISOString().split('T')[0];
+                checkOutInput[0].min = hoje.toISOString().split('T')[0];
+
+                checkInInput.off('input').on('input', function () {
+                    var dataSelecionada = new Date(this.value);
+                    for (var i = 0; i < datas.length; i++) {
+                        var inicio = new Date(datas[i].inicio);
+                        var fim = new Date(datas[i].fim);
+                        if (dataSelecionada >= inicio && dataSelecionada < fim) {
+                            this.setCustomValidity('Esta data está ocupada para esta acomodação.');
+                            return;
+                        }
+                    }
+                    this.setCustomValidity('');
+                });
+                checkOutInput.off('input').on('input', function () {
+                    var dataSelecionada = new Date(this.value);
+                    for (var i = 0; i < datas.length; i++) {
+                        var inicio = new Date(datas[i].inicio);
+                        var fim = new Date(datas[i].fim);
+                        if (dataSelecionada > inicio && dataSelecionada <= fim) {
+                            this.setCustomValidity('Esta data está ocupada para esta acomodação.');
+                            return;
+                        }
+                    }
+                    this.setCustomValidity('');
+                });
+            }
+
+            acomodacaoSelect.on('change', function () {
+                var acomodacaoId = $(this).val();
+                bloquearDatas(acomodacaoId);
+            });
+
+            var inicialId = acomodacaoSelect.val();
+            if (inicialId) bloquearDatas(inicialId);
+        });
+    </script>
 }

@@ -121,12 +121,12 @@
                 </div>
                 <div class="col-md-3">
                     <label asp-for="DataCheckIn" class="form-label"></label>
-                    <input asp-for="DataCheckIn" class="form-control" type="date" />
+                    <input asp-for="DataCheckIn" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                     <span asp-validation-for="DataCheckIn" class="text-danger"></span>
                 </div>
                 <div class="col-md-3">
                     <label asp-for="DataCheckOut" class="form-label"></label>
-                    <input asp-for="DataCheckOut" class="form-control" type="date" />
+                    <input asp-for="DataCheckOut" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                     <span asp-validation-for="DataCheckOut" class="text-danger"></span>
                 </div>
             </div>
@@ -193,6 +193,73 @@
                 brasilOption.remove();
                 countriesSelect.find('option:first').after(brasilOption);
             }
+
+            // Bloquear datas ocupadas no calendário
+                var datasOcupadasPorAcomodacao = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.DatasOcupadasPorAcomodacao ?? new Dictionary<int, object>()));
+                console.log('Datas ocupadas recebidas:', datasOcupadasPorAcomodacao);
+            var acomodacaoSelect = $('select[name="AcomodacaoId"]');
+            var checkInInput = $('input[name="DataCheckIn"]');
+            var checkOutInput = $('input[name="DataCheckOut"]');
+
+            function bloquearDatas(acomodacaoId) {
+                    var datas = datasOcupadasPorAcomodacao[acomodacaoId];
+                    if (!datas) return;
+
+                    var hoje = new Date();
+                    checkInInput[0].min = hoje.toISOString().split('T')[0];
+                    checkOutInput[0].min = hoje.toISOString().split('T')[0];
+
+                    // Bloqueio visual: desabilitar datas ocupadas
+                    // Para cada intervalo ocupado, criar um array de todas as datas ocupadas
+                    var datasBloqueadas = [];
+                    datas.forEach(function(intervalo) {
+                        var inicio = new Date(intervalo.inicio);
+                        var fim = new Date(intervalo.fim);
+                        for (var d = new Date(inicio); d <= fim; d.setDate(d.getDate() + 1)) {
+                            datasBloqueadas.push(d.toISOString().split('T')[0]);
+                        }
+                    });
+
+                    // Desabilitar datas ocupadas visualmente
+                    checkInInput.off('input').on('input', function () {
+                        var dataSelecionada = this.value;
+                        if (datasBloqueadas.includes(dataSelecionada)) {
+                            this.setCustomValidity('Esta data está ocupada para esta acomodação.');
+                        } else {
+                            this.setCustomValidity('');
+                        }
+                    });
+                    checkOutInput.off('input').on('input', function () {
+                        var dataSelecionada = this.value;
+                        if (datasBloqueadas.includes(dataSelecionada)) {
+                            this.setCustomValidity('Esta data está ocupada para esta acomodação.');
+                        } else {
+                            this.setCustomValidity('');
+                        }
+                    });
+                    // Bloqueio visual: impedir seleção manualmente
+                    checkInInput.off('keydown').on('keydown', function (e) {
+                        var valor = this.value;
+                        if (datasBloqueadas.includes(valor)) {
+                            e.preventDefault();
+                        }
+                    });
+                    checkOutInput.off('keydown').on('keydown', function (e) {
+                        var valor = this.value;
+                        if (datasBloqueadas.includes(valor)) {
+                            e.preventDefault();
+                        }
+                    });
+            }
+
+            acomodacaoSelect.on('change', function () {
+                var acomodacaoId = $(this).val();
+                bloquearDatas(acomodacaoId);
+            });
+
+            // Inicializar bloqueio se já houver acomodação selecionada
+            var inicialId = acomodacaoSelect.val();
+            if (inicialId) bloquearDatas(inicialId);
         });
     </script>
 }
