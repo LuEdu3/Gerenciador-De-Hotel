@@ -80,7 +80,7 @@ namespace GerenciadorHotel.Services
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
-            await SeedPaises(context);a
+            await SeedPaises(context);
         }
 
         private static async Task SeedPaises(ApplicationDbContext context)
