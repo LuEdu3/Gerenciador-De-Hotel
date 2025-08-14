@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GerenciadorHotel.Controllers
 {
-    [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
+    [Authorize]
     public class ReservasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,6 +18,7 @@ namespace GerenciadorHotel.Controllers
         }
 
     // GET: Reservas
+    [Authorize(Roles = "Administrador,Recepcionista")]
     public async Task<IActionResult> Index()
         {
             var reservas = await _context.Reservas
@@ -29,6 +30,7 @@ namespace GerenciadorHotel.Controllers
         }
 
         // GET: Reservas/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,6 +47,16 @@ namespace GerenciadorHotel.Controllers
             if (reserva == null)
             {
                 return NotFound();
+            }
+
+            // Se for hóspede, só pode acessar detalhes da própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
             }
 
             return View(reserva);
@@ -134,6 +146,7 @@ namespace GerenciadorHotel.Controllers
         }
 
         // GET: Reservas/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -147,6 +160,16 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
+            // Se for hóspede, só pode editar a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa), "Id", "Nome", reserva.AcomodacaoId);
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
             return View(reserva);
@@ -155,6 +178,7 @@ namespace GerenciadorHotel.Controllers
         // POST: Reservas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Id,NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,Status,ValorTotal,DataReserva,DataCheckInReal,DataCheckOutReal,Observacoes,AcomodacaoId,PaisId")] Reserva reserva)
         {
             if (id != reserva.Id)
@@ -162,17 +186,51 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
+            var reservaOriginal = await _context.Reservas.FindAsync(id);
+            if (reservaOriginal == null)
+            {
+                return NotFound();
+            }
+
+            // Se for hóspede, só pode editar a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reservaOriginal.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             if (ModelState.IsValid)
             {
+                // Atualiza apenas os campos permitidos
+                reservaOriginal.NomeHospede = reserva.NomeHospede;
+                reservaOriginal.SobrenomeHospede = reserva.SobrenomeHospede;
+                reservaOriginal.Email = reserva.Email;
+                reservaOriginal.Telefone = reserva.Telefone;
+                reservaOriginal.DataCheckIn = reserva.DataCheckIn;
+                reservaOriginal.DataCheckOut = reserva.DataCheckOut;
+                reservaOriginal.NumeroHospedes = reserva.NumeroHospedes;
+                reservaOriginal.PedidosEspeciais = reserva.PedidosEspeciais;
+                reservaOriginal.Status = reserva.Status;
+                reservaOriginal.ValorTotal = reserva.ValorTotal;
+                reservaOriginal.DataReserva = reserva.DataReserva;
+                reservaOriginal.DataCheckInReal = reserva.DataCheckInReal;
+                reservaOriginal.DataCheckOutReal = reserva.DataCheckOutReal;
+                reservaOriginal.Observacoes = reserva.Observacoes;
+                reservaOriginal.AcomodacaoId = reserva.AcomodacaoId;
+                reservaOriginal.PaisId = reserva.PaisId;
+
                 try
                 {
-                    _context.Update(reserva);
+                    _context.Update(reservaOriginal);
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "Reserva atualizada com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ReservaExists(reserva.Id))
+                    if (!ReservaExists(reservaOriginal.Id))
                     {
                         return NotFound();
                     }
@@ -181,6 +239,9 @@ namespace GerenciadorHotel.Controllers
                         throw;
                     }
                 }
+                // Redireciona para MinhasReservas se hóspede
+                if (User.IsInRole("Hospede"))
+                    return RedirectToAction("MinhasReservas");
                 return RedirectToAction(nameof(Index));
             }
 
@@ -256,7 +317,7 @@ namespace GerenciadorHotel.Controllers
         }
 
         // GET: Reservas/Delete/5
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -273,23 +334,48 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
+            // Se for hóspede, só pode excluir a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             return View(reserva);
         }
 
         // POST: Reservas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var reserva = await _context.Reservas.FindAsync(id);
-            if (reserva != null)
+            if (reserva == null)
             {
-                _context.Reservas.Remove(reserva);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Reserva excluída com sucesso!";
+                return NotFound();
             }
 
+            // Se for hóspede, só pode excluir a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
+            _context.Reservas.Remove(reserva);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Reserva excluída com sucesso!";
+
+            // Redireciona para MinhasReservas se hóspede
+            if (User.IsInRole("Hospede"))
+                return RedirectToAction("MinhasReservas");
             return RedirectToAction(nameof(Index));
         }
 

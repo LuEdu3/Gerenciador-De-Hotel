@@ -80,7 +80,18 @@
     </div>
     <div class="form-group mt-3">
         <button type="submit" class="btn btn-primary">Salvar</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        @if (User.IsInRole("Hospede"))
+        {
+            <a asp-action="MinhasReservas" class="btn btn-secondary">Cancelar</a>
+            <a asp-action="MinhasReservas" class="btn btn-outline-dark ms-2">Voltar</a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger ms-2" onclick="return confirm('Tem certeza que deseja excluir esta reserva?');">Excluir</button>
+            </form>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        }
     </div>
 </form>
 @section Scripts {
