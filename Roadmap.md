@@ -56,7 +56,7 @@
 - Associação de país ao hóspede/reserva
 
 ### 7. Relatórios
-- Relatório de ocupação
+- ✅Relatório de ocupação
 - Relatório financeiro
 - Relatório de hóspedes
 
