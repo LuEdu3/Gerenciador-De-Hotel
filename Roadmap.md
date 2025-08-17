@@ -29,12 +29,17 @@
 - Mínimo de noites
 - Status da acomodação
 
-### 4. Amenidades
-- Cadastro/edição/exclusão de amenidades
-- Associação de amenidades às acomodações
-- Imagens de amenidades
+### 4. Amenidades ✅ **IMPLEMENTADO**
+- ✅ Sistema de amenidades fixas (8 amenidades pré-definidas)
+- ✅ Associação de amenidades às acomodações
+- ✅ Integração com formulários de acomodação
 
-### 5. Reservas ✅ **IMPLEMENTADO**
+### 5. Países ✅ **IMPLEMENTADO**
+- ✅ Base de dados de países pré-carregada no sistema
+- ✅ Associação automática de país às reservas
+- ✅ Sistema de seed otimizado (preserva dados existentes)
+
+### 6. Reservas ✅ **IMPLEMENTADO**
 - ✅ Criar/editar/excluir reservas
 - ✅ Dados do hóspede (nome, sobrenome, email, telefone)
 - ✅ Pedidos especiais
@@ -55,10 +60,6 @@
 - ✅ **Check-in/Check-out**: Sistema completo com atualização automática do status da acomodação
 - ✅ **Autorização por Perfil**: Hóspedes só podem ver/editar/cancelar suas próprias reservas
 
-### 6. Países
-- Cadastro/edição/exclusão de países
-- Associação de país ao hóspede/reserva
-
 ### 7. Relatórios
 - ✅Relatório de ocupação
 - Relatório financeiro
@@ -78,31 +79,6 @@
 
 ---
 
-## 🔧 Melhorias Prioritárias Identificadas
-
-### 🔒 Segurança e Autorização
-1. **Restrição de Acesso a Endpoints**
-   - **Problema**: Hóspedes podem acessar `/Reservas` (listagem geral)
-   - **Solução**: Adicionar `[Authorize(Roles = "Administrador,Recepcionista")]` na action `Index`
-   - **Manter**: Acesso livre ao `/Reservas/MinhasReservas` para hóspedes
-
-### 📅 Validação de Reservas
-2. **Conflitos de Reservas**
-   - **Problema**: Sistema permite reservas sobrepostas para a mesma acomodação
-   - **Impacto**: Duas pessoas podem reservar o mesmo quarto no mesmo período
-   - **Solução Necessária**: 
-     - Verificar conflitos de datas antes de confirmar reserva
-     - Considerar apenas reservas ativas (não canceladas)
-     - Implementar bloqueio durante o processo de reserva
-
-### 🎯 Regras de Negócio
-3. **Estados de Reserva**
-   - **Implementado**: Sistema de cancelamento para hóspedes
-   - **Funcional**: Administradores e recepcionistas podem gerenciar todas as reservas
-   - **Validação**: Reservas canceladas liberam automaticamente a acomodação
-
----
-
 ## Progresso
 
 - [x] Estrutura inicial do projeto ASP.NET MVC 8.0
@@ -114,18 +90,18 @@
 - [x] Controllers com autorização por roles
 - [x] Dashboard com controle de acesso
 - [x] Cadastro e gestão de acomodações (CRUD completo com views modernas)
+- [x] Sistema de amenidades fixas e associação com acomodações
+- [x] Gestão de países (sistema de seed otimizado e base pré-carregada)
 - [x] Sistema de reservas completo (com "Minhas Reservas" para hóspedes)
 - [x] Restrição de acesso de hóspedes ao endpoint `/Reservas` (segurança implementada)
 - [x] Validação de conflitos de reservas por acomodação/período (bloqueio de sobreposição)
 - [x] Check-in e check-out (com atualização automática do status da acomodação)
-- [ ] Cadastro e associação de amenidades
-- [ ] Gestão de países
 - [ ] Relatórios financeiros e de hóspedes
 - [ ] Painel administrativo avançado
 - [ ] Interface responsiva com Bootstrap (melhorias adicionais)
 - [ ] Integração com pagamentos
 
-### Progresso Atual: 72% concluído
+### Progresso Atual: 83% concluído
 
 > O progresso é calculado automaticamente com base nas tarefas marcadas como concluídas.
 
