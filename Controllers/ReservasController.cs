@@ -18,9 +18,21 @@ namespace GerenciadorHotel.Controllers
         }
 
     // GET: Reservas
-    [Authorize(Roles = "Administrador,Recepcionista")]
+    [Authorize] // Permite qualquer usuário autenticado
     public async Task<IActionResult> Index()
         {
+            // Se hóspede tentar acessar, redireciona para suas próprias reservas
+            if (User.IsInRole("Hospede"))
+            {
+                return RedirectToAction("MinhasReservas");
+            }
+
+            // Apenas admins e recepcionistas chegam aqui
+            if (!User.IsInRole("Administrador") && !User.IsInRole("Recepcionista"))
+            {
+                return Forbid();
+            }
+
             var reservas = await _context.Reservas
                 .Include(r => r.Acomodacao)
                 .Include(r => r.Pais)
