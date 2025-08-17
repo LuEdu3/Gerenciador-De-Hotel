@@ -43,13 +43,17 @@
 - ✅ Cancelamento de reservas por hóspedes
 - ✅ Visualização de histórico de reservas
 - ✅ Estados visuais por status da reserva
-- ✅ Validação de disponibilidade de quartos
+- ✅ Validação de disponibilidade de quartos (bloqueio de conflitos)
 - ✅ Cálculo automático de valor total
 - ✅ Associação automática de reservas ao usuário logado
+- ✅ Check-in/check-out com atualização automática do status da acomodação
+- ✅ Autorização: hóspedes restritos às próprias reservas
 
-**⚠️ PENDÊNCIAS IMPORTANTES:**
-- 🔒 **Segurança**: Restringir acesso de hóspedes ao endpoint `/Reservas` (mantendo acesso apenas ao `/Reservas/MinhasReservas`)
-- 🚫 **Validação de Conflitos**: Implementar verificação para impedir reservas sobrepostas do mesmo quarto (só permitir se reserva anterior foi cancelada)
+**✅ FUNCIONALIDADES COMPLETAS:**
+- ✅ **Segurança**: Acesso de hóspedes restrito ao endpoint `/Reservas` (mantendo acesso apenas ao `/Reservas/MinhasReservas`)
+- ✅ **Validação de Conflitos**: Verificação implementada para impedir reservas sobrepostas do mesmo quarto (ignora reservas canceladas)
+- ✅ **Check-in/Check-out**: Sistema completo com atualização automática do status da acomodação
+- ✅ **Autorização por Perfil**: Hóspedes só podem ver/editar/cancelar suas próprias reservas
 
 ### 6. Países
 - Cadastro/edição/exclusão de países
@@ -111,17 +115,17 @@
 - [x] Dashboard com controle de acesso
 - [x] Cadastro e gestão de acomodações (CRUD completo com views modernas)
 - [x] Sistema de reservas completo (com "Minhas Reservas" para hóspedes)
-- [ ] **PRIORIDADE**: Restrição de acesso de hóspedes ao endpoint `/Reservas`
-- [ ] **PRIORIDADE**: Validação de conflitos de reservas por acomodação/período
+- [x] Restrição de acesso de hóspedes ao endpoint `/Reservas` (segurança implementada)
+- [x] Validação de conflitos de reservas por acomodação/período (bloqueio de sobreposição)
+- [x] Check-in e check-out (com atualização automática do status da acomodação)
 - [ ] Cadastro e associação de amenidades
 - [ ] Gestão de países
-- [ ] Check-in e check-out
-- [ ] Relatórios
-- [ ] Painel administrativo
-- [ ] Interface responsiva com Bootstrap
+- [ ] Relatórios financeiros e de hóspedes
+- [ ] Painel administrativo avançado
+- [ ] Interface responsiva com Bootstrap (melhorias adicionais)
 - [ ] Integração com pagamentos
 
-### Progresso Atual: 67% concluído
+### Progresso Atual: 72% concluído
 
 > O progresso é calculado automaticamente com base nas tarefas marcadas como concluídas.
 
