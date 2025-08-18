@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     <!-- Header -->
     <!-- Cabeçalho Moderno -->
     <header class="header-modern py-3">
@@ -110,20 +110,96 @@
         </div>
     </header>
 
-    <div class="container-fluid p-0">
+    <div class="container-fluid p-0 flex-grow-1">
         <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted bg-light">
-        <div class="container py-3">
-            <div class="row">
-                <div class="col-md-6">
-                    &copy; 2025 - Sistema de Gerenciamento de Hotel
+    <footer class="footer-section bg-dark text-white pt-5 pb-4 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Logo e Sobre -->
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <div class="footer-brand d-flex align-items-center mb-3">
+                        <h2 class="navbar-brand-modern m-0">Sereno<span>Hotel</span></h2>
+                    </div>
+                    <p class="mb-3">O Sereno Hotel oferece uma experiência única de hospedagem, combinando luxo contemporâneo com um serviço personalizado e atenção aos detalhes.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-tripadvisor"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-6 text-end">
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Política de Privacidade</a>
+                <!-- Links Rápidos -->
+                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Acomodações</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Serviços</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Galeria</a></li>
+                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Contato</a></li>
+                    </ul>
+                </div>
+                <!-- Contato -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Contato</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-map-marker-alt me-3" style="color: var(--accent-color);"></i>
+                            <span>Av. Beira Mar, 1234 - Praia do Sereno, BR</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-phone me-3" style="color: var(--accent-color);"></i>
+                            <span>+55 (48) 3333-4444</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-envelope me-3" style="color: var(--accent-color);"></i>
+                            <span>contato@serenohotel.com</span>
+                        </li>
+                        <li class="d-flex">
+                            <i class="fas fa-clock me-3" style="color: var(--accent-color);"></i>
+                            <span>24h por dia, 7 dias por semana</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Newsletter -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Newsletter</h5>
+                    <p class="mb-3">Assine nossa newsletter para receber ofertas exclusivas e novidades.</p>
+                    <form class="mb-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Seu e-mail" aria-label="Seu e-mail">
+                            <button class="btn btn-accent" type="submit">Assinar</button>
+                        </div>
+                    </form>
+                    <div class="payment-methods">
+                        <p class="small mb-2">Métodos de pagamento:</p>
+                        <div class="d-flex flex-wrap">
+                            <i class="fab fa-cc-visa fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                            <i class="fab fa-cc-mastercard fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                            <i class="fab fa-cc-amex fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                            <i class="fab fa-cc-paypal fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <!-- Rodapé inferior -->
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="small mb-0">&copy; 2023 Sereno Hotel. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <ul class="list-inline small mb-0">
+                        <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Política de Privacidade</a></li>
+                        <li class="list-inline-item mx-2">•</li>
+                        <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Termos de Uso</a></li>
+                        <li class="list-inline-item mx-2">•</li>
+                        <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Mapa do Site</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
