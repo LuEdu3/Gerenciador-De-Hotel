@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using GerenciadorHotel.Models;
 using System.Linq;
-using GerenciadorHotel.Data; // Adicione este using
+using GerenciadorHotel.Data; 
 
 namespace GerenciadorHotel.Controllers
 {
@@ -32,6 +32,25 @@ namespace GerenciadorHotel.Controllers
                 QuartosDisponiveis = quartosDisponiveis,
                 TaxaOcupacao = taxaOcupacao,
                 ReservasAtivas = reservasAtivas
+            };
+
+            return View(modelo);
+        }
+
+        public IActionResult Financeiro()
+        {
+            var reservasPagas = _context.Reservas
+                .Where(r => r.Status == StatusReserva.Confirmada || r.Status == StatusReserva.CheckInRealizado)
+                .ToList();
+
+            var totalReceita = reservasPagas.Sum(r => r.ValorTotal);
+            var totalReservas = reservasPagas.Count;
+
+            var modelo = new RelatorioFinanceiroViewModel
+            {
+                TotalReceita = totalReceita,
+                TotalReservas = totalReservas,
+                Reservas = reservasPagas
             };
 
             return View(modelo);
