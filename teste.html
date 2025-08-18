@@ -496,6 +496,153 @@
         justify-content: center;
     }
 }
+.login-modal .modal-content {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .login-modal .modal-header {
+            border-bottom: none;
+            padding: 2rem 2rem 0;
+            position: relative;
+        }
+        
+        .login-modal .btn-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .login-modal .modal-body {
+            padding: 0 2rem 2rem;
+        }
+        
+        .login-tabs .nav-link {
+            color: var(--dark-gray);
+            font-weight: 500;
+            border: none;
+            padding: 1rem 1.5rem;
+            position: relative;
+            margin-right: 0.5rem;
+        }
+        
+        .login-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: transparent;
+        }
+        
+        .login-tabs .nav-link.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+        
+        .login-form .form-control {
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #ddd;
+        }
+        
+        .login-form .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+        }
+        
+        .login-form .btn-login {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            font-weight: 600;
+            width: 100%;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .login-form .btn-login:hover {
+            background-color: #6a1f1e;
+        }
+        
+        .login-divider {
+            position: relative;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .login-divider:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #eee;
+            z-index: 1;
+        }
+        
+        .login-divider span {
+            position: relative;
+            z-index: 2;
+            background-color: white;
+            padding: 0 1rem;
+            color: var(--dark-gray);
+        }
+        
+        .social-login .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .social-login .btn i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .btn-google {
+            background-color: #fff;
+            color: #4285F4;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-google:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-facebook {
+            background-color: #3b5998;
+            color: white;
+        }
+        
+        .btn-facebook:hover {
+            background-color: #344e86;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .forgot-password a {
+            color: var(--dark-gray);
+            text-decoration: none;
+        }
+        
+        .forgot-password a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -552,7 +699,93 @@
             </nav>
         </div>
     </header>
-
+    <!-- Modal de Login -->
+    <div class="modal fade login-modal" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Acesse sua conta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs login-tabs mb-4" id="loginTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">Cadastre-se</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="loginTabsContent">
+                        <!-- Aba de Login -->
+                        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                            <form class="login-form">
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" id="loginEmail" placeholder="E-mail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" id="loginPassword" placeholder="Senha" required>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Lembrar-me</label>
+                                </div>
+                                <button type="submit" class="btn btn-login">Entrar</button>
+                                
+                                <div class="login-divider">
+                                    <span>ou</span>
+                                </div>
+                                
+                                <div class="social-login">
+                                    <button type="button" class="btn btn-google">
+                                        <i class="fab fa-google"></i> Continuar com Google
+                                    </button>
+                                    <button type="button" class="btn btn-facebook">
+                                        <i class="fab fa-facebook-f"></i> Continuar com Facebook
+                                    </button>
+                                </div>
+                                
+                                <div class="forgot-password">
+                                    <a href="#">Esqueceu sua senha?</a>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Aba de Cadastro -->
+                        <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+                            <form class="login-form">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <input type="text" class="form-control" id="firstName" placeholder="Nome" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <input type="text" class="form-control" id="lastName" placeholder="Sobrenome" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" id="registerEmail" placeholder="E-mail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" id="registerPassword" placeholder="Senha" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmar Senha" required>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                    <label class="form-check-label" for="agreeTerms">
+                                        Eu concordo com os <a href="#" class="text-decoration-none">Termos de Serviço</a> e <a href="#" class="text-decoration-none">Política de Privacidade</a>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-login">Cadastrar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Hero Section Moderna -->
     <section class="hero-modern">
         <div class="container">

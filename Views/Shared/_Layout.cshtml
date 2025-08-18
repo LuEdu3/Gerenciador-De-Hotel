@@ -45,23 +45,47 @@
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            @* Usuário logado: botão de logout *@
                             <li class="nav-item d-none d-lg-block">
                                 <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-header">Sair</button>
                                 </form>
                             </li>
+                            <li class="nav-item d-none d-lg-block">
+                                <a href="#" class="btn btn-header btn-header-accent">Reservar</a>
+                            </li>
                         }
                         else
                         {
-                            @* Não logado: botão de login *@
                             <li class="nav-item d-none d-lg-block">
                                 <a class="btn btn-header" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            </li>
+                            <li class="nav-item d-none d-lg-block">
+                                <a href="#" class="btn btn-header btn-header-accent">Reservar</a>
+                            </li>
+                        }
+                        <!-- Botões para mobile -->
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item d-lg-none">
+                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link nav-link-modern">Sair</button>
+                                </form>
+                            </li>
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link nav-link-modern" href="#">Reservar</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link nav-link-modern" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            </li>
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link nav-link-modern" href="#">Reservar</a>
                             </li>
                         }
                         @if (User.IsInRole("Administrador"))
                         {
-                            @* Adiciona opções extras para o administrador *@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">Administração</a>
@@ -77,6 +101,10 @@
                             </li>
                         }
                     </ul>
+                </div>
+                <!-- Ícone de usuário para login (desktop) -->
+                <div class="d-flex align-items-center ms-3 d-none d-lg-block">
+                    <i class="bi bi-person user-icon" data-bs-toggle="modal" data-bs-target="#loginModal"></i>
                 </div>
             </nav>
         </div>
