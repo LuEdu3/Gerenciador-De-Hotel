@@ -14,65 +14,56 @@
 
 <body>
     <!-- Header -->
-    <header class="sticky-top">
-        <nav class="navbar navbar-expand-lg custom-navbar navbar-dark">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="https://static.wixstatic.com/media/b87f83_9f4625b043a944daaf5fddefc7d73d0e~mv2.png/v1/fill/w_80,h_80,al_c,q_85,enc_avif,quality_auto/logo-pousada-quinta-do-ypua.png" alt="Logo Quinta do Ypuã" style="height:48px; margin-right:12px;">
-                    <span class="fw-bold">Quinta do Ypuã</span>
+    <!-- Cabeçalho Moderno -->
+    <header class="header-modern py-3">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light p-0">
+                <a class="navbar-brand navbar-brand-modern" asp-area="" asp-controller="Home" asp-action="Index">
+                    Sereno<span>Hotel</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="navbar-toggler-modern" type="button" data-bs-toggle="collapse" data-bs-target="#navbarModern"
+                    aria-controls="navbarModern" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon-modern"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2">
+                <div class="collapse navbar-collapse" id="navbarModern">
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
                         <li class="nav-item">
-                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")"
+                                asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"].ToString() == "Acomodacoes" ? "active" : "")"
+                                asp-controller="Acomodacoes" asp-action="Index">Acomodações</a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"].ToString() == "Sobre" ? "active" : "")"
+                                asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"].ToString() == "Contato" ? "active" : "")"
+                                asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link custom-nav-link" asp-controller="Home" asp-action="Dashboard">Dashboard</a>
+                            @* Usuário logado: botão de logout *@
+                            <li class="nav-item d-none d-lg-block">
+                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-header">Sair</button>
+                                </form>
                             </li>
                         }
-                        @if (User.IsInRole("Administrador") || User.IsInRole("Recepcionista"))
+                        else
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle custom-nav-link" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">Reservas</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Reservas" asp-action="Index">Lista de Reservas</a>
-                                    </li>
-                                    <li><a class="dropdown-item" asp-controller="Reservas" asp-action="Create">Nova Reserva</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle custom-nav-link" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">Acomodações</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Acomodacoes" asp-action="Index">Lista de Acomodações
-                                            </a></li>
-                                    @if (User.IsInRole("Administrador"))
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Acomodacoes" asp-action="Create">Nova Acomodação
-                                            </a></li>
-                                    }
-                                </ul>
+                            @* Não logado: botão de login *@
+                            <li class="nav-item d-none d-lg-block">
+                                <a class="btn btn-header" asp-area="Identity" asp-page="/Account/Login">Login</a>
                             </li>
                         }
                         @if (User.IsInRole("Administrador"))
                         {
+                            @* Adiciona opções extras para o administrador *@
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle custom-nav-link" href="#" role="button"
+                                <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">Administração</a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Index">Gerenciar Usuários</a>
@@ -85,20 +76,10 @@
                                 </ul>
                             </li>
                         }
-                        @if (User.Identity?.IsAuthenticated != true)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link custom-nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
-                            </li>
-                        }
                     </ul>
-                    <div class="d-flex">
-                        <a class="btn btn-login" asp-area="Identity" asp-page="/Account/Login">Login/Cadastro</a>
-                    </div>
-                    <partial name="_LoginPartial" />
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
     </header>
 
     <div class="container-fluid p-0">
