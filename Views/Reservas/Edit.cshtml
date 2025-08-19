@@ -114,7 +114,10 @@
 
                 var hoje = new Date();
                 checkInInput[0].min = hoje.toISOString().split('T')[0];
-                checkOutInput[0].min = hoje.toISOString().split('T')[0];
+                // check-out mínimo: dia seguinte ao hoje
+                var diaSeguinte = new Date(hoje);
+                diaSeguinte.setDate(diaSeguinte.getDate() + 1);
+                checkOutInput[0].min = diaSeguinte.toISOString().split('T')[0];
 
                 checkInInput.off('input').on('input', function () {
                     var dataSelecionada = new Date(this.value);
@@ -140,6 +143,17 @@
                     }
                     this.setCustomValidity('');
                 });
+                // garantir que check-out seja após check-in
+                checkInInput.off('change').on('change', function () {
+                    if (!this.value) return;
+                    var selected = new Date(this.value);
+                    var next = new Date(selected);
+                    next.setDate(next.getDate() + 1);
+                    checkOutInput.attr('min', next.toISOString().split('T')[0]);
+                    if (checkOutInput.val() && checkOutInput.val() < checkOutInput.attr('min')) {
+                        checkOutInput.val('');
+                    }
+                });
             }
 
             acomodacaoSelect.on('change', function () {
@@ -149,6 +163,46 @@
 
             var inicialId = acomodacaoSelect.val();
             if (inicialId) bloquearDatas(inicialId);
+
+            // Flatpickr integration to visually block occupied dates
+            var flatpickrCss = document.createElement('link');
+            flatpickrCss.rel = 'stylesheet';
+            flatpickrCss.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
+            document.head.appendChild(flatpickrCss);
+
+            var fpScript = document.createElement('script');
+            fpScript.src = 'https://cdn.jsdelivr.net/npm/flatpickr';
+            fpScript.onload = function () {
+                var fpCheckIn = flatpickr(checkInInput[0], {
+                    dateFormat: 'Y-m-d',
+                    minDate: 'today',
+                    disable: []
+                });
+                var fpCheckOut = flatpickr(checkOutInput[0], {
+                    dateFormat: 'Y-m-d',
+                    minDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
+                    disable: []
+                });
+
+                function toDisabled(intervals) {
+                    if (!intervals) return [];
+                    return intervals.map(function (it) { return { from: it.inicio.split('T')[0], to: it.fim.split('T')[0] }; });
+                }
+
+                if (inicialId) {
+                    var disabled = toDisabled(datasOcupadasPorAcomodacao[inicialId]);
+                    fpCheckIn.set('disable', disabled);
+                    fpCheckOut.set('disable', disabled);
+                }
+
+                acomodacaoSelect.on('change', function () {
+                    var id = $(this).val();
+                    var disabled = toDisabled(datasOcupadasPorAcomodacao[id]);
+                    fpCheckIn.set('disable', disabled);
+                    fpCheckOut.set('disable', disabled);
+                });
+            };
+            document.body.appendChild(fpScript);
         });
     </script>
 }

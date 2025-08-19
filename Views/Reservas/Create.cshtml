@@ -201,6 +201,31 @@
             var checkInInput = $('input[name="DataCheckIn"]');
             var checkOutInput = $('input[name="DataCheckOut"]');
 
+            // Definir min dinamicamente como hoje (em tempo real)
+            function setMinHoje() {
+                var hoje = new Date();
+                var hojeStr = hoje.toISOString().split('T')[0];
+                checkInInput.attr('min', hojeStr);
+                // check-out mínimo: dia seguinte ao check-in ou hoje+1 se vazio
+                var diaSeguinte = new Date(hoje);
+                diaSeguinte.setDate(diaSeguinte.getDate() + 1);
+                checkOutInput.attr('min', diaSeguinte.toISOString().split('T')[0]);
+            }
+            setMinHoje();
+
+            // Quando check-in muda, atualizar min do check-out para no mínimo o dia seguinte
+            checkInInput.on('change', function () {
+                if (!this.value) return;
+                var selected = new Date(this.value);
+                var next = new Date(selected);
+                next.setDate(next.getDate() + 1);
+                checkOutInput.attr('min', next.toISOString().split('T')[0]);
+                // se check-out atual for anterior ao novo min, limpar
+                if (checkOutInput.val() && checkOutInput.val() < checkOutInput.attr('min')) {
+                    checkOutInput.val('');
+                }
+            });
+
             function bloquearDatas(acomodacaoId) {
                     var datas = datasOcupadasPorAcomodacao[acomodacaoId];
                     if (!datas) return;
@@ -260,6 +285,74 @@
             // Inicializar bloqueio se já houver acomodação selecionada
             var inicialId = acomodacaoSelect.val();
             if (inicialId) bloquearDatas(inicialId);
+
+            // === Flatpickr integration for visual disabling of occupied dates ===
+            // Load flatpickr via CDN and initialize calendars to visually block dates
+            // Note: _Layout already loads jQuery; we include flatpickr here so it's available on this page
+            var flatpickrCss = document.createElement('link');
+            flatpickrCss.rel = 'stylesheet';
+            flatpickrCss.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
+            document.head.appendChild(flatpickrCss);
+
+            var fpScript = document.createElement('script');
+            fpScript.src = 'https://cdn.jsdelivr.net/npm/flatpickr';
+            fpScript.onload = function () {
+                var fpCheckIn, fpCheckOut;
+
+                function intervalsToDisableArray(intervals) {
+                    if (!intervals) return [];
+                    // Flatpickr accepts objects { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' }
+                    return intervals.map(function (it) {
+                        return { from: it.inicio.split('T')[0], to: it.fim.split('T')[0] };
+                    });
+                }
+
+                function initCalendars() {
+                    var hoje = new Date();
+                    var amanha = new Date(hoje);
+                    amanha.setDate(amanha.getDate() + 1);
+
+                    fpCheckIn = flatpickr(checkInInput[0], {
+                        dateFormat: 'Y-m-d',
+                        minDate: 'today',
+                        disable: []
+                    });
+
+                    fpCheckOut = flatpickr(checkOutInput[0], {
+                        dateFormat: 'Y-m-d',
+                        minDate: amanha.toISOString().split('T')[0],
+                        disable: []
+                    });
+
+                    // when check-in changes, update minDate for check-out
+                    fpCheckIn.config.onChange.push(function (selectedDates) {
+                        if (!selectedDates || !selectedDates[0]) return;
+                        var next = new Date(selectedDates[0]);
+                        next.setDate(next.getDate() + 1);
+                        fpCheckOut.set('minDate', next.toISOString().split('T')[0]);
+                        // if current checkOut before new min, clear
+                        if (checkOutInput.val() && checkOutInput.val() < fpCheckOut.config.minDate) {
+                            fpCheckOut.clear();
+                        }
+                    });
+                }
+
+                function updateDisabled(acomodacaoId) {
+                    var intervals = datasOcupadasPorAcomodacao[acomodacaoId];
+                    var disabled = intervalsToDisableArray(intervals);
+                    if (fpCheckIn) fpCheckIn.set('disable', disabled);
+                    if (fpCheckOut) fpCheckOut.set('disable', disabled);
+                }
+
+                initCalendars();
+                if (inicialId) updateDisabled(inicialId);
+
+                acomodacaoSelect.on('change', function () {
+                    var id = $(this).val();
+                    updateDisabled(id);
+                });
+            };
+            document.body.appendChild(fpScript);
         });
     </script>
 }
