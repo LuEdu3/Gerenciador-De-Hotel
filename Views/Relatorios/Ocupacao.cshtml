@@ -1,6 +1,6 @@
 @model GerenciadorHotel.Models.RelatorioOcupacaoViewModel
 
-<h2>Relatório de Ocupação</h2>
+<h2>Relatório de Ocupação por Quarto</h2>
 <ul>
     <li>Total de acomodações: @Model.TotalAcomodacoes</li>
     <li>Quartos ocupados: @Model.QuartosOcupados</li>
@@ -8,26 +8,85 @@
     <li>Taxa de ocupação: @Model.TaxaOcupacao.ToString("F2")%</li>
 </ul>
 
-<h3>Reservas Ativas</h3>
-<table class="table">
+<form method="get" class="mb-3">
+    <label for="dias">Filtrar por período:</label>
+        <select name="dias" id="dias" class="form-select d-inline w-auto" onchange="this.form.submit()">
+            <option value="7" selected="@(Model.FiltroDias == 7)">Última semana</option>
+            <option value="15" selected="@(Model.FiltroDias == 15)">Últimos 15 dias</option>
+            <option value="30" selected="@(Model.FiltroDias == 30)">Últimos 30 dias</option>
+            <option value="90" selected="@(Model.FiltroDias == 90)">Últimos 90 dias</option>
+        </select>
+</form>
+
+<h3>Ocupação por Quarto</h3>
+
+<table class="table table-bordered">
     <thead>
         <tr>
-            <th>Acomodação</th>
-            <th>Hóspede</th>
-            <th>Check-in</th>
-            <th>Check-out</th>
-            <th>Status</th>
+            <th>Quarto</th>
+            <th>Número de Hóspedes</th>
+            <th>Preço por Noite</th>
+            <th>Valor Total de Faturamento</th>
+            <th>Reservas no período</th>
+            <th>Detalhes</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var reserva in Model.ReservasAtivas)
+        @if (Model.OcupacaoPorQuarto != null)
+        {
+            foreach (var quarto in Model.OcupacaoPorQuarto)
+            {
+                var totalHospedes = quarto.Reservas?.Sum(r => r.NumeroHospedes) ?? 0;
+                var precoPorNoite = quarto.Reservas?.FirstOrDefault()?.Acomodacao?.Preco ?? 0;
+                var valorTotalFaturamento = quarto.Reservas?.Sum(r => r.ValorTotal) ?? 0;
+                <tr>
+                    <td>@quarto.NomeAcomodacao</td>
+                    <td>@totalHospedes</td>
+                    <td>@precoPorNoite.ToString("C")</td>
+                    <td>@valorTotalFaturamento.ToString("C")</td>
+                    <td>@quarto.TotalReservas</td>
+                    <td>
+                        <details>
+                            <summary>Ver reservas</summary>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Hóspede</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (quarto.Reservas != null && quarto.Reservas.Any())
+                                    {
+                                        foreach (var reserva in quarto.Reservas)
+                                        {
+                                            <tr>
+                                                <td>@reserva.NomeHospede @reserva.SobrenomeHospede</td>
+                                                <td>@reserva.DataCheckIn.ToShortDateString()</td>
+                                                <td>@reserva.DataCheckOut.ToShortDateString()</td>
+                                                <td>@reserva.Status</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">Nenhuma reserva no período</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </details>
+                    </td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td>@reserva.Acomodacao?.Nome</td>
-                <td>@reserva.NomeHospede @reserva.SobrenomeHospede</td>
-                <td>@reserva.DataCheckIn.ToShortDateString()</td>
-                <td>@reserva.DataCheckOut.ToShortDateString()</td>
-                <td>@reserva.Status</td>
+                <td colspan="6" class="text-center text-muted">Nenhuma acomodação cadastrada</td>
             </tr>
         }
     </tbody>
