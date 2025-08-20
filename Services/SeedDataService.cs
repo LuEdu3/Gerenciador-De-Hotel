@@ -83,6 +83,215 @@ namespace GerenciadorHotel.Services
             await SeedPaises(context);
         }
 
+        public static async Task SeedAcomodacoes(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await SeedAcomodacoes(context);
+        }
+
+        public static async Task LimparEInserirAcomodacoesQuintaYpua(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await LimparEInserirAcomodacoesQuintaYpua(context);
+        }
+
+        private static async Task LimparEInserirAcomodacoesQuintaYpua(ApplicationDbContext context)
+        {
+            // Remover acomodação "Teste" se existir
+            var acomodacaoTeste = context.Acomodacoes.FirstOrDefault(a => a.Nome == "Teste");
+            if (acomodacaoTeste != null)
+            {
+                context.Acomodacoes.Remove(acomodacaoTeste);
+                Console.WriteLine("🗑️ Acomodação 'Teste' removida.");
+            }
+
+            // Verificar se as acomodações da Quinta do Ypuã já existem
+            var acomodacoesExistentes = new[] { "Domo", "Charrua (Bus)", "Suíte com Cozinha", "Chalé Família", "Cabana", "Estacionamento para Overlanders" };
+            var existeAlguma = context.Acomodacoes.Any(a => acomodacoesExistentes.Contains(a.Nome));
+
+            if (!existeAlguma)
+            {
+                var acomodacoes = new List<Acomodacao>
+                {
+                    new()
+                    {
+                        Nome = "Domo",
+                        Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
+                        QuantidadeCamas = 1,
+                        Preco = 280.00m,
+                        MinimoNoites = 2,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_442829334f1b4dd1879b3231151437a3~mv2.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Charrua (Bus)",
+                        Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
+                        QuantidadeCamas = 2,
+                        Preco = 180.00m,
+                        MinimoNoites = 1,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bus_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Suíte com Cozinha",
+                        Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
+                        QuantidadeCamas = 1,
+                        Preco = 350.00m,
+                        MinimoNoites = 2,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_suite_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Chalé Família",
+                        Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
+                        QuantidadeCamas = 4,
+                        Preco = 450.00m,
+                        MinimoNoites = 2,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_chale_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Cabana",
+                        Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
+                        QuantidadeCamas = 1,
+                        Preco = 220.00m,
+                        MinimoNoites = 1,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_cabana_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Estacionamento para Overlanders",
+                        Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
+                        QuantidadeCamas = 2,
+                        Preco = 80.00m,
+                        MinimoNoites = 1,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_parking_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    }
+                };
+
+                await context.Acomodacoes.AddRangeAsync(acomodacoes);
+                Console.WriteLine($"✅ {acomodacoes.Count} acomodações da Quinta do Ypuã inseridas!");
+            }
+            else
+            {
+                Console.WriteLine("⚠️ Acomodações da Quinta do Ypuã já existem no banco.");
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedAcomodacoes(ApplicationDbContext context)
+        {
+            // Só inserir acomodações se a tabela estiver vazia (NÃO LIMPAR DADOS EXISTENTES)
+            if (!context.Acomodacoes.Any())
+            {
+                var acomodacoes = new List<Acomodacao>
+                {
+                    new()
+                    {
+                        Nome = "Domo",
+                        Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
+                        QuantidadeCamas = 1,
+                        Preco = 280.00m,
+                        MinimoNoites = 2,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_442829334f1b4dd1879b3231151437a3~mv2.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Charrua (Bus)",
+                        Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
+                        QuantidadeCamas = 2,
+                        Preco = 180.00m,
+                        MinimoNoites = 1,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bus_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Suíte com Cozinha",
+                        Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
+                        QuantidadeCamas = 1,
+                        Preco = 350.00m,
+                        MinimoNoites = 2,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_suite_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Chalé Família",
+                        Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
+                        QuantidadeCamas = 4,
+                        Preco = 450.00m,
+                        MinimoNoites = 2,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_chale_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Cabana",
+                        Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
+                        QuantidadeCamas = 1,
+                        Preco = 220.00m,
+                        MinimoNoites = 1,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_cabana_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Estacionamento para Overlanders",
+                        Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
+                        QuantidadeCamas = 2,
+                        Preco = 80.00m,
+                        MinimoNoites = 1,
+                        Status = StatusAcomodacao.Disponivel,
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_parking_example.jpg",
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    }
+                };
+
+                await context.Acomodacoes.AddRangeAsync(acomodacoes);
+                await context.SaveChangesAsync();
+
+                Console.WriteLine($"✅ {acomodacoes.Count} acomodações da Quinta do Ypuã inseridas com sucesso!");
+            }
+            else
+            {
+                Console.WriteLine("⚠️  Acomodações já existem no banco, pulando seed para preservar dados existentes.");
+            }
+        }
+
         private static async Task SeedPaises(ApplicationDbContext context)
         {
             // Só inserir países se a tabela estiver vazia (NÃO LIMPAR DADOS EXISTENTES)

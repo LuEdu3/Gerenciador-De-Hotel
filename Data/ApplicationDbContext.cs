@@ -19,6 +19,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<ImagemAcomodacao> ImagensAcomodacao { get; set; }
     public DbSet<Reserva> Reservas { get; set; }
     public DbSet<Pagamento> Pagamentos { get; set; }
+    public DbSet<Empresa> Empresas { get; set; }
+    public DbSet<EmpresaFoto> EmpresaFotos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
