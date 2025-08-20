@@ -1,0 +1,142 @@
+@model IEnumerable<GerenciadorHotel.Models.Acomodacao>
+@{
+    ViewData["Title"] = "Acomodações";
+}
+
+<section class="hero-modern" style="height: 40vh; min-height: 300px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7">
+                <h1 class="hero-title">Nossas Acomodações</h1>
+                <p class="hero-subtitle">Descubra o conforto e a elegância em cada detalhe de nossas acomodações.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<main class="accommodations">
+    <div class="container">
+        <!-- Filtros -->
+        <form asp-controller="Home" asp-action="Acomodacao" method="get" class="filter-section">
+            <h4 class="filter-title">Filtrar Acomodações</h4>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="TipoAcomodacao" class="form-label">Tipo de Acomodação</label>
+                    <select class="form-select" id="TipoAcomodacao" name="TipoAcomodacao">
+                        <option value="">Todos</option>
+                        @foreach (var tipo in ViewBag.TiposAcomodacao)
+                        {
+                            <option value="@tipo" selected="@(ViewBag.FiltroTipo == tipo)">@tipo</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="FaixaPreco" class="form-label">Faixa de Preço</label>
+                    <select class="form-select" id="FaixaPreco" name="FaixaPreco">
+                        <option value="">Todos</option>
+                        <option value="0-300" selected="@(ViewBag.FiltroPreco == "0-300")">Até R$ 300</option>
+                        <option value="300-600" selected="@(ViewBag.FiltroPreco == "300-600")">R$ 300 - R$ 600</option>
+                        <option value="600-900" selected="@(ViewBag.FiltroPreco == "600-900")">R$ 600 - R$ 900</option>
+                        <option value="900-9999" selected="@(ViewBag.FiltroPreco == "900-9999")">Acima de R$ 900</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="Capacidade" class="form-label">Capacidade</label>
+                    <select class="form-select" id="Capacidade" name="Capacidade">
+                        <option value="">Todos</option>
+                        <option value="1" selected="@(ViewBag.FiltroCapacidade == "1")">1 Pessoa</option>
+                        <option value="2" selected="@(ViewBag.FiltroCapacidade == "2")">2 Pessoas</option>
+                        <option value="3-4" selected="@(ViewBag.FiltroCapacidade == "3-4")">3-4 Pessoas</option>
+                        <option value="5" selected="@(ViewBag.FiltroCapacidade == "5")">Família (5+)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-accent w-100">Aplicar Filtros</button>
+                </div>
+            </div>
+        </form>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center my-5">
+                <h3>Nenhuma acomodação encontrada com os filtros selecionados.</h3>
+                <p>Por favor, tente outros critérios de busca.</p>
+            </div>
+        }
+        else
+        {
+            <!-- Cards de Acomodações -->
+            <div class="row">
+                @foreach (var acomodacao in Model)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="room-card">
+                            @if (!string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
+                            {
+                                <img src="@acomodacao.ImagemPrincipalUrl" alt="@acomodacao.Nome">
+                            }
+                            else if (acomodacao.Imagens != null && acomodacao.Imagens.Any())
+                            {
+                                <img src="@acomodacao.Imagens.First().ImagemUrl" alt="@acomodacao.Nome">
+                            }
+                            else
+                            {
+                                <img src="~/images/no-image.jpg" alt="@acomodacao.Nome">
+                            }
+                            <div class="room-card-body">
+                                <h3 class="room-title">@acomodacao.Nome</h3>
+                                <div class="room-price">R$ @acomodacao.Preco.ToString("N2") <small>/noite</small></div>
+                                <div class="room-features">
+                                    <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamas Camas</span>
+                                    <span><i class="fas fa-moon"></i> Min. @acomodacao.MinimoNoites Noites</span>
+                                    <span><i class="fas fa-ruler-combined"></i> Quarto @acomodacao.Id</span>
+                                </div>
+                                <p>@acomodacao.Descricao</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="@Url.Action("Create", "Reservas", new { id = acomodacao.Id })" class="btn btn-room">Reservar</a>
+                                    <a href="@Url.Action("Details", "Acomodacoes", new { id = acomodacao.Id })" class="text-primary-custom">
+                                        Detalhes <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (Model.Count() > 12)
+            {
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Navegação das páginas">
+                        <ul class="pagination">
+                            @if (ViewBag.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = ViewBag.CurrentPage - 1, TipoAcomodacao = ViewBag.FiltroTipo, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = i, TipoAcomodacao = ViewBag.FiltroTipo, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })">@i</a>
+                                </li>
+                            }
+
+                            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = ViewBag.CurrentPage + 1, TipoAcomodacao = ViewBag.FiltroTipo, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })" aria-label="Próxima">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        }
+    </div>
+</main>

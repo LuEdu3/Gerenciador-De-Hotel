@@ -28,19 +28,19 @@
                 <div class="collapse navbar-collapse" id="navbarModern">
                     <ul class="navbar-nav ms-auto align-items-lg-center">
                         <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")"
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
                                 asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"].ToString() == "Acomodacoes" ? "active" : "")"
-                                asp-controller="Acomodacoes" asp-action="Index">Acomodações</a>
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Acomodacao" ? "active" : "")"
+                                asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"].ToString() == "Sobre" ? "active" : "")"
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
                                 asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"].ToString() == "Contato" ? "active" : "")"
+                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
                                 asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
@@ -165,11 +165,11 @@
                 <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
                     <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Links Rápidos</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Acomodações</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Serviços</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Galeria</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Contato</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Index" class="text-white text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Acomodacao" class="text-white text-decoration-none">Acomodações</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Servicos" class="text-white text-decoration-none">Serviços</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Galeria" class="text-white text-decoration-none">Galeria</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Contato" class="text-white text-decoration-none">Contato</a></li>
                     </ul>
                 </div>
                 <!-- Contato -->

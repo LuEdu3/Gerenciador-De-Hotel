@@ -11,8 +11,8 @@
                 <h1 class="hero-title">Descubra o Luxo da Hospitalidade Autêntica</h1>
                 <p class="hero-subtitle">O Sereno Hotel combina elegância contemporânea com um serviço personalizado para criar experiências memoráveis.</p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="@Url.Action("Index", "Acomodacoes")" class="btn btn-accent btn-lg px-4 py-3">Explorar Acomodações</a>
-                    <a href="#" class="btn btn-outline-light btn-lg px-4 py-3">Ver Ofertas</a>
+                    <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-accent btn-lg px-4 py-3">Explorar Acomodações</a>
+                    <a href="@Url.Action("Acomodacao", "Home", new { FaixaPreco = "0-300" })" class="btn btn-outline-light btn-lg px-4 py-3">Ver Ofertas</a>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
         <p class="text-center mb-5">Conheça nossos espaços cuidadosamente projetados para seu conforto</p>
         
         <!-- Filtros -->
-        <form asp-controller="Acomodacoes" asp-action="Index" method="get" class="filter-section">
+        <form asp-controller="Home" asp-action="Acomodacao" method="get" class="filter-section">
             <h4 class="filter-title">Filtrar Acomodações</h4>
             <div class="row g-3">
                 <div class="col-md-3">
