@@ -101,8 +101,8 @@ dotnet ef database update
 dotnet run GerenciadorHotel.csproj
 
 # 3. Testar login
-# Admin: admin@hotel.com / Admin123!
-# Recepcionista: recepcionista@hotel.com / Recep123!
+Admin: admin@hotel.com / Admin123!
+Recepcionista: recepcionista@hotel.com / Recep123!
 ```
 
 ## ✨ **DESTAQUES TÉCNICOS**
