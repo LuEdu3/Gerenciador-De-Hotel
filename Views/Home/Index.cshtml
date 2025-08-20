@@ -1,20 +1,164 @@
-﻿@{
+﻿@using GerenciadorHotel.Models
+@model IEnumerable<Acomodacao>
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <section class="hero-modern">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
-                    <h1 class="hero-title">Descubra o Luxo da Hospitalidade Autêntica</h1>
-                    <p class="hero-subtitle">O Sereno Hotel combina elegância contemporânea com um serviço personalizado para criar experiências memoráveis.</p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="#" class="btn btn-accent btn-lg px-4 py-3">Explorar Acomodações</a>
-                        <a href="#" class="btn btn-outline-light btn-lg px-4 py-3">Ver Ofertas</a>
-                    </div>
+<section class="hero-modern">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7">
+                <h1 class="hero-title">Descubra o Luxo da Hospitalidade Autêntica</h1>
+                <p class="hero-subtitle">O Sereno Hotel combina elegância contemporânea com um serviço personalizado para criar experiências memoráveis.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="@Url.Action("Index", "Acomodacoes")" class="btn btn-accent btn-lg px-4 py-3">Explorar Acomodações</a>
+                    <a href="#" class="btn btn-outline-light btn-lg px-4 py-3">Ver Ofertas</a>
                 </div>
             </div>
         </div>
-    </section>
-</div>
+    </div>
+</section>
+
+<main class="accommodations">
+    <div class="container">
+        <h2 class="section-title">Nossas Acomodações</h2>
+        <p class="text-center mb-5">Conheça nossos espaços cuidadosamente projetados para seu conforto</p>
+        
+        <!-- Filtros -->
+        <form asp-controller="Acomodacoes" asp-action="Index" method="get" class="filter-section">
+            <h4 class="filter-title">Filtrar Acomodações</h4>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="TipoAcomodacao" class="form-label">Tipo de Acomodação</label>
+                    <select class="form-select" id="TipoAcomodacao" name="TipoAcomodacao">
+                        <option value="">Todos</option>
+                        @foreach (var tipo in ViewBag.TiposAcomodacao)
+                        {
+                            <option value="@tipo">@tipo</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="FaixaPreco" class="form-label">Faixa de Preço</label>
+                    <select class="form-select" id="FaixaPreco" name="FaixaPreco">
+                        <option value="">Todos</option>
+                        <option value="0-300">Até R$ 300</option>
+                        <option value="300-600">R$ 300 - R$ 600</option>
+                        <option value="600-900">R$ 600 - R$ 900</option>
+                        <option value="900-9999">Acima de R$ 900</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="Capacidade" class="form-label">Capacidade</label>
+                    <select class="form-select" id="Capacidade" name="Capacidade">
+                        <option value="">Todos</option>
+                        <option value="1">1 Pessoa</option>
+                        <option value="2">2 Pessoas</option>
+                        <option value="3-4">3-4 Pessoas</option>
+                        <option value="5">Família (5+)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-accent w-100">Aplicar Filtros</button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Cards de Acomodações -->
+        <div class="row">
+            @foreach (var acomodacao in Model.Take(3))
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="room-card">
+                        @if (!string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
+                        {
+                            <img src="@acomodacao.ImagemPrincipalUrl" alt="@acomodacao.Nome">
+                        }
+                        else if (acomodacao.Imagens != null && acomodacao.Imagens.Any())
+                        {
+                            <img src="@acomodacao.Imagens.First().ImagemUrl" alt="@acomodacao.Nome">
+                        }
+                        else
+                        {
+                            <img src="~/images/no-image.jpg" alt="@acomodacao.Nome">
+                        }
+                        <div class="room-card-body">
+                            <h3 class="room-title">@acomodacao.Nome</h3>
+                            <div class="room-price">R$ @acomodacao.Preco.ToString("N2") <small>/noite</small></div>
+                            <div class="room-features">
+                                <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamas Camas</span>
+                                <span><i class="fas fa-moon"></i> Min. @acomodacao.MinimoNoites Noites</span>
+                                <span><i class="fas fa-ruler-combined"></i> Quarto @acomodacao.Id</span>
+                            </div>
+                            <p>@acomodacao.Descricao</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="@Url.Action("Create", "Reservas", new { id = acomodacao.Id })" class="btn btn-room">Reservar</a>
+                                <a href="@Url.Action("Details", "Acomodacoes", new { id = acomodacao.Id })" class="text-primary-custom">
+                                    Detalhes <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="@Url.Action("Index", "Acomodacoes")" class="btn btn-outline-primary btn-lg">Ver Todas as Acomodações</a>
+        </div>
+    </div>
+</main>
+
+<!-- Seção Sobre -->
+<section class="about-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="about-img">
+                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Sobre o Sereno Hotel">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-content">
+                    <h2 class="section-title text-start">Sobre o Sereno Hotel</h2>
+                    <p class="lead">Um refúgio de luxo onde a elegância contemporânea encontra a hospitalidade tradicional.</p>
+                    <p>Fundado em 2005, o Sereno Hotel nasceu da paixão por oferecer experiências memoráveis de hospedagem. Localizado em uma área privilegiada, nosso hotel oferece não apenas acomodações de alto padrão, mas também um ambiente que convida ao relaxamento e reconexão.</p>
+                    
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div>
+                                <h5>Excelência em Serviço</h5>
+                                <p>Premiado por 5 anos consecutivos como melhor hotel de luxo da região.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div>
+                                <h5>Gastronomia Exclusiva</h5>
+                                <p>Restaurante com estrela Michelin e cardápio sazonal com ingredientes locais.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-spa"></i>
+                            </div>
+                            <div>
+                                <h5>Spa & Bem-estar</h5>
+                                <p>Centro de bem-estar com tratamentos exclusivos e terapias relaxantes.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="#" class="btn btn-accent">Conheça Nossa História</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
