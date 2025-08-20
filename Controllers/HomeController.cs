@@ -109,6 +109,28 @@ public class HomeController : Controller
     }
 
     [AllowAnonymous]
+    public async Task<IActionResult> DetalhesAcomodacao(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var acomodacao = await _context.Acomodacoes
+            .Include(a => a.AcomodacaoAmenidades)
+            .ThenInclude(aa => aa.Amenidade)
+            .Include(a => a.Imagens)
+            .FirstOrDefaultAsync(m => m.Id == id && m.Ativa && m.Status == StatusAcomodacao.Disponivel);
+
+        if (acomodacao == null)
+        {
+            return NotFound();
+        }
+
+        return View(acomodacao);
+    }
+
+    [AllowAnonymous]
     public IActionResult Privacy()
     {
         return View();

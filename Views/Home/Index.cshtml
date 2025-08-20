@@ -93,7 +93,7 @@
                             <p>@acomodacao.Descricao</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <a href="@Url.Action("Create", "Reservas", new { id = acomodacao.Id })" class="btn btn-room">Reservar</a>
-                                <a href="@Url.Action("Details", "Acomodacoes", new { id = acomodacao.Id })" class="text-primary-custom">
+                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="text-primary-custom">
                                     Detalhes <i class="fas fa-arrow-right"></i>
                                 </a>
                             </div>
@@ -104,7 +104,7 @@
         </div>
         
         <div class="text-center mt-4">
-            <a href="@Url.Action("Index", "Acomodacoes")" class="btn btn-outline-primary btn-lg">Ver Todas as Acomodações</a>
+            <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-outline-primary btn-lg">Ver Todas as Acomodações</a>
         </div>
     </div>
 </main>

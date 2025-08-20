@@ -75,7 +75,7 @@
                             </li>
                             <!-- Botão Sair para Administrador -->
                             <li class="nav-item d-none d-lg-block">
-                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-header">
                                         <i class="bi bi-box-arrow-right me-1"></i>Sair
                                     </button>
@@ -83,7 +83,7 @@
                             </li>
                             <!-- Botão Sair Mobile para Administrador -->
                             <li class="nav-item d-lg-none">
-                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
                                     <button type="submit" class="nav-link nav-link-modern">
                                         <i class="bi bi-box-arrow-right me-1"></i>Sair
                                     </button>
@@ -114,12 +114,12 @@
                             @if (User.Identity?.IsAuthenticated == true)
                             {
                                 <li class="nav-item d-none d-lg-block">
-                                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
                                         <button type="submit" class="btn btn-header">Sair</button>
                                     </form>
                                 </li>
                                 <li class="nav-item d-none d-lg-block">
-                                    <a href="#" class="btn btn-header btn-header-accent">Reservar</a>
+                                    <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-header btn-header-accent">Reservar</a>
                                 </li>
                             }
                             else
@@ -140,12 +140,12 @@
                             @if (User.Identity?.IsAuthenticated == true)
                             {
                                 <li class="nav-item d-lg-none">
-                                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
                                         <button type="submit" class="nav-link nav-link-modern">Sair</button>
                                     </form>
                                 </li>
                                 <li class="nav-item d-lg-none">
-                                    <a class="nav-link nav-link-modern" href="#">Reservar</a>
+                                    <a class="nav-link nav-link-modern" href="@Url.Action("Acomodacao", "Home")">Reservar</a>
                                 </li>
                             }
                             else
