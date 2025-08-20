@@ -5,130 +5,646 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sistema de Gerenciamento de Hotel</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GerenciadorHotel.styles.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
 </head>
 
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-building"></i> Hotel Manager
+<body class="d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <!-- Cabeçalho Moderno -->
+    <header class="header-modern py-3">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light p-0">
+                <a class="navbar-brand navbar-brand-modern" asp-area="" asp-controller="Home" asp-action="Index">
+                    Sereno<span>Hotel</span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="navbar-toggler-modern" type="button" data-bs-toggle="collapse" data-bs-target="#navbarModern"
+                    aria-controls="navbarModern" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon-modern"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house"></i> Início
-                            </a>
-                        </li>
-
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Home" asp-action="Dashboard">
-                                    <i class="bi bi-speedometer2"></i> Dashboard
-                                </a>
-                            </li>
-                        }
-
-                        @if (User.IsInRole("Administrador") || User.IsInRole("Recepcionista"))
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-calendar-check"></i> Reservas
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Reservas" asp-action="Index"><i
-                                                class="bi bi-list"></i> Lista de Reservas</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Reservas" asp-action="Create"><i
-                                                class="bi bi-plus-circle"></i> Nova Reserva</a></li>
-                                </ul>
-                            </li>
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-building"></i> Acomodações
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Acomodacoes" asp-action="Index"><i
-                                                class="bi bi-list"></i> Lista de Acomodações</a></li>
-                                    @if (User.IsInRole("Administrador"))
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Acomodacoes" asp-action="Create"><i
-                                                    class="bi bi-plus-circle"></i> Nova Acomodação</a></li>
-                                    }
-                                </ul>
-                            </li>
-                        }
-
+                <div class="collapse navbar-collapse" id="navbarModern">
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
                         @if (User.IsInRole("Administrador"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-white" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-gear"></i> Administração
+                            <!-- Menu do Administrador -->
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"
+                                    asp-controller="Home" asp-action="Dashboard">
+                                    <i class="bi bi-speedometer2 me-1"></i>Dashboard
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Index"><i
-                                                class="bi bi-people"></i> Gerenciar Usuários</a></li>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Acomodacoes" ? "active" : "")"
+                                    asp-controller="Acomodacoes" asp-action="Index">
+                                    <i class="bi bi-building me-1"></i>Acomodações
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Usuarios" ? "active" : "")"
+                                    asp-controller="Usuarios" asp-action="Index">
+                                    <i class="bi bi-people me-1"></i>Usuários
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button"
+                                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                    <i class="bi bi-gear-fill me-1"></i>
+                                    Mais Opções
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <hr class="dropdown-divider">
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-stars me-2"></i>Gerenciar Amenidades
+                                        </a>
                                     </li>
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-graph-up"></i> Relatórios</a></li>
                                 </ul>
+                            </li>
+                            <!-- Botão Sair para Administrador -->
+                            <li class="nav-item d-none d-lg-block">
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-header">
+                                        <i class="bi bi-box-arrow-right me-1"></i>Sair
+                                    </button>
+                                </form>
+                            </li>
+                            <!-- Botão Sair Mobile para Administrador -->
+                            <li class="nav-item d-lg-none">
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link nav-link-modern">
+                                        <i class="bi bi-box-arrow-right me-1"></i>Sair
+                                    </button>
+                                </form>
                             </li>
                         }
 
-                        <li class="nav-item">
+                        else
+                      //!!AVISO
+//!!AVISO
+                      <li class="nav-item">
                             <a class="nav-link text-white" asp-controller="Acomodacoes" asp-action="Catalogo">
                                 <i class="bi bi-building"></i> Acomodações
                             </a>
                         </li>
                         @if (User.Identity?.IsAuthenticated != true)
+//!!AVISO
+//!!AVISO
                         {
+                            <!-- Menu do Usuário Comum -->
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">
-                                    <i class="bi bi-info-circle"></i> Privacidade
-                                </a>
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Acomodacao" ? "active" : "")"
+                                    asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                            </li>
+                            
+                            <!-- Botões de autenticação para usuários não logados -->
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item d-none d-lg-block">
+                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-header">Sair</button>
+                                    </form>
+                                </li>
+                                <li class="nav-item d-none d-lg-block">
+                                    <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-header btn-header-accent">Reservar</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item d-none d-lg-block">
+                                    <button type="button" class="btn btn-header" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                        Login
+                                    </button>
+                                </li>
+                                <li class="nav-item d-none d-lg-block">
+                                    <button type="button" class="btn btn-header btn-header-accent" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                        Cadastrar
+                                    </button>
+                                </li>
+                            }
+                            
+                            <!-- Botões para mobile - usuários comuns -->
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item d-lg-none">
+                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
+                                        <button type="submit" class="nav-link nav-link-modern">Sair</button>
+                                    </form>
+                                </li>
+                                <li class="nav-item d-lg-none">
+                                    <a class="nav-link nav-link-modern" href="@Url.Action("Acomodacao", "Home")">Reservar</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item d-lg-none">
+                                    <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                        Login
+                                    </button>
+                                </li>
+                                <li class="nav-item d-lg-none">
+                                    <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                        Cadastrar
+                                    </button>
+                                </li>
+                            }
                         }
                     </ul>
-                    <partial name="_LoginPartial" />
                 </div>
-            </div>
-        </nav>
+                <!-- Ícone de usuário para login (desktop) - apenas para usuários não logados ou não administradores -->
+                @if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Administrador"))
+                {
+                    <div class="d-flex align-items-center ms-3 d-none d-lg-block">
+                        <i class="bi bi-person user-icon" data-bs-toggle="modal" data-bs-target="#loginModal"></i>
+                    </div>
+                }
+            </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="container-fluid p-0 flex-grow-1">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted bg-light">
-        <div class="container py-3">
-            <div class="row">
-                <div class="col-md-6">
-                    &copy; 2025 - Sistema de Gerenciamento de Hotel
+    <footer class="footer-section bg-dark text-white pt-5 pb-4 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Logo e Sobre -->
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <div class="footer-brand d-flex align-items-center mb-3">
+                        <h2 class="navbar-brand-modern m-0">Sereno<span>Hotel</span></h2>
+                    </div>
+                    <p class="mb-3">O Sereno Hotel oferece uma experiência única de hospedagem, combinando luxo contemporâneo com um serviço personalizado e atenção aos detalhes.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-tripadvisor"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-6 text-end">
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Política de Privacidade</a>
+                <!-- Links Rápidos -->
+                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Dashboard" class="text-white text-decoration-none">Dashboard</a></li>
+                            <li class="mb-2"><a asp-controller="Acomodacoes" asp-action="Index" class="text-white text-decoration-none">Acomodações</a></li>
+                            <li class="mb-2"><a asp-controller="Usuarios" asp-action="Index" class="text-white text-decoration-none">Usuários</a></li>
+                        }
+                        else
+                        {
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Index" class="text-white text-decoration-none">Home</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Acomodacao" class="text-white text-decoration-none">Acomodações</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Servicos" class="text-white text-decoration-none">Serviços</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Galeria" class="text-white text-decoration-none">Galeria</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Contato" class="text-white text-decoration-none">Contato</a></li>
+                        }
+                    </ul>
+                </div>
+                <!-- Contato -->
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Contato</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-map-marker-alt me-3" style="color: var(--accent-color);"></i>
+                            <span>Av. Beira Mar, 1234 - Praia do Sereno, BR</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-phone me-3" style="color: var(--accent-color);"></i>
+                            <span>+55 (48) 3333-4444</span>
+                        </li>
+                        <li class="mb-3 d-flex">
+                            <i class="fas fa-envelope me-3" style="color: var(--accent-color);"></i>
+                            <span>contato@serenohotel.com</span>
+                        </li>
+                        <li class="d-flex">
+                            <i class="fas fa-clock me-3" style="color: var(--accent-color);"></i>
+                            <span>24h por dia, 7 dias por semana</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Newsletter -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Newsletter</h5>
+                    <p class="mb-3">Assine nossa newsletter para receber ofertas exclusivas e novidades.</p>
+                    <form class="mb-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Seu e-mail" aria-label="Seu e-mail">
+                            <button class="btn btn-accent" type="submit">Assinar</button>
+                        </div>
+                    </form>
+                    <div class="payment-methods">
+                        <p class="small mb-2">Métodos de pagamento:</p>
+                        <div class="d-flex flex-wrap">
+                            <i class="fab fa-cc-visa fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                            <i class="fab fa-cc-mastercard fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                            <i class="fab fa-cc-amex fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                            <i class="fab fa-cc-paypal fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <!-- Rodapé inferior -->
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="small mb-0">&copy; 2023 Sereno Hotel. Todos os direitos reservados.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <ul class="list-inline small mb-0">
+                        <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Política de Privacidade</a></li>
+                        <li class="list-inline-item mx-2">•</li>
+                        <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Termos de Uso</a></li>
+                        <li class="list-inline-item mx-2">•</li>
+                        <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Mapa do Site</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Modal de Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        @Html.AntiForgeryToken()
+                        <div id="loginValidationSummary" class="alert alert-danger d-none" role="alert"></div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="loginEmail" name="email" 
+                                   required autocomplete="username" placeholder="nome@exemplo.com" />
+                            <label for="loginEmail">Email</label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="loginPassword" name="password" 
+                                   required autocomplete="current-password" placeholder="senha" />
+                            <label for="loginPassword">Senha</label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Lembrar de mim</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-link" onclick="showRegisterModal()">
+                                Não tem uma conta? Cadastre-se
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Cadastro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        @Html.AntiForgeryToken()
+                        <div id="registerValidationSummary" class="alert alert-danger d-none" role="alert"></div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="nome" name="nome" 
+                                   required maxlength="100" placeholder="Nome" />
+                            <label for="nome">Nome</label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="sobrenome" name="sobrenome" 
+                                   required maxlength="100" placeholder="Sobrenome" />
+                            <label for="sobrenome">Sobrenome</label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="registerEmail" name="email" 
+                                   required placeholder="nome@exemplo.com" />
+                            <label for="registerEmail">Email</label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="registerPassword" name="password" 
+                                   required minlength="6" maxlength="100" placeholder="senha" />
+                            <label for="registerPassword">Senha</label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" 
+                                   required placeholder="confirmar senha" />
+                            <label for="confirmPassword">Confirmar Senha</label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-link" onclick="showLoginModal()">
+                                Já tem uma conta? Faça login
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Utilitários
+            const utils = {
+                toggleValidationSummary(formId, show, message = '') {
+                    // Remove "Form" do ID se presente
+                    const baseId = formId.replace('Form', '');
+                    const summary = document.querySelector(`#${baseId}ValidationSummary`);
+                    
+                    if (!summary) {
+                        console.error(`Validation summary not found for ${formId}`);
+                        return;
+                    }
+                    
+                    if (show) {
+                        summary.textContent = message;
+                        summary.classList.remove('d-none');
+                    } else {
+                        summary.classList.add('d-none');
+                    }
+                },
+
+                showFieldError(inputId, message) {
+                    const input = document.getElementById(inputId);
+                    if (!input) {
+                        console.error(`Input element not found: ${inputId}`);
+                        return;
+                    }
+
+                    input.classList.add('is-invalid');
+                    const feedback = input.nextElementSibling?.nextElementSibling;
+                    if (feedback) {
+                        feedback.textContent = message;
+                    } else {
+                        console.error(`Feedback element not found for: ${inputId}`);
+                    }
+                },
+
+                clearFormErrors(formId) {
+                    const form = document.getElementById(formId);
+                    if (!form) {
+                        console.error(`Form not found: ${formId}`);
+                        return;
+                    }
+
+                    form.querySelectorAll('.is-invalid').forEach(input => {
+                        input.classList.remove('is-invalid');
+                        const feedback = input.nextElementSibling?.nextElementSibling;
+                        if (feedback) {
+                            feedback.textContent = '';
+                        }
+                    });
+                    
+                    // Remove "Form" do ID se presente
+                    const baseId = formId.replace('Form', '');
+                    this.toggleValidationSummary(baseId, false);
+                },
+
+                async makeRequest(url, data, token) {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!response.ok) {
+                        const result = await response.json();
+                        throw result;
+                    }
+
+                    return await response.json();
+                }
+            };
+
+            // Modal handling
+            const modalHandling = {
+                showLoginModal() {
+                    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                    if (registerModal) registerModal.hide();
+                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    loginModal.show();
+                },
+
+                showRegisterModal() {
+                    const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                    if (loginModal) loginModal.hide();
+                    const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                    registerModal.show();
+                }
+            };
+
+            // Assign modal functions to window for button onclick handlers
+            window.showLoginModal = modalHandling.showLoginModal;
+            window.showRegisterModal = modalHandling.showRegisterModal;
+
+            // Form handling
+            const formHandling = {
+                async handleLogin(e) {
+                    e.preventDefault();
+                    utils.clearFormErrors('loginForm');
+
+                    try {
+                        const form = e.target;
+                        const data = {
+                            email: form.querySelector('#loginEmail').value,
+                            password: form.querySelector('#loginPassword').value,
+                            rememberMe: form.querySelector('#rememberMe').checked
+                        };
+
+                        const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+                        if (!tokenInput) {
+                            console.error('Anti-forgery token not found');
+                            utils.toggleValidationSummary('login', true, 'Erro de segurança: Token não encontrado');
+                            return;
+                        }
+
+                        await utils.makeRequest('/Auth/Login', data, tokenInput.value);
+                        
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                        if (modal) {
+                            modal.hide();
+                            // Verificar se há uma reserva pendente
+                            if (window.redirectToPendingReserva && typeof window.redirectToPendingReserva === 'function') {
+                                setTimeout(() => {
+                                    window.redirectToPendingReserva();
+                                }, 100);
+                            } else {
+                                window.location.reload();
+                            }
+                        } else {
+                            if (window.redirectToPendingReserva && typeof window.redirectToPendingReserva === 'function') {
+                                setTimeout(() => {
+                                    window.redirectToPendingReserva();
+                                }, 100);
+                            } else {
+                                window.location.reload();
+                            }
+                        }
+                    } catch (result) {
+                        if (result.errors) {
+                            if (Array.isArray(result.errors)) {
+                                utils.toggleValidationSummary('login', true, result.errors.join(' '));
+                            } else {
+                                Object.entries(result.errors).forEach(([key, messages]) => {
+                                    const fieldId = key.toLowerCase() === 'email' ? 'loginEmail' : 'loginPassword';
+                                    utils.showFieldError(fieldId, messages[0]);
+                                });
+                            }
+                        } else {
+                            utils.toggleValidationSummary('login', true, 'Email ou senha inválidos.');
+                        }
+                    }
+                },
+
+                async handleRegister(e) {
+                    e.preventDefault();
+                    utils.clearFormErrors('registerForm');
+
+                    try {
+                        const form = e.target;
+                        const password = form.querySelector('#registerPassword').value;
+                        const confirmPassword = form.querySelector('#confirmPassword').value;
+
+                        if (password !== confirmPassword) {
+                            utils.showFieldError('confirmPassword', 'As senhas não coincidem.');
+                            return;
+                        }
+
+                        const data = {
+                            nome: form.querySelector('#nome').value,
+                            sobrenome: form.querySelector('#sobrenome').value,
+                            email: form.querySelector('#registerEmail').value,
+                            password,
+                            confirmPassword
+                        };
+
+                        const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+                        if (!tokenInput) {
+                            console.error('Anti-forgery token not found');
+                            utils.toggleValidationSummary('register', true, 'Erro de segurança: Token não encontrado');
+                            return;
+                        }
+
+                        await utils.makeRequest('/Auth/Register', data, tokenInput.value);
+                        
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                        if (modal) {
+                            modal.hide();
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    } catch (result) {
+                        if (result.errors) {
+                            if (Array.isArray(result.errors)) {
+                                utils.toggleValidationSummary('register', true, result.errors.join(' '));
+                            } else {
+                                Object.entries(result.errors).forEach(([key, messages]) => {
+                                    utils.showFieldError(key.toLowerCase(), messages[0]);
+                                });
+                            }
+                        } else {
+                            utils.toggleValidationSummary('register', true, 'Erro ao realizar cadastro.');
+                        }
+                    }
+                }
+            };
+
+            // Event Listeners
+            document.getElementById('loginForm').addEventListener('submit', formHandling.handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', formHandling.handleRegister);
+
+            document.getElementById('confirmPassword').addEventListener('input', function() {
+                const password = document.getElementById('registerPassword').value;
+                if (this.value && this.value !== password) {
+                    utils.showFieldError('confirmPassword', 'As senhas não coincidem.');
+                } else {
+                    this.classList.remove('is-invalid');
+                    const feedback = this.nextElementSibling?.nextElementSibling;
+                    if (feedback) {
+                        feedback.textContent = '';
+                    }
+                }
+            });
+
+            // Modal cleanup
+            ['loginModal', 'registerModal'].forEach(modalId => {
+                document.getElementById(modalId).addEventListener('hidden.bs.modal', function() {
+                    const formId = modalId.replace('Modal', '') + 'Form';
+                    document.getElementById(formId).reset();
+                    utils.clearFormErrors(formId);
+                });
+            });
+
+            // Reserva button handling
+            const reservaHandling = {
+                isUserAuthenticated: @(User.Identity?.IsAuthenticated == true ? "true" : "false"),
+                pendingReservaId: null,
+                
+                handleReservaClick(e, acomodacaoId) {
+                    e.preventDefault();
+                    
+                    if (this.isUserAuthenticated) {
+                        // Usuário logado - redirecionar para criar reserva
+                        window.location.href = `/Reservas/Create?id=${acomodacaoId}`;
+                    } else {
+                        // Usuário não logado - armazenar ID da acomodação e abrir modal de login
+                        this.pendingReservaId = acomodacaoId;
+                        modalHandling.showLoginModal();
+                    }
+                },
+
+                // Função para redirecionar após login bem-sucedido
+                redirectToPendingReserva() {
+                    if (this.pendingReservaId) {
+                        window.location.href = `/Reservas/Create?id=${this.pendingReservaId}`;
+                    }
+                }
+            };
+
+            // Assign reserva function to window for button onclick handlers
+            window.handleReservaClick = reservaHandling.handleReservaClick.bind(reservaHandling);
+            window.redirectToPendingReserva = reservaHandling.redirectToPendingReserva.bind(reservaHandling);
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 
