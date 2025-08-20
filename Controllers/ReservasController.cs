@@ -237,7 +237,7 @@ namespace GerenciadorHotel.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,Status,ValorTotal,DataReserva,DataCheckInReal,DataCheckOutReal,Observacoes,AcomodacaoId,PaisId")] Reserva reserva)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,Status,DataCheckInReal,DataCheckOutReal,Observacoes,AcomodacaoId,PaisId")] Reserva reserva)
         {
             if (id != reserva.Id)
             {
@@ -303,8 +303,14 @@ namespace GerenciadorHotel.Controllers
                     reservaOriginal.NumeroHospedes = reserva.NumeroHospedes;
                     reservaOriginal.PedidosEspeciais = reserva.PedidosEspeciais;
                     reservaOriginal.Status = reserva.Status;
-                    reservaOriginal.ValorTotal = reserva.ValorTotal;
-                    reservaOriginal.DataReserva = reserva.DataReserva;
+                    // Recalcular ValorTotal com base na acomodação e número de noites
+                    var acomodacao = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+                    if (acomodacao != null)
+                    {
+                        var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
+                        reservaOriginal.ValorTotal = acomodacao.Preco * quantidadeNoites;
+                    }
+                    // não sobrescrever DataReserva — manter a original
                     reservaOriginal.DataCheckInReal = reserva.DataCheckInReal;
                     reservaOriginal.DataCheckOutReal = reserva.DataCheckOutReal;
                     reservaOriginal.Observacoes = reserva.Observacoes;
