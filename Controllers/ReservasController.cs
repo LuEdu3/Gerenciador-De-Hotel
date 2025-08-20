@@ -412,6 +412,44 @@ namespace GerenciadorHotel.Controllers
             return RedirectToAction(nameof(Details), new { id = id });
         }
 
+        // POST: CancelarReserva
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelarReserva(int id)
+        {
+            var reserva = await _context.Reservas.Include(r => r.Acomodacao).FirstOrDefaultAsync(r => r.Id == id);
+            if (reserva == null)
+            {
+                return NotFound();
+            }
+
+            // Permissão: hóspedes só podem cancelar suas próprias reservas
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
+            // Marcar como cancelada
+            reserva.Status = StatusReserva.Cancelada;
+
+            // Se a acomodação estava marcada como ocupada por esta reserva, liberar
+            if (reserva.Acomodacao != null && reserva.Acomodacao.Status == StatusAcomodacao.Ocupada)
+            {
+                reserva.Acomodacao.Status = StatusAcomodacao.Disponivel;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Reserva cancelada com sucesso.";
+
+            if (User.IsInRole("Hospede"))
+                return RedirectToAction("MinhasReservas");
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Reservas/Delete/5
         [Authorize]
         public async Task<IActionResult> Delete(int? id)
