@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using GerenciadorHotel.Data;
 using GerenciadorHotel.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Identity;
 
 namespace GerenciadorHotel.Controllers
 {
@@ -12,78 +11,38 @@ namespace GerenciadorHotel.Controllers
     public class ReservasController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReservasController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public ReservasController(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
         // GET: Reservas
+        [Authorize] // Permite qualquer usuário autenticado
         public async Task<IActionResult> Index()
         {
+            // Se hóspede tentar acessar, redireciona para suas próprias reservas
+            if (User.IsInRole("Hospede"))
+            {
+                return RedirectToAction("MinhasReservas");
+            }
+
+            // Apenas admins e recepcionistas chegam aqui
+            if (!User.IsInRole("Administrador") && !User.IsInRole("Recepcionista"))
+            {
+                return Forbid();
+            }
+
             var reservas = await _context.Reservas
                 .Include(r => r.Acomodacao)
                 .Include(r => r.Pais)
                 .OrderByDescending(r => r.DataReserva)
                 .ToListAsync();
             return View(reservas);
-        }
-
-        // GET: Minhas Reservas (para hóspedes)
-        [Authorize(Roles = "Hospede")]
-        public async Task<IActionResult> MinhasReservas()
-        {
-            var userId = _userManager.GetUserId(User);
-            var reservas = await _context.Reservas
-                .Include(r => r.Acomodacao)
-                .ThenInclude(a => a!.Imagens)
-                .Include(r => r.Pais)
-                .Where(r => r.UserId == userId)
-                .OrderByDescending(r => r.DataReserva)
-                .ToListAsync();
-
-            return View(reservas);
-        }
-
-        // POST: Cancelar Reserva (para hóspedes)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Hospede")]
-        public async Task<IActionResult> CancelarReserva(int id)
-        {
-            var userId = _userManager.GetUserId(User);
-            var reserva = await _context.Reservas
-                .Include(r => r.Acomodacao)
-                .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
-
-            if (reserva == null)
-            {
-                return NotFound();
-            }
-
-            if (reserva.Status != StatusReserva.Pendente)
-            {
-                TempData["ErrorMessage"] = "Só é possível cancelar reservas com status 'Pendente'.";
-                return RedirectToAction(nameof(MinhasReservas));
-            }
-
-            // Verificar se a data de check-in não é hoje ou já passou
-            if (reserva.DataCheckIn <= DateTime.Today)
-            {
-                TempData["ErrorMessage"] = "Não é possível cancelar reservas com check-in para hoje ou que já passaram.";
-                return RedirectToAction(nameof(MinhasReservas));
-            }
-
-            reserva.Status = StatusReserva.Cancelada;
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Reserva cancelada com sucesso!";
-            return RedirectToAction(nameof(MinhasReservas));
         }
 
         // GET: Reservas/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -102,20 +61,61 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
+            // Se for hóspede, só pode acessar detalhes da própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             return View(reserva);
         }
 
         // GET: Reservas/Create
+        [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
         public IActionResult Create()
         {
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome");
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome");
+
+            // Buscar datas ocupadas por acomodação
+            var reservas = _context.Reservas
+                .Where(r => r.Status != StatusReserva.Cancelada)
+                .Select(r => new
+                {
+                    r.AcomodacaoId,
+                    r.DataCheckIn,
+                    r.DataCheckOut
+                })
+                .ToList();
+
+            // Agrupar por acomodação
+            var datasOcupadasPorAcomodacao = reservas
+                .GroupBy(r => r.AcomodacaoId)
+                .ToDictionary(g => g.Key, g => g.Select(r => new { inicio = r.DataCheckIn, fim = r.DataCheckOut }).ToList());
+
+            // LOG TEMPORÁRIO PARA DEBUG
+            System.Diagnostics.Debug.WriteLine("[DEBUG] Datas ocupadas por acomodação:");
+            foreach (var kvp in datasOcupadasPorAcomodacao)
+            {
+                System.Diagnostics.Debug.WriteLine($"AcomodacaoId: {kvp.Key}");
+                foreach (var intervalo in kvp.Value)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  Início: {intervalo.inicio}, Fim: {intervalo.fim}");
+                }
+            }
+
+            ViewBag.DatasOcupadasPorAcomodacao = datasOcupadasPorAcomodacao;
             return View();
         }
 
         // POST: Reservas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
         public async Task<IActionResult> Create([Bind("NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,AcomodacaoId,PaisId")] Reserva reserva)
         {
             if (ModelState.IsValid)
@@ -131,51 +131,63 @@ namespace GerenciadorHotel.Controllers
                 }
                 else
                 {
-                    // Verificar disponibilidade
-                    var acomodacao = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
-                    if (acomodacao != null)
+                    // Verificar conflitos de reserva sobreposta
+                    var conflito = await _context.Reservas
+                        .Where(r => r.AcomodacaoId == reserva.AcomodacaoId && r.Status != StatusReserva.Cancelada)
+                        .Where(r =>
+                            (reserva.DataCheckIn < r.DataCheckOut && reserva.DataCheckOut > r.DataCheckIn)
+                        )
+                        .AnyAsync();
+                    if (conflito)
                     {
-                        // Calcular valor total
-                        var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
-                        reserva.ValorTotal = acomodacao.Preco * quantidadeNoites;
-                        reserva.DataReserva = DateTime.Now;
-                        reserva.Status = StatusReserva.Pendente;
-
-                        // Associar a reserva ao usuário logado se for um hóspede
-                        if (User.IsInRole("Hospede"))
-                        {
-                            reserva.UserId = _userManager.GetUserId(User);
-                        }
-
-                        _context.Add(reserva);
-                        await _context.SaveChangesAsync();
-
-                        TempData["SuccessMessage"] = "Reserva criada com sucesso!";
-
-                        // Redirecionar baseado no role do usuário
-                        if (User.IsInRole("Hospede"))
-                        {
-                            return RedirectToAction(nameof(MinhasReservas));
-                        }
-                        else
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
+                        ModelState.AddModelError("AcomodacaoId", "Já existe uma reserva para este quarto no período selecionado. Escolha outra acomodação ou datas.");
                     }
                     else
                     {
-                        ModelState.AddModelError("AcomodacaoId", "Acomodação não encontrada.");
+                        var acomodacao = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+                        if (acomodacao != null)
+                        {
+                            // Calcular valor total
+                            var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
+                            reserva.ValorTotal = acomodacao.Preco * quantidadeNoites;
+                            reserva.DataReserva = DateTime.Now;
+                            reserva.Status = StatusReserva.Pendente;
+                            // Associar ao usuário logado
+                            if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                                reserva.UserId = userId;
+                            }
+
+                            _context.Add(reserva);
+                            await _context.SaveChangesAsync();
+                            TempData["SuccessMessage"] = "Reserva criada com sucesso!";
+                            return RedirectToAction("MinhasReservas");
+                        }
                     }
                 }
             }
 
-            // Se chegou até aqui, há erros no formulário
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome", reserva.AcomodacaoId);
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
             return View(reserva);
         }
+        // GET: Reservas/MinhasReservas
+        [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
+        public async Task<IActionResult> MinhasReservas()
+        {
+            string? userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            var reservas = await _context.Reservas
+                .Include(r => r.Acomodacao)
+                .Include(r => r.Pais)
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(r => r.DataReserva)
+                .ToListAsync();
+            return View(reservas);
+        }
 
         // GET: Reservas/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -189,41 +201,144 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
+            // Se for hóspede, só pode editar a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa), "Id", "Nome", reserva.AcomodacaoId);
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
+
+            // Buscar datas ocupadas por acomodação (ignora a própria reserva)
+            var reservas = _context.Reservas
+                .Where(r => r.Status != StatusReserva.Cancelada && r.Id != reserva.Id)
+                .Select(r => new
+                {
+                    r.AcomodacaoId,
+                    r.DataCheckIn,
+                    r.DataCheckOut
+                })
+                .ToList();
+
+            var datasOcupadasPorAcomodacao = reservas
+                .GroupBy(r => r.AcomodacaoId)
+                .ToDictionary(g => g.Key, g => g.Select(r => new { inicio = r.DataCheckIn, fim = r.DataCheckOut }).ToList());
+
+            ViewBag.DatasOcupadasPorAcomodacao = datasOcupadasPorAcomodacao;
             return View(reserva);
         }
 
         // POST: Reservas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,Status,ValorTotal,DataReserva,DataCheckInReal,DataCheckOutReal,Observacoes,AcomodacaoId,PaisId")] Reserva reserva)
+        [Authorize]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,Status,DataCheckInReal,DataCheckOutReal,Observacoes,AcomodacaoId,PaisId")] Reserva reserva)
         {
             if (id != reserva.Id)
             {
                 return NotFound();
             }
 
+            var reservaOriginal = await _context.Reservas.FindAsync(id);
+            if (reservaOriginal == null)
+            {
+                return NotFound();
+            }
+
+            // Se for hóspede, só pode editar a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reservaOriginal.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                try
+                // Validação de ordem das datas e data mínima (mesma regra do Create)
+                if (reserva.DataCheckIn >= reserva.DataCheckOut)
                 {
-                    _context.Update(reserva);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Reserva atualizada com sucesso!";
+                    ModelState.AddModelError("DataCheckOut", "A data de check-out deve ser posterior à data de check-in.");
                 }
-                catch (DbUpdateConcurrencyException)
+                else if (reserva.DataCheckIn < DateTime.Today)
                 {
-                    if (!ReservaExists(reserva.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("DataCheckIn", "A data de check-in não pode ser anterior à data atual.");
                 }
-                return RedirectToAction(nameof(Index));
+
+                // Se houve erro nas datas, retorna para a view com os selects repovidados
+                if (!ModelState.IsValid)
+                {
+                    ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa), "Id", "Nome", reserva.AcomodacaoId);
+                    ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
+                    return View(reserva);
+                }
+
+                // Validação de conflito de datas (ignora a própria reserva)
+                var conflito = await _context.Reservas
+                    .Where(r => r.AcomodacaoId == reserva.AcomodacaoId && r.Id != reserva.Id && r.Status != StatusReserva.Cancelada)
+                    .Where(r =>
+                        (reserva.DataCheckIn < r.DataCheckOut && reserva.DataCheckOut > r.DataCheckIn)
+                    )
+                    .AnyAsync();
+                if (conflito)
+                {
+                    ModelState.AddModelError("AcomodacaoId", "Já existe uma reserva para este quarto no período selecionado. Escolha outra acomodação ou datas.");
+                }
+                else
+                {
+                    // Atualiza apenas os campos permitidos
+                    reservaOriginal.NomeHospede = reserva.NomeHospede;
+                    reservaOriginal.SobrenomeHospede = reserva.SobrenomeHospede;
+                    reservaOriginal.Email = reserva.Email;
+                    reservaOriginal.Telefone = reserva.Telefone;
+                    reservaOriginal.DataCheckIn = reserva.DataCheckIn;
+                    reservaOriginal.DataCheckOut = reserva.DataCheckOut;
+                    reservaOriginal.NumeroHospedes = reserva.NumeroHospedes;
+                    reservaOriginal.PedidosEspeciais = reserva.PedidosEspeciais;
+                    reservaOriginal.Status = reserva.Status;
+                    // Recalcular ValorTotal com base na acomodação e número de noites
+                    var acomodacao = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+                    if (acomodacao != null)
+                    {
+                        var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
+                        reservaOriginal.ValorTotal = acomodacao.Preco * quantidadeNoites;
+                    }
+                    // não sobrescrever DataReserva — manter a original
+                    reservaOriginal.DataCheckInReal = reserva.DataCheckInReal;
+                    reservaOriginal.DataCheckOutReal = reserva.DataCheckOutReal;
+                    reservaOriginal.Observacoes = reserva.Observacoes;
+                    reservaOriginal.AcomodacaoId = reserva.AcomodacaoId;
+                    reservaOriginal.PaisId = reserva.PaisId;
+
+                    try
+                    {
+                        _context.Update(reservaOriginal);
+                        await _context.SaveChangesAsync();
+                        TempData["SuccessMessage"] = "Reserva atualizada com sucesso!";
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!ReservaExists(reservaOriginal.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    // Redireciona para MinhasReservas se hóspede
+                    if (User.IsInRole("Hospede"))
+                        return RedirectToAction("MinhasReservas");
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa), "Id", "Nome", reserva.AcomodacaoId);
@@ -297,8 +412,46 @@ namespace GerenciadorHotel.Controllers
             return RedirectToAction(nameof(Details), new { id = id });
         }
 
+        // POST: CancelarReserva
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelarReserva(int id)
+        {
+            var reserva = await _context.Reservas.Include(r => r.Acomodacao).FirstOrDefaultAsync(r => r.Id == id);
+            if (reserva == null)
+            {
+                return NotFound();
+            }
+
+            // Permissão: hóspedes só podem cancelar suas próprias reservas
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
+            // Marcar como cancelada
+            reserva.Status = StatusReserva.Cancelada;
+
+            // Se a acomodação estava marcada como ocupada por esta reserva, liberar
+            if (reserva.Acomodacao != null && reserva.Acomodacao.Status == StatusAcomodacao.Ocupada)
+            {
+                reserva.Acomodacao.Status = StatusAcomodacao.Disponivel;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Reserva cancelada com sucesso.";
+
+            if (User.IsInRole("Hospede"))
+                return RedirectToAction("MinhasReservas");
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Reservas/Delete/5
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -315,23 +468,48 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
+            // Se for hóspede, só pode excluir a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             return View(reserva);
         }
 
         // POST: Reservas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var reserva = await _context.Reservas.FindAsync(id);
-            if (reserva != null)
+            if (reserva == null)
             {
-                _context.Reservas.Remove(reserva);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Reserva excluída com sucesso!";
+                return NotFound();
             }
 
+            // Se for hóspede, só pode excluir a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
+            _context.Reservas.Remove(reserva);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Reserva excluída com sucesso!";
+
+            // Redireciona para MinhasReservas se hóspede
+            if (User.IsInRole("Hospede"))
+                return RedirectToAction("MinhasReservas");
             return RedirectToAction(nameof(Index));
         }
 

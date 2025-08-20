@@ -1,0 +1,133 @@
+@model GerenciadorHotel.Models.Acomodacao
+@using GerenciadorHotel.Models
+
+@{
+    ViewData["Title"] = "Detalhes da Acomodação";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Galeria de Imagens -->
+            @if (Model.Imagens != null && Model.Imagens.Any())
+            {
+                <div class="card mb-4">
+                    <div id="carouselImages" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @for (int i = 0; i < Model.Imagens.Count; i++)
+                            {
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@Model.Imagens.ElementAt(i).ImagemUrl" class="d-block w-100" alt="@Model.Nome" style="height: 400px; object-fit: cover;">
+                                </div>
+                            }
+                        </div>
+                        @if (Model.Imagens.Count > 1)
+                        {
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselImages" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Próximo</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Informações da Acomodação -->
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h3 mb-3">@Model.Nome</h1>
+                    <p class="text-muted mb-4">@Model.Descricao</p>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-bed text-primary me-2"></i>
+                                <span>@Model.QuantidadeCamas Camas</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-users text-primary me-2"></i>
+                                <span>Até @Model.QuantidadeCamas camas</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-moon text-primary me-2"></i>
+                                <span>Mín. @Model.MinimoNoites noites</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amenidades -->
+                    @if (Model.AcomodacaoAmenidades != null && Model.AcomodacaoAmenidades.Any())
+                    {
+                        <div class="mb-4">
+                            <h5>Amenidades</h5>
+                            <div class="row">
+                                @foreach (var amenidade in Model.AcomodacaoAmenidades)
+                                {
+                                    <div class="col-md-6 mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            <span>@amenidade.Amenidade?.Nome</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar de Reserva -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h4 class="text-success mb-0">@Model.Preco.ToString("C")</h4>
+                        <small class="text-muted">por noite</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Status:</span>
+                            <span class="badge @(Model.Status switch {
+                                GerenciadorHotel.Models.StatusAcomodacao.Disponivel => "bg-success",
+                                GerenciadorHotel.Models.StatusAcomodacao.Ocupada => "bg-danger",
+                                GerenciadorHotel.Models.StatusAcomodacao.Manutencao => "bg-warning text-dark",
+                                _ => "bg-secondary"
+                            })">
+                                @(Model.Status == StatusAcomodacao.Disponivel ? "Disponível" : Model.Status.ToString())
+                            </span>
+                        </div>
+                    </div>
+
+                    @if (Model.Status == StatusAcomodacao.Disponivel)
+                    {
+                        <button type="button" class="btn btn-primary w-100 mb-3" onclick="handleReservaClick(event, @Model.Id)">
+                            <i class="fas fa-calendar-check me-2"></i>Reservar Agora
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary w-100 mb-3" disabled>
+                            <i class="fas fa-times me-2"></i>Indisponível
+                        </button>
+                    }
+
+                    <div class="text-center">
+                        <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Ver Outras Acomodações
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 @model GerenciadorHotel.Models.Acomodacao
-<form asp-action="Create" method="post" class="mb-5">
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="mb-5">
     <div class="mb-3">
         <label asp-for="Nome" class="form-label"></label>
         <input asp-for="Nome" class="form-control" />
@@ -35,9 +35,18 @@
         <span asp-validation-for="Status" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="ImagemPrincipalUrl" class="form-label"></label>
-        <input asp-for="ImagemPrincipalUrl" class="form-control" />
-        <span asp-validation-for="ImagemPrincipalUrl" class="text-danger"></span>
+        <label class="form-label">Fotos da Acomodação (mínimo 1, máximo 10)</label>
+        <input type="file" name="Imagens" id="Imagens" class="form-control" accept="image/*" multiple required />
+        <small class="form-text text-muted">Selecione de 1 a 10 imagens. Após o envio, escolha a principal.</small>
+        <span class="text-danger" id="imagemErro"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Fotos adicionais da acomodação</label>
+        <input type="text" name="ImagensAcomodacao[0]" class="form-control mb-2" placeholder="URL da Foto 1" />
+        <input type="text" name="ImagensAcomodacao[1]" class="form-control mb-2" placeholder="URL da Foto 2" />
+        <input type="text" name="ImagensAcomodacao[2]" class="form-control mb-2" placeholder="URL da Foto 3" />
+        <input type="text" name="ImagensAcomodacao[3]" class="form-control mb-2" placeholder="URL da Foto 4" />
+        <input type="text" name="ImagensAcomodacao[4]" class="form-control mb-2" placeholder="URL da Foto 5" />
     </div>
     <div class="mb-3 form-check">
         <input asp-for="Ativa" class="form-check-input" />

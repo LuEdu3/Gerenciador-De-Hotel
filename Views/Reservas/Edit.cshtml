@@ -42,12 +42,14 @@
             </div>
             <div class="form-group">
                 <label asp-for="DataCheckIn" class="control-label"></label>
-                <input asp-for="DataCheckIn" class="form-control" type="date" />
+                <input asp-for="DataCheckIn" class="form-control" type="date"
+                    min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="DataCheckIn" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DataCheckOut" class="control-label"></label>
-                <input asp-for="DataCheckOut" class="form-control" type="date" />
+                <input asp-for="DataCheckOut" class="form-control" type="date"
+                    min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="DataCheckOut" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -61,15 +63,17 @@
                 <span asp-validation-for="PedidosEspeciais" class="text-danger"></span>
             </div>
             <div class="form-group">
-                    <label asp-for="Status" class="control-label"></label>
-                    <select asp-for="Status" class="form-control">
-                        @foreach (GerenciadorHotel.Models.StatusReserva status in Enum.GetValues(typeof(GerenciadorHotel.Models.StatusReserva)))
-                        {
-                            var displayName = GerenciadorHotel.Extensions.EnumExtensions.GetDisplayName(status);
-                            <option value="@((int)status)" selected="@(Model.Status == status ? "selected" : null)">@displayName</option>
-                        }
-                    </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
+                <label asp-for="Status" class="control-label"></label>
+                <select asp-for="Status" class="form-control">
+                    @foreach (GerenciadorHotel.Models.StatusReserva status in
+                                        Enum.GetValues(typeof(GerenciadorHotel.Models.StatusReserva)))
+                    {
+                        var displayName = GerenciadorHotel.Extensions.EnumExtensions.GetDisplayName(status);
+                        <option value="@((int)status)" selected="@(Model.Status == status ? "selected" : null)">@displayName
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Observacoes" class="control-label"></label>
@@ -80,9 +84,179 @@
     </div>
     <div class="form-group mt-3">
         <button type="submit" class="btn btn-primary">Salvar</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        @if (User.IsInRole("Hospede"))
+        {
+            <a asp-action="MinhasReservas" class="btn btn-secondary">Cancelar</a>
+            <a asp-action="MinhasReservas" class="btn btn-outline-dark ms-2">Voltar</a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger ms-2"
+                    onclick="return confirm('Tem certeza que deseja excluir esta reserva?');">Excluir</button>
+            </form>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        }
     </div>
 </form>
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            var datasOcupadasPorAcomodacao = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.DatasOcupadasPorAcomodacao ?? new Dictionary<int, object>()));
+            var acomodacaoSelect = $('select[name="AcomodacaoId"]');
+            var checkInInput = $('input[name="DataCheckIn"]');
+            var checkOutInput = $('input[name="DataCheckOut"]');
+
+            function bloquearDatas(acomodacaoId) {
+                checkInInput.removeAttr('disabled');
+                checkOutInput.removeAttr('disabled');
+                checkInInput.find('option').removeAttr('disabled');
+                checkOutInput.find('option').removeAttr('disabled');
+
+                var datas = datasOcupadasPorAcomodacao[acomodacaoId] || [];
+
+                var hoje = new Date();
+                var hojeStr = hoje.toISOString().split('T')[0];
+                checkInInput[0].min = hojeStr;
+
+                // se já existe um valor em checkIn, mín. do checkOut será dia seguinte ao checkIn
+                function atualizarMinCheckOut() {
+                    var ciVal = checkInInput.val();
+                    var minCheckOut;
+                    if (ciVal) {
+                        var selected = new Date(ciVal);
+                        var next = new Date(selected);
+                        next.setDate(next.getDate() + 1);
+                        minCheckOut = next.toISOString().split('T')[0];
+                    } else {
+                        var diaSeguinte = new Date(hoje);
+                        diaSeguinte.setDate(diaSeguinte.getDate() + 1);
+                        minCheckOut = diaSeguinte.toISOString().split('T')[0];
+                    }
+                    checkOutInput[0].min = minCheckOut;
+                }
+
+                atualizarMinCheckOut();
+
+                checkInInput.off('input').on('input', function () {
+                    var dataSelecionada = new Date(this.value);
+                    for (var i = 0; i < datas.length; i++) {
+                        var inicio = new Date(datas[i].inicio);
+                        var fim = new Date(datas[i].fim);
+                        if (dataSelecionada >= inicio && dataSelecionada < fim) {
+                            this.setCustomValidity('Esta data está ocupada para esta acomodação.');
+                            return;
+                        }
+                    }
+                    this.setCustomValidity('');
+                    atualizarMinCheckOut();
+                });
+                checkOutInput.off('input').on('input', function () {
+                    var dataSelecionada = new Date(this.value);
+                    for (var i = 0; i < datas.length; i++) {
+                        var inicio = new Date(datas[i].inicio);
+                        var fim = new Date(datas[i].fim);
+                        if (dataSelecionada > inicio && dataSelecionada <= fim) {
+                            this.setCustomValidity('Esta data está ocupada para esta acomodação.');
+                            return;
+                        }
+                    }
+                    this.setCustomValidity('');
+                });
+
+                // garantir que check-out seja após check-in
+                checkInInput.off('change').on('change', function () {
+                    if (!this.value) return;
+                    atualizarMinCheckOut();
+                    if (checkOutInput.val() && checkOutInput.val() < checkOutInput[0].min) {
+                        checkOutInput.val('');
+                    }
+                });
+            }
+
+            acomodacaoSelect.on('change', function () {
+                var acomodacaoId = $(this).val();
+                bloquearDatas(acomodacaoId);
+            });
+
+            var inicialId = acomodacaoSelect.val();
+            if (inicialId) bloquearDatas(inicialId);
+
+            // Validação extra no submit para prevenir envio quando check-in >= check-out
+            $('form[asp-action="Edit"]').on('submit', function (e) {
+                var ci = checkInInput.val();
+                var co = checkOutInput.val();
+                if (ci && co) {
+                    var dci = new Date(ci);
+                    var dco = new Date(co);
+                    if (dci >= dco) {
+                        e.preventDefault();
+                        checkOutInput[0].setCustomValidity('A data de check-out deve ser posterior à data de check-in.');
+                        checkOutInput[0].reportValidity();
+                        return false;
+                    }
+                }
+                // garantir que check-in não seja anterior a hoje
+                if (ci) {
+                    var hoje = new Date();
+                    var dci2 = new Date(ci);
+                    // zerar hora para comparação apenas de datas
+                    hoje.setHours(0, 0, 0, 0);
+                    dci2.setHours(0, 0, 0, 0);
+                    if (dci2 < hoje) {
+                        e.preventDefault();
+                        checkInInput[0].setCustomValidity('A data de check-in não pode ser anterior à data atual.');
+                        checkInInput[0].reportValidity();
+                        return false;
+                    }
+                }
+                // limpar mensagens customizadas antes do envio
+                checkInInput[0].setCustomValidity('');
+                checkOutInput[0].setCustomValidity('');
+            });
+
+            // Flatpickr integration to visually block occupied dates
+            var flatpickrCss = document.createElement('link');
+            flatpickrCss.rel = 'stylesheet';
+            flatpickrCss.href = 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css';
+            document.head.appendChild(flatpickrCss);
+
+            var fpScript = document.createElement('script');
+            fpScript.src = 'https://cdn.jsdelivr.net/npm/flatpickr';
+            fpScript.onload = function () {
+                var fpCheckIn = flatpickr(checkInInput[0], {
+                    dateFormat: 'Y-m-d',
+                    minDate: 'today',
+                    disable: []
+                });
+                var fpCheckOut = flatpickr(checkOutInput[0], {
+                    dateFormat: 'Y-m-d',
+                    minDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
+                    disable: []
+                });
+
+                function toDisabled(intervals) {
+                    if (!intervals) return [];
+                    return intervals.map(function (it) { return { from: it.inicio.split('T')[0], to: it.fim.split('T')[0] }; });
+                }
+
+                if (inicialId) {
+                    var disabled = toDisabled(datasOcupadasPorAcomodacao[inicialId]);
+                    fpCheckIn.set('disable', disabled);
+                    fpCheckOut.set('disable', disabled);
+                }
+
+                acomodacaoSelect.on('change', function () {
+                    var id = $(this).val();
+                    var disabled = toDisabled(datasOcupadasPorAcomodacao[id]);
+                    fpCheckIn.set('disable', disabled);
+                    fpCheckOut.set('disable', disabled);
+                });
+            };
+            document.body.appendChild(fpScript);
+        });
+    </script>
 }
