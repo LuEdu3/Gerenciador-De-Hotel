@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using GerenciadorHotel.Models;
+using GerenciadorHotel.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using GerenciadorHotel.Data; 
 
+using GerenciadorHotel.ViewModels;
 namespace GerenciadorHotel.Controllers
 {
     [Authorize(Roles = "Administrador")]
@@ -21,9 +24,10 @@ namespace GerenciadorHotel.Controllers
             int filtroDias = dias ?? 30;
             var dataLimite = DateTime.Now.AddDays(-filtroDias);
             var totalAcomodacoes = _context.Acomodacoes.Count();
+            // Carregar reservas de todos os status relevantes, incluindo pendentes, confirmadas, check-in/check-out
             var reservasFiltradas = _context.Reservas
-                .Where(r => (r.Status == StatusReserva.Confirmada || r.Status == StatusReserva.CheckInRealizado)
-                    && r.DataCheckIn >= dataLimite)
+                .Where(r => r.DataCheckIn >= dataLimite)
+                .Include(r => r.Acomodacao)
                 .ToList();
 
             var acomodacoes = _context.Acomodacoes.ToList();

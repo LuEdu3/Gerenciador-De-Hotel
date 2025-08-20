@@ -1,7 +1,8 @@
-using System.Collections.Generic;
-using GerenciadorHotel.Models;
 
-namespace GerenciadorHotel.Models
+using GerenciadorHotel.Models;
+using System.Collections.Generic;
+
+namespace GerenciadorHotel.ViewModels
 {
     public class RelatorioOcupacaoViewModel
     {

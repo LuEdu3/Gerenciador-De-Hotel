@@ -1,4 +1,4 @@
-@model GerenciadorHotel.Models.RelatorioOcupacaoViewModel
+@model GerenciadorHotel.ViewModels.RelatorioOcupacaoViewModel
 
 <h2>Relatório de Ocupação por Quarto</h2>
 <ul>
@@ -32,7 +32,7 @@
         </tr>
     </thead>
     <tbody>
-        @if (Model.OcupacaoPorQuarto != null)
+        @if (Model.OcupacaoPorQuarto != null && Model.OcupacaoPorQuarto.Any())
         {
             foreach (var quarto in Model.OcupacaoPorQuarto)
             {
