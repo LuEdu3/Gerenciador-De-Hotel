@@ -110,9 +110,9 @@
 
                     @if (Model.Status == StatusAcomodacao.Disponivel)
                     {
-                        <a href="@Url.Action("Create", "Reservas", new { id = Model.Id })" class="btn btn-primary w-100 mb-3">
+                        <button type="button" class="btn btn-primary w-100 mb-3" onclick="handleReservaClick(event, @Model.Id)">
                             <i class="fas fa-calendar-check me-2"></i>Reservar Agora
-                        </a>
+                        </button>
                     }
                     else
                     {

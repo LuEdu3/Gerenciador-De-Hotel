@@ -501,9 +501,22 @@
                         const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
                         if (modal) {
                             modal.hide();
-                            window.location.reload();
+                            // Verificar se há uma reserva pendente
+                            if (window.redirectToPendingReserva && typeof window.redirectToPendingReserva === 'function') {
+                                setTimeout(() => {
+                                    window.redirectToPendingReserva();
+                                }, 100);
+                            } else {
+                                window.location.reload();
+                            }
                         } else {
-                            window.location.reload();
+                            if (window.redirectToPendingReserva && typeof window.redirectToPendingReserva === 'function') {
+                                setTimeout(() => {
+                                    window.redirectToPendingReserva();
+                                }, 100);
+                            } else {
+                                window.location.reload();
+                            }
                         }
                     } catch (result) {
                         if (result.errors) {
@@ -600,6 +613,36 @@
                     utils.clearFormErrors(formId);
                 });
             });
+
+            // Reserva button handling
+            const reservaHandling = {
+                isUserAuthenticated: @(User.Identity?.IsAuthenticated == true ? "true" : "false"),
+                pendingReservaId: null,
+                
+                handleReservaClick(e, acomodacaoId) {
+                    e.preventDefault();
+                    
+                    if (this.isUserAuthenticated) {
+                        // Usuário logado - redirecionar para criar reserva
+                        window.location.href = `/Reservas/Create?id=${acomodacaoId}`;
+                    } else {
+                        // Usuário não logado - armazenar ID da acomodação e abrir modal de login
+                        this.pendingReservaId = acomodacaoId;
+                        modalHandling.showLoginModal();
+                    }
+                },
+
+                // Função para redirecionar após login bem-sucedido
+                redirectToPendingReserva() {
+                    if (this.pendingReservaId) {
+                        window.location.href = `/Reservas/Create?id=${this.pendingReservaId}`;
+                    }
+                }
+            };
+
+            // Assign reserva function to window for button onclick handlers
+            window.handleReservaClick = reservaHandling.handleReservaClick.bind(reservaHandling);
+            window.redirectToPendingReserva = reservaHandling.redirectToPendingReserva.bind(reservaHandling);
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
