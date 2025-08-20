@@ -79,20 +79,9 @@
                                 </form>
                             </li>
                         }
-
-                        else
-                      //!!AVISO
-//!!AVISO
-                      @* <li class="nav-item"> *@
-                            <a class="nav-link text-white" asp-controller="Acomodacoes" asp-action="Catalogo">
-                                <i class="bi bi-building"></i> Acomodações
-                            </a>
-                        </li>
-                        @if (User.Identity?.IsAuthenticated != true)
-//!!AVISO
-//!!AVISO
+                        else if (User.Identity?.IsAuthenticated == true)
                         {
-                            <!-- Menu do Usuário Comum -->
+                            <!-- Menu para usuários logados (não administradores) -->
                             <li class="nav-item">
                                 <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
                                     asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -110,62 +99,74 @@
                                     asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
                             </li>
                             
-                            <!-- Botões de autenticação para usuários não logados -->
-                            @if (User.Identity?.IsAuthenticated == true)
-                            {
-                                <li class="nav-item d-none d-lg-block">
-                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-header">Sair</button>
-                                    </form>
-                                </li>
-                                <li class="nav-item d-none d-lg-block">
-                                    <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-header btn-header-accent">Reservar</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item d-none d-lg-block">
-                                    <button type="button" class="btn btn-header" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                        Login
-                                    </button>
-                                </li>
-                                <li class="nav-item d-none d-lg-block">
-                                    <button type="button" class="btn btn-header btn-header-accent" data-bs-toggle="modal" data-bs-target="#registerModal">
-                                        Cadastrar
-                                    </button>
-                                </li>
-                            }
+                            <!-- Botões para usuários logados (não administradores) -->
+                            <li class="nav-item d-none d-lg-block">
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-header">Sair</button>
+                                </form>
+                            </li>
+                            <li class="nav-item d-none d-lg-block">
+                                <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-header btn-header-accent">Reservar</a>
+                            </li>
                             
-                            <!-- Botões para mobile - usuários comuns -->
-                            @if (User.Identity?.IsAuthenticated == true)
-                            {
-                                <li class="nav-item d-lg-none">
-                                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
-                                        <button type="submit" class="nav-link nav-link-modern">Sair</button>
-                                    </form>
-                                </li>
-                                <li class="nav-item d-lg-none">
-                                    <a class="nav-link nav-link-modern" href="@Url.Action("Acomodacao", "Home")">Reservar</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item d-lg-none">
-                                    <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                        Login
-                                    </button>
-                                </li>
-                                <li class="nav-item d-lg-none">
-                                    <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#registerModal">
-                                        Cadastrar
-                                    </button>
-                                </li>
-                            }
+                            <!-- Botões para mobile - usuários logados (não administradores) -->
+                            <li class="nav-item d-lg-none">
+                                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link nav-link-modern">Sair</button>
+                                </form>
+                            </li>
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link nav-link-modern" href="@Url.Action("Acomodacao", "Home")">Reservar</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Menu para usuários não logados -->
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Acomodacao" ? "active" : "")"
+                                    asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                            </li>
+                            
+                            <!-- Botões de login/cadastro para usuários não logados -->
+                            <li class="nav-item d-none d-lg-block">
+                                <button type="button" class="btn btn-header" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                    Login
+                                </button>
+                            </li>
+                            <li class="nav-item d-none d-lg-block">
+                                <button type="button" class="btn btn-header btn-header-accent" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                    Cadastrar
+                                </button>
+                            </li>
+                            
+                            <!-- Botões para mobile - usuários não logados -->
+                            <li class="nav-item d-lg-none">
+                                <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                    Login
+                                </button>
+                            </li>
+                            <li class="nav-item d-lg-none">
+                                <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                    Cadastrar
+                                </button>
+                            </li>
                         }
                     </ul>
                 </div>
-                <!-- Ícone de usuário para login (desktop) - apenas para usuários não logados ou não administradores -->
-                @if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Administrador"))
+                <!-- Ícone de usuário para login (desktop) - apenas para usuários não logados -->
+                @if (User.Identity?.IsAuthenticated != true)
                 {
                     <div class="d-flex align-items-center ms-3 d-none d-lg-block">
                         <i class="bi bi-person user-icon" data-bs-toggle="modal" data-bs-target="#loginModal"></i>
@@ -501,23 +502,10 @@
                         const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
                         if (modal) {
                             modal.hide();
-                            // Verificar se há uma reserva pendente
-                            if (window.redirectToPendingReserva && typeof window.redirectToPendingReserva === 'function') {
-                                setTimeout(() => {
-                                    window.redirectToPendingReserva();
-                                }, 100);
-                            } else {
-                                window.location.reload();
-                            }
-                        } else {
-                            if (window.redirectToPendingReserva && typeof window.redirectToPendingReserva === 'function') {
-                                setTimeout(() => {
-                                    window.redirectToPendingReserva();
-                                }, 100);
-                            } else {
-                                window.location.reload();
-                            }
                         }
+                        
+                        // Sempre recarregar para atualizar o menu baseado na role do usuário
+                        window.location.reload();
                     } catch (result) {
                         if (result.errors) {
                             if (Array.isArray(result.errors)) {
@@ -568,10 +556,8 @@
                         const modal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
                         if (modal) {
                             modal.hide();
-                            window.location.reload();
-                        } else {
-                            window.location.reload();
                         }
+                        window.location.reload();
                     } catch (result) {
                         if (result.errors) {
                             if (Array.isArray(result.errors)) {
