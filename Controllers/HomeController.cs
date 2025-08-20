@@ -95,9 +95,16 @@ public class HomeController : Controller
         return View(acomodacoes);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     public IActionResult Dashboard()
     {
+        // Dados do dashboard para administradores
+        ViewBag.TotalAcomodacoes = _context.Acomodacoes.Count();
+        ViewBag.AcomodacoesDisponiveis = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Disponivel);
+        ViewBag.AcomodacoesOcupadas = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Ocupada);
+        ViewBag.TotalUsuarios = _context.Users.Count();
+        ViewBag.TotalReservas = _context.Reservas?.Count() ?? 0;
+        
         return View();
     }
 

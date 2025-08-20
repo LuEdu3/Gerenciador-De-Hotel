@@ -27,86 +27,34 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarModern">
                     <ul class="navbar-nav ms-auto align-items-lg-center">
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
-                                asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Acomodacao" ? "active" : "")"
-                                asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
-                                asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
-                                asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
-                        </li>
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item d-none d-lg-block">
-                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-header">Sair</button>
-                                </form>
-                            </li>
-                            <li class="nav-item d-none d-lg-block">
-                                <a href="#" class="btn btn-header btn-header-accent">Reservar</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item d-none d-lg-block">
-                                <button type="button" class="btn btn-header" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                    Login
-                                </button>
-                            </li>
-                            <li class="nav-item d-none d-lg-block">
-                                <button type="button" class="btn btn-header btn-header-accent" data-bs-toggle="modal" data-bs-target="#registerModal">
-                                    Cadastrar
-                                </button>
-                            </li>
-                        }
-                        <!-- Botões para mobile -->
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item d-lg-none">
-                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
-                                    <button type="submit" class="nav-link nav-link-modern">Sair</button>
-                                </form>
-                            </li>
-                            <li class="nav-item d-lg-none">
-                                <a class="nav-link nav-link-modern" href="#">Reservar</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item d-lg-none">
-                                <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                    Login
-                                </button>
-                            </li>
-                            <li class="nav-item d-lg-none">
-                                <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#registerModal">
-                                    Cadastrar
-                                </button>
-                            </li>
-                        }
                         @if (User.IsInRole("Administrador"))
                         {
+                            <!-- Menu do Administrador -->
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"
+                                    asp-controller="Home" asp-action="Dashboard">
+                                    <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Acomodacoes" ? "active" : "")"
+                                    asp-controller="Acomodacoes" asp-action="Index">
+                                    <i class="bi bi-building me-1"></i>Acomodações
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Usuarios" ? "active" : "")"
+                                    asp-controller="Usuarios" asp-action="Index">
+                                    <i class="bi bi-people me-1"></i>Usuários
+                                </a>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button"
                                     data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                     <i class="bi bi-gear-fill me-1"></i>
-                                    Administração
+                                    Mais Opções
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Usuarios" asp-action="Index">
-                                            <i class="bi bi-people me-2"></i>Gerenciar Usuários
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" href="#">
                                             <i class="bi bi-stars me-2"></i>Gerenciar Amenidades
@@ -125,13 +73,104 @@
                                     </li>
                                 </ul>
                             </li>
+                            <!-- Botão Sair para Administrador -->
+                            <li class="nav-item d-none d-lg-block">
+                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-header">
+                                        <i class="bi bi-box-arrow-right me-1"></i>Sair
+                                    </button>
+                                </form>
+                            </li>
+                            <!-- Botão Sair Mobile para Administrador -->
+                            <li class="nav-item d-lg-none">
+                                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link nav-link-modern">
+                                        <i class="bi bi-box-arrow-right me-1"></i>Sair
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Menu do Usuário Comum -->
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Acomodacao" ? "active" : "")"
+                                    asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
+                                    asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                            </li>
+                            
+                            <!-- Botões de autenticação para usuários não logados -->
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item d-none d-lg-block">
+                                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-header">Sair</button>
+                                    </form>
+                                </li>
+                                <li class="nav-item d-none d-lg-block">
+                                    <a href="#" class="btn btn-header btn-header-accent">Reservar</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item d-none d-lg-block">
+                                    <button type="button" class="btn btn-header" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                        Login
+                                    </button>
+                                </li>
+                                <li class="nav-item d-none d-lg-block">
+                                    <button type="button" class="btn btn-header btn-header-accent" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                        Cadastrar
+                                    </button>
+                                </li>
+                            }
+                            
+                            <!-- Botões para mobile - usuários comuns -->
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item d-lg-none">
+                                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                        <button type="submit" class="nav-link nav-link-modern">Sair</button>
+                                    </form>
+                                </li>
+                                <li class="nav-item d-lg-none">
+                                    <a class="nav-link nav-link-modern" href="#">Reservar</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item d-lg-none">
+                                    <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                        Login
+                                    </button>
+                                </li>
+                                <li class="nav-item d-lg-none">
+                                    <button type="button" class="nav-link nav-link-modern" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                        Cadastrar
+                                    </button>
+                                </li>
+                            }
                         }
                     </ul>
                 </div>
-                <!-- Ícone de usuário para login (desktop) -->
-                <div class="d-flex align-items-center ms-3 d-none d-lg-block">
-                    <i class="bi bi-person user-icon" data-bs-toggle="modal" data-bs-target="#loginModal"></i>
-                </div>
+                <!-- Ícone de usuário para login (desktop) - apenas para usuários não logados ou não administradores -->
+                @if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Administrador"))
+                {
+                    <div class="d-flex align-items-center ms-3 d-none d-lg-block">
+                        <i class="bi bi-person user-icon" data-bs-toggle="modal" data-bs-target="#loginModal"></i>
+                    </div>
+                }
             </nav>
         </div>
     </header>
@@ -165,11 +204,20 @@
                 <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
                     <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Links Rápidos</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a asp-controller="Home" asp-action="Index" class="text-white text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a asp-controller="Home" asp-action="Acomodacao" class="text-white text-decoration-none">Acomodações</a></li>
-                        <li class="mb-2"><a asp-controller="Home" asp-action="Servicos" class="text-white text-decoration-none">Serviços</a></li>
-                        <li class="mb-2"><a asp-controller="Home" asp-action="Galeria" class="text-white text-decoration-none">Galeria</a></li>
-                        <li class="mb-2"><a asp-controller="Home" asp-action="Contato" class="text-white text-decoration-none">Contato</a></li>
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Dashboard" class="text-white text-decoration-none">Dashboard</a></li>
+                            <li class="mb-2"><a asp-controller="Acomodacoes" asp-action="Index" class="text-white text-decoration-none">Acomodações</a></li>
+                            <li class="mb-2"><a asp-controller="Usuarios" asp-action="Index" class="text-white text-decoration-none">Usuários</a></li>
+                        }
+                        else
+                        {
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Index" class="text-white text-decoration-none">Home</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Acomodacao" class="text-white text-decoration-none">Acomodações</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Servicos" class="text-white text-decoration-none">Serviços</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Galeria" class="text-white text-decoration-none">Galeria</a></li>
+                            <li class="mb-2"><a asp-controller="Home" asp-action="Contato" class="text-white text-decoration-none">Contato</a></li>
+                        }
                     </ul>
                 </div>
                 <!-- Contato -->
