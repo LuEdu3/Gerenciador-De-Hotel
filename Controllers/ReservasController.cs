@@ -17,9 +17,9 @@ namespace GerenciadorHotel.Controllers
             _context = context;
         }
 
-    // GET: Reservas
-    [Authorize] // Permite qualquer usuário autenticado
-    public async Task<IActionResult> Index()
+        // GET: Reservas
+        [Authorize] // Permite qualquer usuário autenticado
+        public async Task<IActionResult> Index()
         {
             // Se hóspede tentar acessar, redireciona para suas próprias reservas
             if (User.IsInRole("Hospede"))
@@ -74,9 +74,9 @@ namespace GerenciadorHotel.Controllers
             return View(reserva);
         }
 
-    // GET: Reservas/Create
-    [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
-    public IActionResult Create()
+        // GET: Reservas/Create
+        [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
+        public IActionResult Create()
         {
             ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome");
             ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome");
@@ -84,7 +84,8 @@ namespace GerenciadorHotel.Controllers
             // Buscar datas ocupadas por acomodação
             var reservas = _context.Reservas
                 .Where(r => r.Status != StatusReserva.Cancelada)
-                .Select(r => new {
+                .Select(r => new
+                {
                     r.AcomodacaoId,
                     r.DataCheckIn,
                     r.DataCheckOut
@@ -95,27 +96,27 @@ namespace GerenciadorHotel.Controllers
             var datasOcupadasPorAcomodacao = reservas
                 .GroupBy(r => r.AcomodacaoId)
                 .ToDictionary(g => g.Key, g => g.Select(r => new { inicio = r.DataCheckIn, fim = r.DataCheckOut }).ToList());
-            
-                // LOG TEMPORÁRIO PARA DEBUG
-                System.Diagnostics.Debug.WriteLine("[DEBUG] Datas ocupadas por acomodação:");
-                foreach (var kvp in datasOcupadasPorAcomodacao)
+
+            // LOG TEMPORÁRIO PARA DEBUG
+            System.Diagnostics.Debug.WriteLine("[DEBUG] Datas ocupadas por acomodação:");
+            foreach (var kvp in datasOcupadasPorAcomodacao)
+            {
+                System.Diagnostics.Debug.WriteLine($"AcomodacaoId: {kvp.Key}");
+                foreach (var intervalo in kvp.Value)
                 {
-                    System.Diagnostics.Debug.WriteLine($"AcomodacaoId: {kvp.Key}");
-                    foreach (var intervalo in kvp.Value)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"  Início: {intervalo.inicio}, Fim: {intervalo.fim}");
-                    }
+                    System.Diagnostics.Debug.WriteLine($"  Início: {intervalo.inicio}, Fim: {intervalo.fim}");
                 }
+            }
 
             ViewBag.DatasOcupadasPorAcomodacao = datasOcupadasPorAcomodacao;
             return View();
         }
 
-    // POST: Reservas/Create
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
-    public async Task<IActionResult> Create([Bind("NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,AcomodacaoId,PaisId")] Reserva reserva)
+        // POST: Reservas/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
+        public async Task<IActionResult> Create([Bind("NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,AcomodacaoId,PaisId")] Reserva reserva)
         {
             if (ModelState.IsValid)
             {
@@ -216,7 +217,8 @@ namespace GerenciadorHotel.Controllers
             // Buscar datas ocupadas por acomodação (ignora a própria reserva)
             var reservas = _context.Reservas
                 .Where(r => r.Status != StatusReserva.Cancelada && r.Id != reserva.Id)
-                .Select(r => new {
+                .Select(r => new
+                {
                     r.AcomodacaoId,
                     r.DataCheckIn,
                     r.DataCheckOut
@@ -260,6 +262,24 @@ namespace GerenciadorHotel.Controllers
 
             if (ModelState.IsValid)
             {
+                // Validação de ordem das datas e data mínima (mesma regra do Create)
+                if (reserva.DataCheckIn >= reserva.DataCheckOut)
+                {
+                    ModelState.AddModelError("DataCheckOut", "A data de check-out deve ser posterior à data de check-in.");
+                }
+                else if (reserva.DataCheckIn < DateTime.Today)
+                {
+                    ModelState.AddModelError("DataCheckIn", "A data de check-in não pode ser anterior à data atual.");
+                }
+
+                // Se houve erro nas datas, retorna para a view com os selects repovidados
+                if (!ModelState.IsValid)
+                {
+                    ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa), "Id", "Nome", reserva.AcomodacaoId);
+                    ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
+                    return View(reserva);
+                }
+
                 // Validação de conflito de datas (ignora a própria reserva)
                 var conflito = await _context.Reservas
                     .Where(r => r.AcomodacaoId == reserva.AcomodacaoId && r.Id != reserva.Id && r.Status != StatusReserva.Cancelada)
