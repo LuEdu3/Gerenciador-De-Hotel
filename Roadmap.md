@@ -113,3 +113,12 @@
 ---
 
 Este roadmap será atualizado conforme avançarmos no desenvolvimento.
+  
+---
+
+## Próximos Passos - Banco de Dados
+
+- Dados da empresa (Nome, logo, contato, email e galeria para fotos)
+- Adicionar Acomodações
+- Adicionar filtros: Capacidade, Tipo de acomodação (Chalé, cabana, suíte, estacionamento e domo)
+- Adicionar no banco mais capacidades de fotos
