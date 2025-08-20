@@ -97,6 +97,49 @@ namespace GerenciadorHotel.Services
             await LimparEInserirAcomodacoesQuintaYpua(context);
         }
 
+        public static async Task AtualizarImagensAcomodacoes(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await AtualizarImagensAcomodacoes(context);
+        }
+
+        private static async Task AtualizarImagensAcomodacoes(ApplicationDbContext context)
+        {
+            // Definir as URLs das imagens para cada acomodação
+            var imagensAcomodacoes = new Dictionary<string, string>
+            {
+                { "Domo", "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg" },
+                { "Charrua (Bus)", "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg" },
+                { "Suíte com Cozinha", "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg" },
+                { "Chalé Família", "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg" },
+                { "Cabana", "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg" },
+                { "Estacionamento para Overlanders", "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg" }
+            };
+
+            var atualizacoes = 0;
+            foreach (var item in imagensAcomodacoes)
+            {
+                var acomodacao = context.Acomodacoes.FirstOrDefault(a => a.Nome == item.Key);
+                if (acomodacao != null)
+                {
+                    acomodacao.ImagemPrincipalUrl = item.Value;
+                    acomodacao.DataAtualizacao = DateTime.Now;
+                    atualizacoes++;
+                }
+            }
+
+            if (atualizacoes > 0)
+            {
+                await context.SaveChangesAsync();
+                Console.WriteLine($"🖼️ {atualizacoes} imagens de acomodações atualizadas e fixadas!");
+            }
+            else
+            {
+                Console.WriteLine("⚠️ Nenhuma acomodação encontrada para atualizar imagens.");
+            }
+        }
+
         private static async Task LimparEInserirAcomodacoesQuintaYpua(ApplicationDbContext context)
         {
             // Remover acomodação "Teste" se existir

@@ -44,6 +44,7 @@ using (var scope = app.Services.CreateScope())
         await SeedDataService.SeedRolesAndAdminUser(services);
         await SeedDataService.SeedPaises(services);
         await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
+        await SeedDataService.AtualizarImagensAcomodacoes(services);
     }
     catch (Exception ex)
     {
