@@ -41,8 +41,9 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-    await SeedDataService.SeedRolesAndAdminUser(services);
-    await SeedDataService.SeedPaises(services);
+        await SeedDataService.SeedRolesAndAdminUser(services);
+        await SeedDataService.SeedPaises(services);
+        await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
     }
     catch (Exception ex)
     {
