@@ -66,15 +66,60 @@ namespace GerenciadorHotel.Controllers
         }
 
         // POST: Acomodacoes/Create
+    [HttpPost]
+    [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Create([Bind("Nome,Descricao,QuantidadeCamas,Preco,MinimoNoites,Status,ImagemPrincipalUrl,Ativa")] Acomodacao acomodacao)
+        public async Task<IActionResult> Create([Bind("Nome,Descricao,QuantidadeCamas,Preco,MinimoNoites,Status,Ativa")] Acomodacao acomodacao)
         {
+            var files = Request.Form.Files;
+            int principalIndex = 0;
+            int.TryParse(Request.Form["ImagemPrincipalIndex"], out principalIndex);
+            if (files == null || files.Count < 1 || files.Count > 10)
+            {
+                ModelState.AddModelError("Imagens", "Selecione entre 1 e 10 imagens.");
+            }
             if (ModelState.IsValid)
             {
                 acomodacao.DataCriacao = DateTime.Now;
                 _context.Add(acomodacao);
+                await _context.SaveChangesAsync();
+
+                int imgIndex = 0;
+                if (files != null)
+                {
+                    foreach (var file in files)
+                    {
+                        if (file.Name != "Imagens") continue;
+                        if (file.Length > 0)
+                        {
+                            var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagens");
+                            if (!Directory.Exists(uploads)) Directory.CreateDirectory(uploads);
+                            var fileName = $"acomodacao_{acomodacao.Id}_{DateTime.Now.Ticks}_{imgIndex}{Path.GetExtension(file.FileName)}";
+                            var filePath = Path.Combine(uploads, fileName);
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                            var url = $"/imagens/{fileName}";
+                            var imagem = new ImagemAcomodacao
+                            {
+                                AcomodacaoId = acomodacao.Id,
+                                ImagemUrl = url,
+                                Ordem = imgIndex,
+                                Ativa = true,
+                                DataUpload = DateTime.Now
+                            };
+                            _context.ImagensAcomodacao.Add(imagem);
+                            if (imgIndex == principalIndex)
+                            {
+                                acomodacao.ImagemPrincipalUrl = url;
+                            }
+                            imgIndex++;
+                        }
+                    }
+                }
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Acomodação criada com sucesso!";
                 return RedirectToAction(nameof(Index));
