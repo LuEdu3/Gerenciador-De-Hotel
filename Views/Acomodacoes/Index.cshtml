@@ -1,50 +1,94 @@
 @model IEnumerable<GerenciadorHotel.Models.Acomodacao>
-
 @{
-    ViewData["Title"] = "Gerenciar Acomodações";
+	ViewData["Title"] = "Acomodações";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="bi bi-house-door"></i> @ViewData["Title"]</h1>
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Nova Acomodação
-    </a>
+
+<h2>@ViewData["Title"]</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Nova Acomodação</a>
+
+<!-- Cards de resumo -->
+<div class="row mb-4">
+	<div class="col-md-4">
+		<div class="card bg-primary text-white">
+			<div class="card-body">
+				<h5><i class="bi bi-house"></i> Total de Acomodações</h5>
+				<h2>@Model.Count()</h2>
+			</div>
+		</div>
+	</div>
+	<!-- Espaço para mais cards futuramente -->
 </div>
 
-<!-- Filtros e Pesquisa -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" placeholder="Pesquisar por nome..." id="searchInput">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select" id="statusFilter">
-                    <option value="">Todos os Status</option>
-                    <option value="Disponivel">Disponível</option>
-                    <option value="Ocupada">Ocupada</option>
-                    <option value="Manutencao">Manutenção</option>
-                    <option value="ForaDeServico">Fora de Serviço</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select" id="activeFilter">
-                    <option value="">Todas</option>
-                    <option value="true">Apenas Ativas</option>
-                    <option value="false">Apenas Inativas</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                    <i class="bi bi-arrow-clockwise"></i> Limpar
-                </button>
-            </div>
-        </div>
-    </div>
+<div class="card">
+	<div class="card-body">
+		<div class="table-responsive">
+			<table class="table table-hover align-middle">
+				<thead class="table-dark">
+					<tr>
+						<th>Imagem</th>
+						<th>Nome</th>
+						<th>Descrição</th>
+						<th>Qtd. Camas</th>
+						<th>Qtd. Camas Casal</th>
+						<th>Preço</th>
+						<th>Status</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>
+								@if (!string.IsNullOrEmpty(item.ImagemPrincipalUrl))
+								{
+									<img src="@item.ImagemPrincipalUrl" alt="Imagem" class="img-thumbnail" style="max-width: 80px; max-height: 80px;" />
+								}
+								else
+								{
+									<span class="text-muted">Sem imagem</span>
+								}
+							</td>
+							<td><strong>@item.Nome</strong></td>
+							<td>@item.Descricao</td>
+							<td>@item.QuantidadeCamas</td>
+							<td><!-- Exibir quantidade de camas de casal se implementado --></td>
+							<td>@item.Preco.ToString("C")</td>
+							<td>
+								<span class="badge @(item.Status == GerenciadorHotel.Models.StatusAcomodacao.Disponivel ? "bg-success" : item.Status == GerenciadorHotel.Models.StatusAcomodacao.Ocupada ? "bg-warning text-dark" : "bg-secondary")">
+									@item.Status
+								</span>
+							</td>
+							<td>
+								<div class="btn-group btn-group-sm" role="group">
+									<a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Detalhes">
+										<i class="bi bi-eye"></i>
+									</a>
+									<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Editar">
+										<i class="bi bi-pencil"></i>
+									</a>
+									<a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Excluir">
+										<i class="bi bi-trash"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+		@if (!Model.Any())
+		{
+			<div class="text-center py-4">
+				<i class="bi bi-house display-1 text-muted"></i>
+				<h4 class="text-muted mt-3">Nenhuma acomodação cadastrada</h4>
+				<p class="text-muted">Clique em "Nova Acomodação" para cadastrar a primeira acomodação.</p>
+			</div>
+		}
+	</div>
 </div>
+
 
 <!-- Estatísticas Rápidas -->
 <div class="row mb-4">

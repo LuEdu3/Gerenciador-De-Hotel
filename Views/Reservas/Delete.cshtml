@@ -1,0 +1,26 @@
+@model GerenciadorHotel.Models.Reserva
+@{
+    ViewData["Title"] = "Excluir Reserva";
+}
+<h2>Excluir Reserva</h2>
+<hr />
+<div class="alert alert-danger">
+    Tem certeza que deseja excluir esta reserva?
+</div>
+<dl class="row">
+    <dt class="col-sm-3">Hóspede</dt>
+    <dd class="col-sm-9">@Model.NomeCompleto</dd>
+    <dt class="col-sm-3">Acomodação</dt>
+    <dd class="col-sm-9">@Model.Acomodacao?.Nome</dd>
+    <dt class="col-sm-3">Check-in</dt>
+    <dd class="col-sm-9">@Model.DataCheckIn.ToString("dd/MM/yyyy")</dd>
+    <dt class="col-sm-3">Check-out</dt>
+    <dd class="col-sm-9">@Model.DataCheckOut.ToString("dd/MM/yyyy")</dd>
+    <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Model.Status.GetDisplayName()</dd>
+</dl>
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Excluir</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

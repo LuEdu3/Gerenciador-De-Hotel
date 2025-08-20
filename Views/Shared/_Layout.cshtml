@@ -60,17 +60,6 @@
                                             <i class="bi bi-stars me-2"></i>Gerenciar Amenidades
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bi bi-globe me-2"></i>Gerenciar Países
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bi bi-graph-up me-2"></i>Relatórios
-                                        </a>
-                                    </li>
                                 </ul>
                             </li>
                             <!-- Botão Sair para Administrador -->
@@ -90,7 +79,18 @@
                                 </form>
                             </li>
                         }
+
                         else
+                      //!!AVISO
+//!!AVISO
+                      <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Acomodacoes" asp-action="Catalogo">
+                                <i class="bi bi-building"></i> Acomodações
+                            </a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated != true)
+//!!AVISO
+//!!AVISO
                         {
                             <!-- Menu do Usuário Comum -->
                             <li class="nav-item">

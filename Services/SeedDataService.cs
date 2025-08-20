@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using GerenciadorHotel.Models;
+using GerenciadorHotel.Data;
 
 namespace GerenciadorHotel.Services
 {
@@ -72,6 +73,43 @@ namespace GerenciadorHotel.Services
                 {
                     await userManager.AddToRoleAsync(recepcionista, "Recepcionista");
                 }
+            }
+        }
+
+        public static async Task SeedPaises(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await SeedPaises(context);
+        }
+
+        private static async Task SeedPaises(ApplicationDbContext context)
+        {
+            // Só inserir países se a tabela estiver vazia (NÃO LIMPAR DADOS EXISTENTES)
+            if (!context.Paises.Any())
+            {
+                var paises = new List<Pais>
+                {
+                    new() { Nome = "Brasil", Codigo = "br" },
+                    new() { Nome = "Estados Unidos", Codigo = "us" },
+                    new() { Nome = "Argentina", Codigo = "ar" },
+                    new() { Nome = "Chile", Codigo = "cl" },
+                    new() { Nome = "França", Codigo = "fr" },
+                    new() { Nome = "Alemanha", Codigo = "de" },
+                    new() { Nome = "Reino Unido", Codigo = "gb" },
+                    new() { Nome = "Espanha", Codigo = "es" },
+                    new() { Nome = "Itália", Codigo = "it" },
+                    new() { Nome = "Portugal", Codigo = "pt" }
+                };
+
+                await context.Paises.AddRangeAsync(paises);
+                await context.SaveChangesAsync();
+
+                Console.WriteLine($"✅ {paises.Count} países inseridos com sucesso!");
+            }
+            else
+            {
+                Console.WriteLine("⚠️  Países já existem no banco, pulando seed para preservar dados existentes.");
             }
         }
     }

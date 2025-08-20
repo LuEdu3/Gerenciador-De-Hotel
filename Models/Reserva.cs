@@ -98,12 +98,18 @@ namespace GerenciadorHotel.Models
         [Display(Name = "País do Hóspede")]
         public int PaisId { get; set; }
 
+        [Display(Name = "Usuário")]
+        public string? UserId { get; set; }
+
         // Relacionamentos
         [ForeignKey("AcomodacaoId")]
-        public virtual Acomodacao Acomodacao { get; set; } = null!;
+        public virtual Acomodacao? Acomodacao { get; set; }
 
         [ForeignKey("PaisId")]
-        public virtual Pais Pais { get; set; } = null!;
+        public virtual Pais? Pais { get; set; }
+
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser? User { get; set; }
 
         public virtual ICollection<Pagamento> Pagamentos { get; set; } = new List<Pagamento>();
 

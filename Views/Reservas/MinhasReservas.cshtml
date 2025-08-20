@@ -1,0 +1,230 @@
+@model IEnumerable<GerenciadorHotel.Models.Reserva>
+@{
+    ViewData["Title"] = "Minhas Reservas";
+}
+
+<style>
+    .reservas-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+        padding: 32px;
+        max-width: 1200px;
+        margin: 40px auto;
+    }
+
+    .reserva-card {
+        background: #fff;
+        border: 1px solid #e3e6f0;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .reserva-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pendente {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-confirmada {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-checkin {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-checkout {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-cancelada {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .reserva-image {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #dee2e6;
+    }
+</style>
+
+<div class="reservas-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-calendar-check"></i> Minhas Reservas</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus"></i> Nova Reserva
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        @foreach (var reserva in Model)
+        {
+            <div class="reserva-card">
+                <div class="row">
+                    <div class="col-md-2">
+                        @if (!string.IsNullOrEmpty(reserva.Acomodacao.ImagemPrincipalUrl))
+                        {
+                            <img src="@reserva.Acomodacao.ImagemPrincipalUrl" alt="@reserva.Acomodacao.Nome" class="reserva-image">
+                        }
+                        else
+                        {
+                            <div class="reserva-image bg-light d-flex align-items-center justify-content-center">
+                                <i class="bi bi-building text-muted"></i>
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-2">@reserva.Acomodacao.Nome</h5>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-calendar"></i>
+                            @reserva.DataCheckIn.ToString("dd/MM/yyyy") - @reserva.DataCheckOut.ToString("dd/MM/yyyy")
+                        </p>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-people"></i>
+                            @reserva.NumeroHospedes hóspede@(reserva.NumeroHospedes > 1 ? "s" : "")
+                        </p>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-moon"></i>
+                            @reserva.QuantidadeNoites noite@(reserva.QuantidadeNoites > 1 ? "s" : "")
+                        </p>
+                        @if (!string.IsNullOrEmpty(reserva.PedidosEspeciais))
+                        {
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-chat-dots"></i>
+                                @reserva.PedidosEspeciais
+                            </p>
+                        }
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <div class="mb-2">
+                            @{
+                                var statusClass = reserva.Status switch
+                                {
+                                    StatusReserva.Pendente => "status-pendente",
+                                    StatusReserva.Confirmada => "status-confirmada",
+                                    StatusReserva.CheckInRealizado => "status-checkin",
+                                    StatusReserva.CheckOutRealizado => "status-checkout",
+                                    StatusReserva.Cancelada => "status-cancelada",
+                                    StatusReserva.NoShow => "status-cancelada",
+                                    _ => "status-pendente"
+                                };
+                            }
+                            <span class="status-badge @statusClass">@reserva.Status.GetDisplayName()</span>
+                        </div>
+                        <div class="text-muted small">
+                            Reservado em<br>
+                            @reserva.DataReserva.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <h4 class="text-primary mb-2">@reserva.ValorTotal.ToString("C")</h4>
+                        <div class="d-grid">
+                            <a asp-action="Details" asp-route-id="@reserva.Id" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> Ver Detalhes
+                            </a>
+                        </div>
+                        @if (reserva.Status == StatusReserva.Pendente)
+                        {
+                            <div class="d-grid mt-2">
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#cancelModal-@reserva.Id">
+                                    <i class="bi bi-x"></i> Cancelar
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Cancelamento -->
+            <div class="modal fade" id="cancelModal-@reserva.Id" tabindex="-1" aria-labelledby="cancelModalLabel-@reserva.Id"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cancelModalLabel-@reserva.Id">Cancelar Reserva</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Tem certeza de que deseja cancelar esta reserva?</p>
+                            <div class="alert alert-warning">
+                                <strong>@reserva.Acomodacao.Nome</strong><br>
+                                @reserva.DataCheckIn.ToString("dd/MM/yyyy") - @reserva.DataCheckOut.ToString("dd/MM/yyyy")<br>
+                                Valor: @reserva.ValorTotal.ToString("C")
+                            </div>
+                            <p class="text-muted small">Esta ação não pode ser desfeita.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não, manter reserva</button>
+                            <form asp-action="CancelarReserva" asp-route-id="@reserva.Id" method="post"
+                                style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger">Sim, cancelar reserva</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <h4>Nenhuma reserva encontrada</h4>
+            <p>Você ainda não possui reservas. Que tal fazer sua primeira reserva?</p>
+            <a asp-action="Create" class="btn btn-primary btn-lg mt-3">
+                <i class="bi bi-plus"></i> Fazer minha primeira reserva
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Script para confirmação de cancelamento via modal
+        document.addEventListener('DOMContentLoaded', function () {
+            // Bootstrap 5 modal events
+            var modals = document.querySelectorAll('.modal');
+            modals.forEach(function (modal) {
+                modal.addEventListener('show.bs.modal', function () {
+                    console.log('Modal opening');
+                });
+            });
+        });
+    </script>
+}
