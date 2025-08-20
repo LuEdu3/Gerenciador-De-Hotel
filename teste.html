@@ -807,113 +807,82 @@
             <p class="text-center mb-5">Conheça nossos espaços cuidadosamente projetados para seu conforto</p>
             
             <!-- Filtros -->
-            <div class="filter-section">
+            <form asp-controller="Acomodacoes" asp-action="Index" method="get" class="filter-section">
                 <h4 class="filter-title">Filtrar Acomodações</h4>
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label for="room-type" class="form-label">Tipo de Acomodação</label>
-                        <select class="form-select" id="room-type">
-                            <option selected>Todos</option>
-                            <option>Suíte Luxo</option>
-                            <option>Quarto Standard</option>
-                            <option>Chalé Familiar</option>
-                            <option>Suíte Presidencial</option>
+                        <label for="TipoAcomodacao" class="form-label">Tipo de Acomodação</label>
+                        <select class="form-select" id="TipoAcomodacao" name="TipoAcomodacao">
+                            <option value="">Todos</option>
+                            @foreach (var tipo in ViewBag.TiposAcomodacao)
+                            {
+                                <option value="@tipo">@tipo</option>
+                            }
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="price-range" class="form-label">Faixa de Preço</label>
-                        <select class="form-select" id="price-range">
-                            <option selected>Todos</option>
-                            <option>Até R$ 300</option>
-                            <option>R$ 300 - R$ 600</option>
-                            <option>R$ 600 - R$ 900</option>
-                            <option>Acima de R$ 900</option>
+                        <label for="FaixaPreco" class="form-label">Faixa de Preço</label>
+                        <select class="form-select" id="FaixaPreco" name="FaixaPreco">
+                            <option value="">Todos</option>
+                            <option value="0-300">Até R$ 300</option>
+                            <option value="300-600">R$ 300 - R$ 600</option>
+                            <option value="600-900">R$ 600 - R$ 900</option>
+                            <option value="900-9999">Acima de R$ 900</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="capacity" class="form-label">Capacidade</label>
-                        <select class="form-select" id="capacity">
-                            <option selected>Todos</option>
-                            <option>1 Pessoa</option>
-                            <option>2 Pessoas</option>
-                            <option>3-4 Pessoas</option>
-                            <option>Família (5+)</option>
+                        <label for="Capacidade" class="form-label">Capacidade</label>
+                        <select class="form-select" id="Capacidade" name="Capacidade">
+                            <option value="">Todos</option>
+                            <option value="1">1 Pessoa</option>
+                            <option value="2">2 Pessoas</option>
+                            <option value="3-4">3-4 Pessoas</option>
+                            <option value="5">Família (5+)</option>
                         </select>
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
-                        <button class="btn btn-accent w-100">Aplicar Filtros</button>
+                        <button type="submit" class="btn btn-accent w-100">Aplicar Filtros</button>
                     </div>
                 </div>
-            </div>
+            </form>
             
             <!-- Cards de Acomodações -->
             <div class="row">
-                <!-- Acomodação 1 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="room-card">
-                        <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Suíte Luxo">
-                        <div class="room-card-body">
-                            <h3 class="room-title">Suíte Luxo</h3>
-                            <div class="room-price">R$ 580 <small>/noite</small></div>
-                            <div class="room-features">
-                                <span><i class="fas fa-user"></i> 2 Pessoas</span>
-                                <span><i class="fas fa-bed"></i> 1 Cama King</span>
-                                <span><i class="fas fa-ruler-combined"></i> 45m²</span>
-                            </div>
-                            <p>Suíte espaçosa com vista para o mar, varanda privativa e banheira de hidromassagem.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-room">Reservar</a>
-                                <a href="#" class="text-primary-custom">Detalhes <i class="fas fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Acomodação 2 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="room-card">
-                        <img src="https://images.unsplash.com/photo-1566669437685-5f63c8ede3c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" alt="Quarto Standard">
-                        <div class="room-card-body">
-                            <h3 class="room-title">Quarto Standard</h3>
-                            <div class="room-price">R$ 380 <small>/noite</small></div>
-                            <div class="room-features">
-                                <span><i class="fas fa-user"></i> 2 Pessoas</span>
-                                <span><i class="fas fa-bed"></i> 2 Camas Queen</span>
-                                <span><i class="fas fa-ruler-combined"></i> 30m²</span>
-                            </div>
-                            <p>Confortável quarto com vista para o jardim, perfeito para estadias curtas.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-room">Reservar</a>
-                                <a href="#" class="text-primary-custom">Detalhes <i class="fas fa-arrow-right"></i></a>
+                @foreach (var acomodacao in Model)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="room-card">
+                            @if (acomodacao.ImagensAcomodacao != null && acomodacao.ImagensAcomodacao.Any())
+                            {
+                                <img src="@acomodacao.ImagensAcomodacao.First().Url" alt="@acomodacao.Nome">
+                            }
+                            else
+                            {
+                                <img src="~/images/no-image.jpg" alt="@acomodacao.Nome">
+                            }
+                            <div class="room-card-body">
+                                <h3 class="room-title">@acomodacao.Nome</h3>
+                                <div class="room-price">R$ @acomodacao.ValorDiaria.ToString("N2") <small>/noite</small></div>
+                                <div class="room-features">
+                                    <span><i class="fas fa-user"></i> @acomodacao.CapacidadeMaxima Pessoas</span>
+                                    <span><i class="fas fa-bed"></i> @acomodacao.NumeroQuartos Quarto(s)</span>
+                                    <span><i class="fas fa-ruler-combined"></i> @acomodacao.MetrosQuadrados m²</span>
+                                </div>
+                                <p>@acomodacao.Descricao</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="@Url.Action("Create", "Reservas", new { id = acomodacao.Id })" class="btn btn-room">Reservar</a>
+                                    <a href="@Url.Action("Details", "Acomodacoes", new { id = acomodacao.Id })" class="text-primary-custom">
+                                        Detalhes <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Acomodação 3 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="room-card">
-                        <img src="https://images.unsplash.com/photo-1618221118493-9cfa1a1c00da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" alt="Chalé Familiar">
-                        <div class="room-card-body">
-                            <h3 class="room-title">Chalé Familiar</h3>
-                            <div class="room-price">R$ 850 <small>/noite</small></div>
-                            <div class="room-features">
-                                <span><i class="fas fa-user"></i> 5 Pessoas</span>
-                                <span><i class="fas fa-bed"></i> 3 Quartos</span>
-                                <span><i class="fas fa-ruler-combined"></i> 90m²</span>
-                            </div>
-                            <p>Amplo chalé com cozinha equipada, sala de estar e varanda com vista para a montanha.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="#" class="btn btn-room">Reservar</a>
-                                <a href="#" class="text-primary-custom">Detalhes <i class="fas fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                }
             </div>
             
             <div class="text-center mt-4">
-                <a href="#" class="btn btn-outline-primary btn-lg">Ver Todas as Acomodações</a>
+                <a href="@Url.Action("Index", "Acomodacoes")" class="btn btn-outline-primary btn-lg">Ver Todas as Acomodações</a>
             </div>
         </div>
     </main>

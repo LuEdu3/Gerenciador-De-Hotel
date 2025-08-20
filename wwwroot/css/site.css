@@ -15,17 +15,32 @@
             font-family: 'Playfair Display', serif;
         }
         
+        /* Reset de z-index para todo o site */
+        .dropdown-menu,
+        .modal,
+        .tooltip,
+        .popover {
+            z-index: 1056 !important;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            margin-top: 80px; /* Ajuste conforme a altura do seu header */
+        }
+
         /* Cabeçalho Moderno */
         .header-modern {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
+            z-index: 1055;
             transition: all 0.3s ease;
+            height: 80px; /* Altura fixa para o header */
         }
         
         .header-modern.scrolled {
@@ -187,6 +202,56 @@
             transform: rotate(-45deg);
         }
 
+        /* Estilos do Menu Dropdown do Administrador */
+        .dropdown-menu {
+            background: rgba(255, 255, 255, 0.98);
+            border: none;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 1rem 0;
+            margin-top: 0.5rem;
+            z-index: 1035;
+        }
+
+        .dropdown-item {
+            color: var(--dark-gray);
+            padding: 0.7rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background-color: rgba(126, 39, 38, 0.05);
+            color: var(--primary-color);
+        }
+
+        .dropdown-divider {
+            margin: 0.5rem 0;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Posicionamento do Dropdown em Mobile */
+        @media (max-width: 991.98px) {
+            .dropdown-menu {
+                border: none;
+                background: transparent;
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .dropdown-item {
+                color: var(--dark-gray);
+                padding: 0.5rem 1rem;
+                margin: 0.2rem 0;
+            }
+
+            .dropdown-divider {
+                display: none;
+            }
+        }
+
         /* Ajustes para responsividade mobile */
         @media (max-width: 991.98px) {
             .header-modern {
@@ -254,6 +319,18 @@
         .accommodations {
             padding: 5rem 0;
             background-color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Garante que botões e elementos interativos fiquem acima */
+        .btn, 
+        .card,
+        .form-control,
+        .nav-tabs,
+        .table {
+            position: relative;
+            z-index: 2;
         }
         
         .section-title {

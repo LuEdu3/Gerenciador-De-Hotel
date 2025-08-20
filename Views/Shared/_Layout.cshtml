@@ -96,15 +96,33 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">Administração</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Index">Gerenciar Usuários</a>
+                                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                    <i class="bi bi-gear-fill me-1"></i>
+                                    Administração
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Usuarios" asp-action="Index">
+                                            <i class="bi bi-people me-2"></i>Gerenciar Usuários
+                                        </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#">Gerenciar Amenidades</a></li>
-                                    <li><a class="dropdown-item" href="#">Gerenciar Países</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-stars me-2"></i>Gerenciar Amenidades
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-globe me-2"></i>Gerenciar Países
+                                        </a>
+                                    </li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#">Relatórios</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                            <i class="bi bi-graph-up me-2"></i>Relatórios
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         }
@@ -118,10 +136,13 @@
         </div>
     </header>
 
-    <div class="container-fluid p-0 flex-grow-1">
-        <main role="main">
-            @RenderBody()
-        </main>
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <div class="container-fluid p-0 flex-grow-1">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
     <footer class="footer-section bg-dark text-white pt-5 pb-4 mt-auto">
