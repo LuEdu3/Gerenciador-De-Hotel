@@ -122,3 +122,79 @@ Este roadmap será atualizado conforme avançarmos no desenvolvimento.
 - Adicionar filtros: Capacidade, Tipo de acomodação (Chalé, cabana, suíte, estacionamento e domo)
 - Adicionar no banco mais capacidades de fotos - Iolanda
 
+---
+
+## Futuras Modificações (solicitadas)
+
+Abaixo estão as modificações que você listou, o estado atual com base na inspeção do código e sugestões rápidas do que precisa ser feito para cada item.
+
+### Como usuário
+
+- Clicar na reserva vai direto pro quarto selecionado
+- Clicar na reserva vai direto pro quarto selecionado na página de reservas
+	- Status: Pendente (prioridade alta)
+	- Observação: Na view `Views/Reservas/MinhasReservas.cshtml` o botão atualmente direciona para os detalhes da reserva (`Reservas/Details/{reserva.Id}`), o que pode abrir uma tela genérica (ex.: sempre para o tipo "domo"). O comportamento desejado é abrir a página da acomodação associada à reserva.
+	- Próximo passo: alterar o link do botão para apontar para a acomodação. Exemplo de alteração sugerida na view:
+
+		```razor
+		<a asp-controller="Acomodacoes" asp-action="Details" asp-route-id="@reserva.AcomodacaoId" class="btn btn-outline-primary btn-sm">
+				<i class="bi bi-eye"></i> Ver Acomodação
+		</a>
+		```
+
+		Ou substituir o botão atual `asp-action="Details" asp-route-id="@reserva.Id"` por esta versão que usa `AcomodacaoId`.
+		Testar como hóspede e administrador após a alteração; garantir que a rota `Acomodacoes/Details/{id}` retorna `NotFound` (404) quando a acomodação não existir.
+
+- Mostrar amenidades nos detalhes da acomodação como usuário
+	- Status: Implementado
+	- Onde: `Views/Acomodacoes/Details.cshtml` já renderiza `Model.AcomodacaoAmenidades` com imagens e nomes.
+
+- Mostrar camas de solteiros e de casal nos detalhes da acomodação
+	- Status: Não implementado
+	- Observação: O modelo `Acomodacao` atualmente só tem `QuantidadeCamas` (total). Não há informações separadas para camas de solteiro e casal.
+	- Próximo passo: estender `Models/Acomodacao.cs` com campos como `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal`, atualizar validações e views (Create/Edit/Details) e ajustar seed/migrations.
+
+- Horário do check-in
+	- Status: Parcial / Não apresentado ao usuário
+	- Observação: `Reserva` usa `DataCheckIn`/`DataCheckOut` (DateTime) mas as views exibem apenas a data (`dd/MM/yyyy`). Não existe um campo dedicado de "horário do check-in" visível ao usuário.
+	- Próximo passo: se desejar um campo separado, criar `HorarioCheckIn` em `Reserva` ou formatar `DataCheckIn` para exibir hora nas views; atualizar formulários e validações conforme necessário.
+
+### Como Administrador
+
+- Mostrar diferenças de cama de solteiro e cama de casal
+	- Status: Não implementado
+	- Observação: depende de modelagem (ver item acima). Sem campos separados não é possível apresentar diferenças.
+	- Próximo passo: adicionar campos no model e novo UI no painel admin para exibir/filtrar por tipo de cama.
+
+- Quantidades de cama deve ser maior ou igual a quantidades de cama de casal
+	- Status: Não implementado
+	- Observação: regra de validação depende da existência de `QuantidadeCamasCasal`. Após adicionar campos, aplicar DataAnnotation/validação customizada no `Acomodacao` e no servidor (Create/Edit POST).
+
+- Escolher ficheiros deve ficar salvo os arquivos que ja foram upados
+	- Status: Parcialmente implementado
+	- Observação: O back-end já salva uploads em `wwwroot/imagens` e persiste `ImagemAcomodacao` (veja `Controllers/AcomodacoesController.cs`), e `Views/Acomodacoes/Details.cshtml` exibe as imagens. Entretanto o input `<input type="file">` não pode ser pre-populado por motivos de segurança do navegador. O que falta é uma UI de gerenciamento de imagens no Edit (listar arquivos já upados, permitir remover/definir principal) — assim o usuário verá e poderá reutilizar os arquivos já enviados.
+	- Próximo passo: implementar painel de imagens em `Views/Acomodacoes/Edit.cshtml` que lista `Model.Imagens` com botões (remover, definir principal, mover ordem) e preservar essas alterações no POST.
+
+- Ao visualizar a acomodação tem que aparecer as amenidades
+	- Status: Implementado
+	- Onde: `Views/Acomodacoes/Details.cshtml` já exibe as amenidades associadas.
+
+---
+
+## Mapeamento rápido das alterações no código (onde olhar)
+
+- Exibir amenidades e fotos: `Views/Acomodacoes/Details.cshtml`
+- Upload e persistência de imagens: `Controllers/AcomodacoesController.cs` (Create/Edit POST) e modelo `Models/ImagemAcomodacao.cs`
+- Lista de reservas do usuário (link): `Views/Reservas/MinhasReservas.cshtml`
+- Validação de reservas (datas e conflitos): `Controllers/ReservasController.cs`
+
+## Próximos passos sugeridos (técnicos)
+
+1. Para "clicar na reserva vai direto pro quarto": alterar `Views/Reservas/MinhasReservas.cshtml` e atualizar botão/link. Testar com usuário hóspede.
+2. Para camas separadas: adicionar `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal` em `Models/Acomodacao.cs`, criar migração EF Core, atualizar formulários Create/Edit e `Views/Acomodacoes/Details.cshtml` para exibir ambos os valores.
+3. Implementar painel de gerenciamento de imagens em Edit (listar imagens já salvas, criar endpoints para remover/definir principal, e ajustar POST Edit para respeitar alterações de ordem/atributos).
+4. Definir formato de exibição do horário de check-in (usar `DataCheckIn` ou campo separado) e atualizar views de reservas e detalhes.
+
+Se quiser, eu já posso: (A) aplicar a mudança simples em `MinhasReservas.cshtml` para que o botão "Ver Detalhes" direcione para a acomodação; (B) adicionar os campos de cama ao model + migration inicial; ou (C) implementar o painel de imagens (essa é a maior tarefa entre as opções). Diga qual prefere que eu faça primeiro.
+
+
