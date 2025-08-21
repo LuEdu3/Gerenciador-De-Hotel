@@ -33,7 +33,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-floating mb-3">
-                                <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorHotel.Models.StatusAcomodacao>()">
+                                <select asp-for="Status" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<GerenciadorHotel.Models.StatusAcomodacao>()">
                                 </select>
                                 <label asp-for="Status"></label>
                                 <span asp-validation-for="Status" class="text-danger"></span>
@@ -42,7 +43,8 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <textarea asp-for="Descricao" class="form-control" placeholder="Descrição" style="height: 100px"></textarea>
+                        <textarea asp-for="Descricao" class="form-control" placeholder="Descrição"
+                            style="height: 100px"></textarea>
                         <label asp-for="Descricao"></label>
                         <span asp-validation-for="Descricao" class="text-danger"></span>
                     </div>
@@ -50,7 +52,8 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input asp-for="QuantidadeCamas" class="form-control" placeholder="Quantidade de Camas" />
+                                <input asp-for="QuantidadeCamas" class="form-control"
+                                    placeholder="Quantidade de Camas" />
                                 <label asp-for="QuantidadeCamas"></label>
                                 <span asp-validation-for="QuantidadeCamas" class="text-danger"></span>
                             </div>
@@ -72,10 +75,27 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="ImagemPrincipalUrl" class="form-control" placeholder="URL da Imagem Principal" />
+                        <input asp-for="ImagemPrincipalUrl" class="form-control"
+                            placeholder="URL da Imagem Principal" />
                         <label asp-for="ImagemPrincipalUrl"></label>
                         <span asp-validation-for="ImagemPrincipalUrl" class="text-danger"></span>
                         <div class="form-text">Cole a URL de uma imagem para a acomodação</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fotos adicionais da acomodação</label>
+                        <input type="text" name="ImagensAcomodacao[0]" class="form-control mb-2"
+                            placeholder="URL da Foto 1" />
+                        <input type="text" name="ImagensAcomodacao[1]" class="form-control mb-2"
+                            placeholder="URL da Foto 2" />
+                        <input type="text" name="ImagensAcomodacao[2]" class="form-control mb-2"
+                            placeholder="URL da Foto 3" />
+                        <input type="text" name="ImagensAcomodacao[3]" class="form-control mb-2"
+                            placeholder="URL da Foto 4" />
+                        <input type="text" name="ImagensAcomodacao[4]" class="form-control mb-2"
+                            placeholder="URL da Foto 5" />
+                        <small class="form-text text-muted">Cole URLs de imagens para adicionar ao carousel
+                            (opcional).</small>
                     </div>
 
                     <div class="form-check mb-3">
@@ -110,7 +130,8 @@
             <div class="card-body text-center">
                 @if (!string.IsNullOrEmpty(Model.ImagemPrincipalUrl))
                 {
-                    <img src="@Model.ImagemPrincipalUrl" alt="Preview" class="img-fluid rounded" style="max-height: 200px;" id="image-preview">
+                    <img src="@Model.ImagemPrincipalUrl" alt="Preview" class="img-fluid rounded" style="max-height: 200px;"
+                        id="image-preview">
                 }
                 else
                 {
@@ -155,14 +176,16 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
     <script>
         // Preview da imagem quando a URL é alterada
-        document.getElementById('ImagemPrincipalUrl').addEventListener('input', function() {
+        document.getElementById('ImagemPrincipalUrl').addEventListener('input', function () {
             var url = this.value;
             var preview = document.getElementById('image-preview');
-            
+
             if (url) {
                 preview.innerHTML = '<img src="' + url + '" alt="Preview" class="img-fluid rounded" style="max-height: 200px;" onerror="this.style.display=\'none\'">';
             } else {
