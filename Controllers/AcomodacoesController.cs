@@ -66,8 +66,8 @@ namespace GerenciadorHotel.Controllers
         }
 
         // POST: Acomodacoes/Create
-    [HttpPost]
-    [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador")]
@@ -119,6 +119,44 @@ namespace GerenciadorHotel.Controllers
                             imgIndex++;
                         }
                     }
+                }
+
+                // Processar URLs adicionais enviadas nos campos ImagensAcomodacao[0..n]
+                // Permite que o usuário cole URLs no formulário (carousel de imagens)
+                try
+                {
+                    // coletar entradas com índice até 20 (seguro e extensível)
+                    for (int i = 0; i < 20; i++)
+                    {
+                        var key = $"ImagensAcomodacao[{i}]";
+                        if (!Request.Form.ContainsKey(key)) continue;
+                        var urlValue = Request.Form[key].ToString()?.Trim();
+                        if (string.IsNullOrEmpty(urlValue)) continue;
+                        if (urlValue.Length > 255) urlValue = urlValue.Substring(0, 255);
+
+                        var imagemUrl = urlValue;
+                        var imagem = new ImagemAcomodacao
+                        {
+                            AcomodacaoId = acomodacao.Id,
+                            ImagemUrl = imagemUrl,
+                            Ordem = imgIndex,
+                            Ativa = true,
+                            DataUpload = DateTime.Now
+                        };
+                        _context.ImagensAcomodacao.Add(imagem);
+
+                        // Se ainda não existe imagem principal, e a URL foi informada, usar como principal
+                        if (string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
+                        {
+                            acomodacao.ImagemPrincipalUrl = imagemUrl;
+                        }
+
+                        imgIndex++;
+                    }
+                }
+                catch
+                {
+                    // Não falhar o fluxo se algo der errado ao processar urls; apenas ignora.
                 }
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Acomodação criada com sucesso!";
