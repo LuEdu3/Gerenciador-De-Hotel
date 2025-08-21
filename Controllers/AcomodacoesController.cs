@@ -140,6 +140,64 @@ namespace GerenciadorHotel.Controllers
                     // Não falhar o fluxo se algo der errado ao processar urls; apenas ignora.
                 }
                 await _context.SaveChangesAsync();
+                // Processar amenidades selecionadas (form usa checkboxes name="AmenidadesSelecionadas" com valores simples)
+                try
+                {
+                    // DEBUG: verificar o que está chegando no form
+                    var allFormKeys = Request.Form.Keys.ToArray();
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Form keys: {string.Join(", ", allFormKeys)}");
+
+                    var selected = Request.Form["AmenidadesSelecionadas"].ToArray();
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG Create] AmenidadesSelecionadas values: [{string.Join(", ", selected)}]");
+
+                    if (selected != null && selected.Length > 0)
+                    {
+                        // Mapear os valores curtos do formulário para nomes de amenidades no banco
+                        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            { "ar", "Ar-condicionado" },
+                            { "wifi", "Wi-Fi" },
+                            { "tv", "TV" },
+                            { "frigobar", "Frigobar" },
+                            { "ducha", "Ducha" },
+                            { "banheira", "Banheira" },
+                            { "cozinha", "Cozinha" },
+                            { "toalha", "Toalha" }
+                        };
+
+                        // DEBUG: listar amenidades existentes no banco
+                        var amenidadesDB = _context.Amenidades.Select(a => new { a.Id, a.Nome }).ToList();
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Amenidades no banco: {string.Join(", ", amenidadesDB.Select(a => $"Id={a.Id} Nome='{a.Nome}'"))}");
+
+                        foreach (var key in selected)
+                        {
+                            if (string.IsNullOrWhiteSpace(key)) continue;
+                            if (!map.TryGetValue(key, out var amenidadeNome)) continue;
+
+                            System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Procurando amenidade: '{amenidadeNome}'");
+                            var amenidade = _context.Amenidades.FirstOrDefault(a => a.Nome == amenidadeNome);
+                            System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Amenidade encontrada: {(amenidade != null ? $"Id={amenidade.Id}, Nome='{amenidade.Nome}'" : "NULL")}");
+
+                            if (amenidade == null) continue;
+                            // Evitar duplicatas
+                            var exists = _context.AcomodacaoAmenidades.Any(aa => aa.AcomodacaoId == acomodacao.Id && aa.AmenidadeId == amenidade.Id);
+                            if (!exists)
+                            {
+                                _context.AcomodacaoAmenidades.Add(new AcomodacaoAmenidade
+                                {
+                                    AcomodacaoId = acomodacao.Id,
+                                    AmenidadeId = amenidade.Id,
+                                    DataAssociacao = DateTime.Now
+                                });
+                            }
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                catch
+                {
+                    // Não falhar o fluxo se algo der errado ao processar amenidades
+                }
                 TempData["SuccessMessage"] = "Acomodação criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
@@ -245,6 +303,83 @@ namespace GerenciadorHotel.Controllers
                     acomodacao.DataAtualizacao = DateTime.Now;
                     _context.Update(acomodacao);
                     await _context.SaveChangesAsync();
+                    // Atualizar amenidades associadas com base na seleção do formulário
+                    try
+                    {
+                        // DEBUG: verificar o que está chegando no form
+                        var allFormKeys = Request.Form.Keys.ToArray();
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG Edit] Form keys: {string.Join(", ", allFormKeys)}");
+
+                        var selected = Request.Form["AmenidadesSelecionadas"].ToArray();
+                        System.Diagnostics.Debug.WriteLine($"[DEBUG Edit] AmenidadesSelecionadas values: [{string.Join(", ", selected)}]");
+                        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            { "ar", "Ar-condicionado" },
+                            { "wifi", "Wi-Fi" },
+                            { "tv", "TV" },
+                            { "frigobar", "Frigobar" },
+                            { "ducha", "Ducha" },
+                            { "banheira", "Banheira" },
+                            { "cozinha", "Cozinha" },
+                            { "toalha", "Toalha" }
+                        };
+
+                        // Buscar todas as amenidades existentes para mapear nomes
+                        var allAmenidades = _context.Amenidades.ToList();
+
+                        // Se não houver seleção, remover todas as associações
+                        if (selected == null || selected.Length == 0)
+                        {
+                            var existentes = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).ToList();
+                            if (existentes.Any())
+                            {
+                                _context.AcomodacaoAmenidades.RemoveRange(existentes);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                        else
+                        {
+                            // Converter seleção para IDs de amenidade desejados
+                            var desejados = new List<int>();
+                            foreach (var key in selected)
+                            {
+                                if (string.IsNullOrWhiteSpace(key)) continue;
+                                if (!map.TryGetValue(key, out var nome)) continue;
+                                var a = allAmenidades.FirstOrDefault(x => x.Nome == nome);
+                                if (a != null) desejados.Add(a.Id);
+                            }
+
+                            // Remover associações que não estão na lista desejada
+                            var existentes2 = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).ToList();
+                            foreach (var ex in existentes2)
+                            {
+                                if (!desejados.Contains(ex.AmenidadeId))
+                                {
+                                    _context.AcomodacaoAmenidades.Remove(ex);
+                                }
+                            }
+
+                            // Adicionar novas associações
+                            foreach (var amenId in desejados)
+                            {
+                                var exists = _context.AcomodacaoAmenidades.Any(aa => aa.AcomodacaoId == acomodacao.Id && aa.AmenidadeId == amenId);
+                                if (!exists)
+                                {
+                                    _context.AcomodacaoAmenidades.Add(new AcomodacaoAmenidade
+                                    {
+                                        AcomodacaoId = acomodacao.Id,
+                                        AmenidadeId = amenId,
+                                        DataAssociacao = DateTime.Now
+                                    });
+                                }
+                            }
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    catch
+                    {
+                        // Ignorar falhas na atualização de amenidades
+                    }
                     TempData["SuccessMessage"] = "Acomodação atualizada com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
