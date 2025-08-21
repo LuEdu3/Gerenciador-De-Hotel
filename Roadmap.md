@@ -160,7 +160,7 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 
 ### Como Administrador
 
-- Mostrar diferenças de cama de solteiro e cama de casal
+- Mostrar diferenças de cama de solteiro e cama de casal - IOLANDA
 	- Status: Não implementado
 	- Observação: depende de modelagem (ver item acima). Sem campos separados não é possível apresentar diferenças.
 	- Próximo passo: adicionar campos no model e novo UI no painel admin para exibir/filtrar por tipo de cama.
@@ -195,5 +195,3 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 4. Definir formato de exibição do horário de check-in (usar `DataCheckIn` ou campo separado) e atualizar views de reservas e detalhes.
 
 Se quiser, eu já posso: (A) aplicar a mudança simples em `MinhasReservas.cshtml` para que o botão "Ver Detalhes" direcione para a acomodação; (B) adicionar os campos de cama ao model + migration inicial; ou (C) implementar o painel de imagens (essa é a maior tarefa entre as opções). Diga qual prefere que eu faça primeiro.
-
-
