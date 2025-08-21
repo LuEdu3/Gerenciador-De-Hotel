@@ -17,6 +17,12 @@
             <dd class="col-sm-7">@Model.Pais?.Nome</dd>
             <dt class="col-sm-5">Acomodação</dt>
             <dd class="col-sm-7">@Model.Acomodacao?.Nome</dd>
+            <dt class="col-sm-5">Camas Totais</dt>
+            <dd class="col-sm-7">@Model.Acomodacao?.QuantidadeCamas</dd>
+            <dt class="col-sm-5">Camas de Solteiro</dt>
+            <dd class="col-sm-7">@Model.Acomodacao?.QuantidadeCamasSolteiro</dd>
+            <dt class="col-sm-5">Camas de Casal</dt>
+            <dd class="col-sm-7">@Model.Acomodacao?.QuantidadeCamasCasal</dd>
             <dt class="col-sm-5">Check-in</dt>
             <dd class="col-sm-7">@Model.DataCheckIn.ToString("dd/MM/yyyy")</dd>
             <dt class="col-sm-5">Check-out</dt>

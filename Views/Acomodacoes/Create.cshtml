@@ -58,9 +58,18 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input id="QuantidadeCamasCasal" name="QuantidadeCamasCasal" class="form-control"
-                                    type="number" min="0" max="10" placeholder="Quantidade de Camas de Casal" />
-                                <label for="QuantidadeCamasCasal">Quantidade de Camas de Casal</label>
+                                <input asp-for="QuantidadeCamasSolteiro" class="form-control" placeholder="Camas de Solteiro"
+                                    type="number" min="0" max="10" />
+                                <label asp-for="QuantidadeCamasSolteiro"></label>
+                                <span asp-validation-for="QuantidadeCamasSolteiro" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="QuantidadeCamasCasal" class="form-control" placeholder="Camas de Casal"
+                                    type="number" min="0" max="10" />
+                                <label asp-for="QuantidadeCamasCasal"></label>
+                                <span asp-validation-for="QuantidadeCamasCasal" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">

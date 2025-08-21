@@ -32,6 +32,13 @@ namespace GerenciadorHotel.Models
         [Range(1, 10, ErrorMessage = "A quantidade de camas deve ser entre 1 e 10")]
         [Display(Name = "Quantidade de Camas")]
         public int QuantidadeCamas { get; set; }
+        [Display(Name = "Camas de Solteiro")]
+        [Range(0, int.MaxValue, ErrorMessage = "Informe um valor válido para camas de solteiro.")]
+        public int QuantidadeCamasSolteiro { get; set; }
+
+        [Display(Name = "Camas de Casal")]
+        [Range(0, int.MaxValue, ErrorMessage = "Informe um valor válido para camas de casal.")]
+        public int QuantidadeCamasCasal { get; set; }
 
         [Required(ErrorMessage = "O preço é obrigatório")]
         [Range(0.01, 9999.99, ErrorMessage = "O preço deve ser maior que zero")]
