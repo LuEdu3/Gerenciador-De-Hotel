@@ -7,18 +7,29 @@
     var labelsGeral = quartos.Any() ? string.Join(",", quartos.Select(q => "'" + (q.NomeAcomodacao ?? string.Empty).Replace("'", "\\'") + "'")) : "";
     var dataGeral = quartos.Any() ? string.Join(",", quartos.Select(q => q.TotalReservas.ToString())) : "";
 
-    // Construir dados por quarto (JSON parcial) para injeção no JS
-    var dadosPorQuartoBuilder = new System.Text.StringBuilder();
-    for (int i = 0; i < quartos.Count; i++)
+    // Construir dados por quarto de forma segura (serializar para JSON)
+    var dadosPorQuartoDict = new System.Collections.Generic.Dictionary<string, object>();
+    foreach (var quarto in quartos)
     {
-        var quarto = quartos[i];
-        var reservas = quarto.Reservas ?? new List<GerenciadorHotel.Models.Reserva>();
-        var labels = reservas.Any() ? string.Join(",", reservas.Select(r => "'" + r.DataCheckIn.ToShortDateString() + "'")) : "";
-        var data = reservas.Any() ? string.Join(",", reservas.Select(r => "1")) : "";
-        dadosPorQuartoBuilder.Append($"'{quarto.AcomodacaoId}': {{ labels: [{labels}], datasets: [{{ label: 'Reservas ({quarto.NomeAcomodacao})', data: [{data}], borderColor: '#1cc88a', backgroundColor: 'rgba(28,200,138,0.2)', tension: 0.3, fill: true }}] }}");
-        if (i < quartos.Count - 1) dadosPorQuartoBuilder.Append(",");
+        var reservas = quarto.Reservas ?? new System.Collections.Generic.List<GerenciadorHotel.Models.Reserva>();
+        var labelsList = reservas.Select(r => r.DataCheckIn.ToShortDateString()).ToList();
+        var dataList = reservas.Any() ? Enumerable.Repeat(1, reservas.Count()).ToList() : new System.Collections.Generic.List<int>();
+        var dataset = new[] {
+            new {
+                label = $"Reservas ({quarto.NomeAcomodacao})",
+                data = dataList,
+                borderColor = "#1cc88a",
+                backgroundColor = "rgba(28,200,138,0.2)",
+                tension = 0.3,
+                fill = true
+            }
+        };
+    dadosPorQuartoDict[quarto.AcomodacaoId.ToString()] = new {
+            labels = labelsList,
+            datasets = dataset
+        };
     }
-    var dadosPorQuartoJson = dadosPorQuartoBuilder.ToString();
+    var dadosPorQuartoJson = System.Text.Json.JsonSerializer.Serialize(dadosPorQuartoDict);
 
     // Não construir options dinamicamente aqui — usaremos JS para marcar a opção correta
 }
@@ -179,8 +190,8 @@
             }]
         };
 
-        // Dados por quarto (objeto com chaves: acomodacaoId)
-        var dadosPorQuarto = { @Html.Raw(dadosPorQuartoJson) };
+    // Dados por quarto (objeto com chaves: acomodacaoId)
+    var dadosPorQuarto = @Html.Raw(dadosPorQuartoJson);
 
         var ctxLinha = document.getElementById('graficoLinhaOcupacao').getContext('2d');
         var graficoLinha = new Chart(ctxLinha, {
@@ -213,6 +224,8 @@
             }
             graficoLinha.update();
         }
+    // Aplicar filtro inicial (caso o select tenha valor diferente de 'geral')
+    filtrarGrafico();
     </script>
         <script>
             // Seleciona o option de 'dias' baseado no modelo (evita Razor em atributos option)
