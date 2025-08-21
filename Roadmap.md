@@ -129,8 +129,8 @@ Este roadmap será atualizado conforme avançarmos no desenvolvimento.
 Abaixo estão as modificações que você listou, o estado atual com base na inspeção do código e sugestões rápidas do que precisa ser feito para cada item.
 
 ### Como usuário
-#### Pedro
-- Clicar na reserva vai direto pro quarto selecionado na página de reservas
+#### Pedro ✅
+-  Clicar na reserva vai direto pro quarto selecionado na página de reservas
 	- Status: Pendente (prioridade alta)
 	- Observação: Na view `Views/Reservas/MinhasReservas.cshtml` o botão atualmente direciona para os detalhes da reserva (`Reservas/Details/{reserva.Id}`), o que pode abrir uma tela genérica (ex.: sempre para o tipo "domo"). O comportamento desejado é abrir a página da acomodação associada à reserva.
 	- Próximo passo: alterar o link do botão para apontar para a acomodação. Exemplo de alteração sugerida na view:
@@ -159,6 +159,10 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 	- Status: Parcial / Não apresentado ao usuário
 	- Observação: `Reserva` usa `DataCheckIn`/`DataCheckOut` (DateTime) mas as views exibem apenas a data (`dd/MM/yyyy`). Não existe um campo dedicado de "horário do check-in" visível ao usuário.
 	- Próximo passo: se desejar um campo separado, criar `HorarioCheckIn` em `Reserva` ou formatar `DataCheckIn` para exibir hora nas views; atualizar formulários e validações conforme necessário.
+
+
+- Adicionar local para o Usuário ter acesso as suas reservas
+	- Status: Não implementado
 
 ### Como Administrador
 
