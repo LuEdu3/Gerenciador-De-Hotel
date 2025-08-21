@@ -129,7 +129,7 @@ Este roadmap será atualizado conforme avançarmos no desenvolvimento.
 Abaixo estão as modificações que você listou, o estado atual com base na inspeção do código e sugestões rápidas do que precisa ser feito para cada item.
 
 ### Como usuário
-
+#### Pedro
 - Clicar na reserva vai direto pro quarto selecionado na página de reservas
 	- Status: Pendente (prioridade alta)
 	- Observação: Na view `Views/Reservas/MinhasReservas.cshtml` o botão atualmente direciona para os detalhes da reserva (`Reservas/Details/{reserva.Id}`), o que pode abrir uma tela genérica (ex.: sempre para o tipo "domo"). O comportamento desejado é abrir a página da acomodação associada à reserva.
@@ -143,6 +143,8 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 
 		Ou substituir o botão atual `asp-action="Details" asp-route-id="@reserva.Id"` por esta versão que usa `AcomodacaoId`.
 		Testar como hóspede e administrador após a alteração; garantir que a rota `Acomodacoes/Details/{id}` retorna `NotFound` (404) quando a acomodação não existir.
+
+##### Luiz
 
 - Mostrar amenidades nos detalhes da acomodação como usuário
 	- Status: Implementado
