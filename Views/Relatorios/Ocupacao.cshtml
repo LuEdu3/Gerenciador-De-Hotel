@@ -1,24 +1,48 @@
 @model GerenciadorHotel.ViewModels.RelatorioOcupacaoViewModel
+@{
+    // Preparar dados em C# para evitar expressões dinâmicas no Razor
+    var quartos = Model.OcupacaoPorQuarto?.ToList() ?? new List<GerenciadorHotel.ViewModels.RelatorioOcupacaoPorQuartoViewModel>();
 
-<h2>Relatório de Ocupação por Quarto</h2>
-<ul>
-    <li>Total de acomodações: @Model.TotalAcomodacoes</li>
-    <li>Quartos ocupados: @Model.QuartosOcupados</li>
+    // Labels e dados gerais para o gráfico
+    var labelsGeral = quartos.Any() ? string.Join(",", quartos.Select(q => "'" + (q.NomeAcomodacao ?? string.Empty).Replace("'", "\\'") + "'")) : "";
+    var dataGeral = quartos.Any() ? string.Join(",", quartos.Select(q => q.TotalReservas.ToString())) : "";
+
+    // Construir dados por quarto (JSON parcial) para injeção no JS
+    var dadosPorQuartoBuilder = new System.Text.StringBuilder();
+    for (int i = 0; i < quartos.Count; i++)
+    {
+        var quarto = quartos[i];
+        var reservas = quarto.Reservas ?? new List<GerenciadorHotel.Models.Reserva>();
+        var labels = reservas.Any() ? string.Join(",", reservas.Select(r => "'" + r.DataCheckIn.ToShortDateString() + "'")) : "";
+        var data = reservas.Any() ? string.Join(",", reservas.Select(r => "1")) : "";
+        dadosPorQuartoBuilder.Append($"'{quarto.AcomodacaoId}': {{ labels: [{labels}], datasets: [{{ label: 'Reservas ({quarto.NomeAcomodacao})', data: [{data}], borderColor: '#1cc88a', backgroundColor: 'rgba(28,200,138,0.2)', tension: 0.3, fill: true }}] }}");
+        if (i < quartos.Count - 1) dadosPorQuartoBuilder.Append(",");
+    }
+    var dadosPorQuartoJson = dadosPorQuartoBuilder.ToString();
+
+    // Não construir options dinamicamente aqui — usaremos JS para marcar a opção correta
+}
+
+<!-- removed single doughnut canvas here; will render inside the charts container below -->
+
+<ul class="list-unstyled mb-3">
     <li>Quartos disponíveis: @Model.QuartosDisponiveis</li>
     <li>Taxa de ocupação: @Model.TaxaOcupacao.ToString("F2")%</li>
 </ul>
 
 <form method="get" class="mb-3">
     <label for="dias">Filtrar por período:</label>
-        <select name="dias" id="dias" class="form-select d-inline w-auto" onchange="this.form.submit()">
-            <option value="7" selected="@(Model.FiltroDias == 7)">Última semana</option>
-            <option value="15" selected="@(Model.FiltroDias == 15)">Últimos 15 dias</option>
-            <option value="30" selected="@(Model.FiltroDias == 30)">Últimos 30 dias</option>
-            <option value="90" selected="@(Model.FiltroDias == 90)">Últimos 90 dias</option>
-        </select>
+    <select name="dias" id="dias" class="form-select d-inline w-auto" onchange="this.form.submit()">
+        <option value="7">Última semana</option>
+        <option value="15">Últimos 15 dias</option>
+        <option value="30">Últimos 30 dias</option>
+        <option value="90">Últimos 90 dias</option>
+    </select>
 </form>
 
 <h3>Ocupação por Quarto</h3>
+
+
 
 <table class="table table-bordered">
     <thead>
@@ -32,9 +56,9 @@
         </tr>
     </thead>
     <tbody>
-        @if (Model.OcupacaoPorQuarto != null && Model.OcupacaoPorQuarto.Any())
+        @if (quartos.Any())
         {
-            foreach (var quarto in Model.OcupacaoPorQuarto)
+            foreach (var quarto in quartos)
             {
                 var totalHospedes = quarto.Reservas?.Sum(r => r.NumeroHospedes) ?? 0;
                 var precoPorNoite = quarto.Reservas?.FirstOrDefault()?.Acomodacao?.Preco ?? 0;
@@ -91,3 +115,113 @@
         }
     </tbody>
 </table>
+
+<!-- Gráfico de ocupação por período -->
+<div class="mt-4 mb-4">
+    <label for="quartoFiltro">Filtrar por quarto:</label>
+    <select id="quartoFiltro" class="form-select d-inline w-auto" onchange="filtrarGrafico()">
+        <option value="geral">Geral</option>
+        @foreach (var quarto in quartos)
+        {
+            <option value="@quarto.AcomodacaoId">@quarto.NomeAcomodacao</option>
+        }
+    </select>
+</div>
+
+@* Container dos gráficos será renderizado acima do footer, antes da seção Scripts *@
+@{
+    /* Container de gráficos: ambos com mesmo tamanho maior/moderado */
+}
+
+<!-- Container para gráficos (acima do footer) -->
+<div class="d-flex justify-content-center mb-4" style="gap:1rem; align-items:center;">
+    <div style="flex:0 0 420px; max-width:48%;">
+        <canvas id="graficoOcupacao" width="420" height="260"></canvas>
+    </div>
+    <div style="flex:0 0 420px; max-width:48%;">
+        <canvas id="graficoLinhaOcupacao" width="420" height="260"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Gráfico de pizza (ocupação geral)
+        var ctx = document.getElementById('graficoOcupacao').getContext('2d');
+        var graficoOcupacao = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ocupados', 'Disponíveis'],
+                datasets: [{
+                    data: [@Model.QuartosOcupados, @Model.QuartosDisponiveis],
+                    backgroundColor: ['#4e73df', '#1cc88a'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: { display: true, text: 'Taxa de Ocupação (%)' }
+                }
+            }
+        });
+
+        // Dados gerais injetados do Razor
+        var dadosGeral = {
+            labels: [@Html.Raw(labelsGeral)],
+            datasets: [{
+                label: 'Reservas por Quarto',
+                data: [@Html.Raw(dataGeral)],
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78,115,223,0.2)',
+                tension: 0.3,
+                fill: true
+            }]
+        };
+
+        // Dados por quarto (objeto com chaves: acomodacaoId)
+        var dadosPorQuarto = { @Html.Raw(dadosPorQuartoJson) };
+
+        var ctxLinha = document.getElementById('graficoLinhaOcupacao').getContext('2d');
+        var graficoLinha = new Chart(ctxLinha, {
+            type: 'line',
+            data: dadosGeral,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'bottom' },
+                    title: { display: true, text: 'Reservas por Quarto (Geral)' }
+                }
+            }
+        });
+
+        function filtrarGrafico() {
+            var filtro = document.getElementById('quartoFiltro').value;
+            if (filtro === 'geral') {
+                graficoLinha.data = dadosGeral;
+                graficoLinha.options.plugins.title.text = 'Reservas por Quarto (Geral)';
+            } else {
+                // Se não houver dados para o quarto, zera o gráfico
+                var sel = dadosPorQuarto[filtro];
+                if (sel) {
+                    graficoLinha.data = sel;
+                    graficoLinha.options.plugins.title.text = 'Reservas do Quarto';
+                } else {
+                    graficoLinha.data = { labels: [], datasets: [] };
+                    graficoLinha.options.plugins.title.text = 'Sem dados para o quarto selecionado';
+                }
+            }
+            graficoLinha.update();
+        }
+    </script>
+        <script>
+            // Seleciona o option de 'dias' baseado no modelo (evita Razor em atributos option)
+            (function() {
+                try {
+                    var filtroDias = @Model.FiltroDias;
+                    var sel = document.getElementById('dias');
+                    if (sel) sel.value = filtroDias.toString();
+                } catch(e) { /* noop */ }
+            })();
+        </script>
+}
