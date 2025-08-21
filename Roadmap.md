@@ -144,6 +144,8 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 		Ou substituir o botão atual `asp-action="Details" asp-route-id="@reserva.Id"` por esta versão que usa `AcomodacaoId`.
 		Testar como hóspede e administrador após a alteração; garantir que a rota `Acomodacoes/Details/{id}` retorna `NotFound` (404) quando a acomodação não existir.
 
+##### Luiz
+
 - Mostrar amenidades nos detalhes da acomodação como usuário
 	- Status: Implementado
 	- Onde: `Views/Acomodacoes/Details.cshtml` já renderiza `Model.AcomodacaoAmenidades` com imagens e nomes.
