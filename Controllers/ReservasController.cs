@@ -76,40 +76,16 @@ namespace GerenciadorHotel.Controllers
 
         // GET: Reservas/Create
         [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
-        public IActionResult Create()
+        public IActionResult Create(int? id)
         {
-            ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome");
-            ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome");
+            var acomodacoes = _context.Acomodacoes.Where(a => a.Ativa).ToList();
+            ViewBag.AcomodacaoId = new SelectList(acomodacoes, "Id", "Nome", id);
 
-            // Buscar datas ocupadas por acomodação
-            var reservas = _context.Reservas
-                .Where(r => r.Status != StatusReserva.Cancelada)
-                .Select(r => new
-                {
-                    r.AcomodacaoId,
-                    r.DataCheckIn,
-                    r.DataCheckOut
-                })
-                .ToList();
+            var reserva = new Reserva();
+            if (id.HasValue)
+                reserva.AcomodacaoId = id.Value;
 
-            // Agrupar por acomodação
-            var datasOcupadasPorAcomodacao = reservas
-                .GroupBy(r => r.AcomodacaoId)
-                .ToDictionary(g => g.Key, g => g.Select(r => new { inicio = r.DataCheckIn, fim = r.DataCheckOut }).ToList());
-
-            // LOG TEMPORÁRIO PARA DEBUG
-            System.Diagnostics.Debug.WriteLine("[DEBUG] Datas ocupadas por acomodação:");
-            foreach (var kvp in datasOcupadasPorAcomodacao)
-            {
-                System.Diagnostics.Debug.WriteLine($"AcomodacaoId: {kvp.Key}");
-                foreach (var intervalo in kvp.Value)
-                {
-                    System.Diagnostics.Debug.WriteLine($"  Início: {intervalo.inicio}, Fim: {intervalo.fim}");
-                }
-            }
-
-            ViewBag.DatasOcupadasPorAcomodacao = datasOcupadasPorAcomodacao;
-            return View();
+            return View(reserva);
         }
 
         // POST: Reservas/Create
