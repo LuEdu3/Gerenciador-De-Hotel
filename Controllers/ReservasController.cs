@@ -80,6 +80,7 @@ namespace GerenciadorHotel.Controllers
         {
             var acomodacoes = _context.Acomodacoes.Where(a => a.Ativa).ToList();
             ViewBag.AcomodacaoId = new SelectList(acomodacoes, "Id", "Nome", id);
+            ViewBag.PaisId = new SelectList(_context.Paises, "Id", "Nome");
 
             var reserva = new Reserva();
             if (id.HasValue)
@@ -144,8 +145,8 @@ namespace GerenciadorHotel.Controllers
                 }
             }
 
-            ViewData["AcomodacaoId"] = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome", reserva.AcomodacaoId);
-            ViewData["PaisId"] = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
+            ViewBag.AcomodacaoId = new SelectList(_context.Acomodacoes.Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel), "Id", "Nome", reserva.AcomodacaoId);
+            ViewBag.PaisId = new SelectList(_context.Paises, "Id", "Nome", reserva.PaisId);
             return View(reserva);
         }
         // GET: Reservas/MinhasReservas
