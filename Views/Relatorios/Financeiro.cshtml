@@ -1,0 +1,38 @@
+@model GerenciadorHotel.Models.RelatorioFinanceiroViewModel
+
+<h2>Relatório Financeiro</h2>
+<ul>
+    <li>Total de reservas pagas: @Model.TotalReservas</li>
+    <li>Total arrecadado: @Model.TotalReceita.ToString("C")</li>
+</ul>
+
+<h3>Reservas Pagas</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Acomodação</th>
+            <th>Hóspede</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Valor</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reserva in Model.Reservas)
+        {
+            <tr>
+                <td>@reserva.Acomodacao?.Nome</td>
+                <td>@reserva.NomeHospede @reserva.SobrenomeHospede</td>
+                <td>@reserva.DataCheckIn.ToShortDateString()</td>
+                <td>@reserva.DataCheckOut.ToShortDateString()</td>
+                <td>@reserva.ValorTotal.ToString("C")</td>
+                <td>@reserva.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Financeiro", "Relatorios")" class="dropdown-item">
+    <i class="bi bi-cash-coin"></i> Relatório Financeiro
+</a>

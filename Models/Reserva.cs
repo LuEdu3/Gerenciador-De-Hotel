@@ -21,7 +21,6 @@ namespace GerenciadorHotel.Models
 
     public class Reserva
     {
-        [Key]
         public int Id { get; set; }
 
         // Dados do Hóspede

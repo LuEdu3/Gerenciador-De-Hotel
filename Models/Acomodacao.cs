@@ -17,7 +17,6 @@ namespace GerenciadorHotel.Models
 
     public class Acomodacao
     {
-        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "O nome da acomodação é obrigatório")]
