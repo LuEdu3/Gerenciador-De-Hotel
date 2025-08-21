@@ -130,7 +130,6 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 
 ### Como usuário
 
-- Clicar na reserva vai direto pro quarto selecionado
 - Clicar na reserva vai direto pro quarto selecionado na página de reservas
 	- Status: Pendente (prioridade alta)
 	- Observação: Na view `Views/Reservas/MinhasReservas.cshtml` o botão atualmente direciona para os detalhes da reserva (`Reservas/Details/{reserva.Id}`), o que pode abrir uma tela genérica (ex.: sempre para o tipo "domo"). O comportamento desejado é abrir a página da acomodação associada à reserva.
