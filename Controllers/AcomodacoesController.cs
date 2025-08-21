@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 using GerenciadorHotel.Data;
 using GerenciadorHotel.Models;
 
@@ -9,6 +10,13 @@ namespace GerenciadorHotel.Controllers
     [AllowAnonymous]
     public class AcomodacoesController : Controller
     {
+        private readonly ApplicationDbContext _context;
+
+        public AcomodacoesController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         // GET: Acomodacoes/Catalogo
         [AllowAnonymous]
         public async Task<IActionResult> Catalogo()
@@ -18,11 +26,13 @@ namespace GerenciadorHotel.Controllers
                 .ToListAsync();
             return View(acomodacoes);
         }
-        private readonly ApplicationDbContext _context;
 
-        public AcomodacoesController(ApplicationDbContext context)
+        // GET: Acomodacoes/Create
+        [Authorize(Roles = "Administrador")]
+        public IActionResult Create()
         {
-            _context = context;
+            ViewBag.Amenidades = _context.Amenidades.Where(a => a.Ativa).ToList();
+            return View();
         }
 
         // GET: Acomodacoes
@@ -31,38 +41,9 @@ namespace GerenciadorHotel.Controllers
             var acomodacoes = await _context.Acomodacoes
                 .Include(a => a.AcomodacaoAmenidades)
                 .ThenInclude(aa => aa.Amenidade)
+                .Include(a => a.Imagens)
                 .ToListAsync();
             return View(acomodacoes);
-        }
-
-        // GET: Acomodacoes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var acomodacao = await _context.Acomodacoes
-                .Include(a => a.AcomodacaoAmenidades)
-                .ThenInclude(aa => aa.Amenidade)
-                .Include(a => a.Imagens)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (acomodacao == null)
-            {
-                return NotFound();
-            }
-
-            return View(acomodacao);
-        }
-
-        // GET: Acomodacoes/Create
-        [Authorize(Roles = "Administrador")]
-        public IActionResult Create()
-        {
-            ViewBag.Amenidades = _context.Amenidades.Where(a => a.Ativa).ToList();
-            return View();
         }
 
         // POST: Acomodacoes/Create
@@ -199,6 +180,68 @@ namespace GerenciadorHotel.Controllers
             {
                 try
                 {
+                    // Processar uploads de arquivos (novas imagens enviadas no Edit)
+                    var files = Request.Form.Files;
+                    int nextIndex = _context.ImagensAcomodacao.Where(i => i.AcomodacaoId == acomodacao.Id).Count();
+                    if (files != null && files.Count > 0)
+                    {
+                        int imgIndex = nextIndex;
+                        foreach (var file in files)
+                        {
+                            if (file.Name != "Imagens") continue;
+                            if (file.Length <= 0) continue;
+                            var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagens");
+                            if (!Directory.Exists(uploads)) Directory.CreateDirectory(uploads);
+                            var fileName = $"acomodacao_{acomodacao.Id}_{DateTime.Now.Ticks}_{imgIndex}{Path.GetExtension(file.FileName)}";
+                            var filePath = Path.Combine(uploads, fileName);
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                            var url = $"/imagens/{fileName}";
+                            var imagem = new ImagemAcomodacao
+                            {
+                                AcomodacaoId = acomodacao.Id,
+                                ImagemUrl = url,
+                                Ordem = imgIndex,
+                                Ativa = true,
+                                DataUpload = DateTime.Now
+                            };
+                            _context.ImagensAcomodacao.Add(imagem);
+                            if (string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
+                            {
+                                acomodacao.ImagemPrincipalUrl = url;
+                            }
+                            imgIndex++;
+                        }
+                        nextIndex = imgIndex;
+                    }
+
+                    // Em seguida processar quaisquer URLs adicionais ImagensAcomodacao[0..n]
+                    for (int i = 0; i < 20; i++)
+                    {
+                        var key = $"ImagensAcomodacao[{i}]";
+                        if (!Request.Form.ContainsKey(key)) continue;
+                        var urlValue = Request.Form[key].ToString()?.Trim();
+                        if (string.IsNullOrEmpty(urlValue)) continue;
+                        if (urlValue.Length > 255) urlValue = urlValue.Substring(0, 255);
+
+                        var imagem = new ImagemAcomodacao
+                        {
+                            AcomodacaoId = acomodacao.Id,
+                            ImagemUrl = urlValue,
+                            Ordem = nextIndex,
+                            Ativa = true,
+                            DataUpload = DateTime.Now
+                        };
+                        _context.ImagensAcomodacao.Add(imagem);
+                        if (string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
+                        {
+                            acomodacao.ImagemPrincipalUrl = urlValue;
+                        }
+                        nextIndex++;
+                    }
+
                     acomodacao.DataAtualizacao = DateTime.Now;
                     _context.Update(acomodacao);
                     await _context.SaveChangesAsync();
@@ -218,6 +261,29 @@ namespace GerenciadorHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Amenidades = _context.Amenidades.Where(a => a.Ativa).ToList();
+            return View(acomodacao);
+        }
+
+        // GET: Acomodacoes/Details/5
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var acomodacao = await _context.Acomodacoes
+                .Include(a => a.AcomodacaoAmenidades)
+                    .ThenInclude(aa => aa.Amenidade)
+                .Include(a => a.Imagens)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (acomodacao == null)
+            {
+                return NotFound();
+            }
+
             return View(acomodacao);
         }
 

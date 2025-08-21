@@ -18,7 +18,7 @@
                 <h4><i class="bi bi-house-door"></i> Informações da Acomodação</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Edit">
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="DataCriacao" />
@@ -52,24 +52,25 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input asp-for="QuantidadeCamas" class="form-control"
-                                    placeholder="Quantidade de Camas" />
+                                <input asp-for="QuantidadeCamas" class="form-control" placeholder="Quantidade de Camas"
+                                    type="number" min="1" max="10" />
                                 <label asp-for="QuantidadeCamas"></label>
                                 <span asp-validation-for="QuantidadeCamas" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input asp-for="Preco" class="form-control" placeholder="Preço por Noite" />
-                                <label asp-for="Preco"></label>
-                                <span asp-validation-for="Preco" class="text-danger"></span>
+                                <input id="QuantidadeCamasCasal" name="QuantidadeCamasCasal" class="form-control"
+                                    type="number" min="0" max="10" placeholder="Quantidade de Camas de Casal" />
+                                <label for="QuantidadeCamasCasal">Quantidade de Camas de Casal</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input asp-for="MinimoNoites" class="form-control" placeholder="Mínimo de Noites" />
-                                <label asp-for="MinimoNoites"></label>
-                                <span asp-validation-for="MinimoNoites" class="text-danger"></span>
+                                <input asp-for="Preco" class="form-control" placeholder="Preço por Noite" type="number"
+                                    step="0.01" min="0.01" max="9999.99" />
+                                <label asp-for="Preco"></label>
+                                <span asp-validation-for="Preco" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -80,6 +81,14 @@
                         <label asp-for="ImagemPrincipalUrl"></label>
                         <span asp-validation-for="ImagemPrincipalUrl" class="text-danger"></span>
                         <div class="form-text">Cole a URL de uma imagem para a acomodação</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fotos da Acomodação (mínimo 1, máximo 10)</label>
+                        <input type="file" name="Imagens" id="Imagens" class="form-control" accept="image/*" multiple />
+                        <small class="form-text text-muted">Faça upload de novas imagens para adicionar ao
+                            carousel.</small>
+                        <span class="text-danger" id="imagemErro"></span>
                     </div>
 
                     <div class="mb-3">
@@ -104,6 +113,84 @@
                             Acomodação Ativa
                         </label>
                         <span asp-validation-for="Ativa" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Amenidades</label>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="ar" id="amenidade_ar" />
+                                    <label class="form-check-label" for="amenidade_ar">
+                                        <i class="bi bi-snow"></i> Ar-condicionado
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="wifi" id="amenidade_wifi" />
+                                    <label class="form-check-label" for="amenidade_wifi">
+                                        <i class="bi bi-wifi"></i> Wi-Fi
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="tv" id="amenidade_tv" />
+                                    <label class="form-check-label" for="amenidade_tv">
+                                        <i class="bi bi-tv"></i> TV
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="frigobar" id="amenidade_frigobar" />
+                                    <label class="form-check-label" for="amenidade_frigobar">
+                                        <i class="bi bi-cup"></i> Frigobar
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="ducha" id="amenidade_ducha" />
+                                    <label class="form-check-label" for="amenidade_ducha">
+                                        <i class="bi bi-droplet"></i> Ducha
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="banheira" id="amenidade_banheira" />
+                                    <label class="form-check-label" for="amenidade_banheira">
+                                        <i class="bi bi-bucket"></i> Banheira
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="cozinha" id="amenidade_cozinha" />
+                                    <label class="form-check-label" for="amenidade_cozinha">
+                                        <i class="bi bi-house-door"></i> Cozinha
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                        value="toalha" id="amenidade_toalha" />
+                                    <label class="form-check-label" for="amenidade_toalha">
+                                        <i class="bi bi-badge-tm"></i> Toalha
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -192,5 +279,21 @@
                 preview.innerHTML = '<div class="bg-light border rounded p-4"><i class="bi bi-image display-4 text-muted"></i><p class="text-muted mt-2">Preview da imagem aparecerá aqui</p></div>';
             }
         });
+
+        // preview das imagens selecionadas (mostra a primeira selecionada)
+        var imagensInput = document.getElementById('Imagens');
+        if (imagensInput) {
+            imagensInput.addEventListener('change', function (e) {
+                var files = e.target.files;
+                var preview = document.getElementById('image-preview');
+                if (files && files.length > 0) {
+                    var reader = new FileReader();
+                    reader.onload = function (ev) {
+                        preview.innerHTML = '<img src="' + ev.target.result + '" class="img-fluid rounded" style="max-height:200px">';
+                    };
+                    reader.readAsDataURL(files[0]);
+                }
+            });
+        }
     </script>
 }
