@@ -56,8 +56,7 @@
 
 ### 7. Relatórios [🔄 33%]
 - ✅ Relatório de ocupação
-- ❌ Relatório financeiro
-- ❌ Relatório de hóspedes
+
 
 ### 8. Painel Administrativo [🔄 50%]
 - ✅ Dashboard com estatísticas
