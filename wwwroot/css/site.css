@@ -439,6 +439,199 @@
         .room-card-body .d-flex {
             margin-top: auto;
         }
+
+        /* Página de Detalhes da Acomodação */
+        .accommodation-details {
+            margin-top: 2rem;
+        }
+
+        .details-carousel {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+        }
+
+        .details-carousel .carousel-item img {
+            height: 500px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .details-carousel .carousel-control-prev,
+        .details-carousel .carousel-control-next {
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(126, 39, 38, 0.8);
+            border-radius: 50%;
+            margin: 0 15px;
+        }
+
+        .details-carousel .carousel-control-prev {
+            left: 15px;
+        }
+
+        .details-carousel .carousel-control-next {
+            right: 15px;
+        }
+
+        .details-carousel .carousel-indicators {
+            bottom: 20px;
+        }
+
+        .details-carousel .carousel-indicators button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 2px solid white;
+        }
+
+        .details-carousel .carousel-indicators button.active {
+            background-color: white;
+        }
+
+        .amenities-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .amenity-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .amenity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            color: white;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+
+        .amenity-name {
+            font-weight: 500;
+            color: var(--dark-gray);
+            margin: 0;
+        }
+
+        .accommodation-info-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .accommodation-info-card .card-body {
+            padding: 2rem;
+        }
+
+        .accommodation-title {
+            color: var(--primary-color);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .accommodation-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .info-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--dark-gray);
+            margin: 0;
+        }
+
+        .reservation-card {
+            position: sticky;
+            top: 100px;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .reservation-card .card-body {
+            padding: 2rem;
+        }
+
+        .price-display {
+            background: linear-gradient(135deg, var(--accent-color), #f4d03f);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .price-period {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
         
         .btn-room {
             background-color: var(--primary-color);
