@@ -1,0 +1,245 @@
+@model GerenciadorHotel.ViewModels.EmpresaViewModel
+
+@{
+    ViewData["Title"] = "Gerenciar Empresa";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">Informações da Empresa</h1>
+                    <p class="text-muted mb-0">Gerencie os dados da sua empresa exibidos no site</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Edit")" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Editar Informações
+                    </a>
+                </div>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Informações Básicas -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-building me-2"></i>Informações Básicas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Nome da Empresa</label>
+                                <p class="fw-bold">@Model.Nome</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Nome Resumido</label>
+                                <p>@(Model.NomeResumido ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Slogan</label>
+                                <p>@(Model.Slogan ?? "Não informado")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Ano de Fundação</label>
+                                <p>@(Model.AnoFundacao?.ToString() ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Logo</label>
+                                @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                                {
+                                    <div>
+                                        <img src="@Model.LogoUrl" alt="Logo da empresa" class="img-thumbnail" style="max-height: 100px;">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p>Não informado</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Descrição Breve</label>
+                                <p>@(Model.DescricaoBreve ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Sobre a Empresa</label>
+                                <p>@(Model.DescricaoSobre ?? "Não informado")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contatos -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-phone me-2"></i>Informações de Contato
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Telefone</label>
+                                <p>@(Model.Telefone ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">WhatsApp</label>
+                                <p>@(Model.WhatsApp ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">E-mail</label>
+                                <p>@(Model.Email ?? "Não informado")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Website</label>
+                                <p>@(Model.Website ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Check-in</label>
+                                <p>@(Model.HorarioCheckin ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Check-out</label>
+                                <p>@(Model.HorarioCheckout ?? "Não informado")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Endereço -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-map-marker-alt me-2"></i>Endereço
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Endereço</label>
+                                <p>@(Model.Endereco ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Cidade</label>
+                                <p>@(Model.Cidade ?? "Não informado")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Estado</label>
+                                <p>@(Model.Estado ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">CEP</label>
+                                <p>@(Model.CEP ?? "Não informado")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Redes Sociais -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-share-alt me-2"></i>Redes Sociais
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Facebook</label>
+                                <p>@(Model.Facebook ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Instagram</label>
+                                <p>@(Model.Instagram ?? "Não informado")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Twitter</label>
+                                <p>@(Model.Twitter ?? "Não informado")</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">LinkedIn</label>
+                                <p>@(Model.LinkedIn ?? "Não informado")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Adicionais -->
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-images fa-2x text-primary mb-2"></i>
+                            <h6>Gerenciar Fotos</h6>
+                            <p class="text-muted small">@Model.Fotos.Count foto(s)</p>
+                            <a href="@Url.Action("Fotos")" class="btn btn-outline-primary btn-sm">
+                                Gerenciar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-concierge-bell fa-2x text-success mb-2"></i>
+                            <h6>Gerenciar Serviços</h6>
+                            <p class="text-muted small">@Model.Servicos.Count serviço(s)</p>
+                            <a href="@Url.Action("Servicos")" class="btn btn-outline-success btn-sm">
+                                Gerenciar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+                            <h6>Gerenciar Prêmios</h6>
+                            <p class="text-muted small">@Model.Premios.Count prêmio(s)</p>
+                            <a href="@Url.Action("Premios")" class="btn btn-outline-warning btn-sm">
+                                Gerenciar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

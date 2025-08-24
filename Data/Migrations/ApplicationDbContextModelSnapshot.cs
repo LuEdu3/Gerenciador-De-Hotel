@@ -64,7 +64,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("Acomodacoes");
+                    b.ToTable("Acomodacoes", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.AcomodacaoAmenidade", b =>
@@ -89,7 +89,7 @@ namespace GerenciadorHotel.Migrations
                     b.HasIndex("AcomodacaoId", "AmenidadeId")
                         .IsUnique();
 
-                    b.ToTable("AcomodacaoAmenidades");
+                    b.ToTable("AcomodacaoAmenidades", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.Amenidade", b =>
@@ -119,7 +119,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Amenidades");
+                    b.ToTable("Amenidades", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.ApplicationUser", b =>
@@ -243,7 +243,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Empresas");
+                    b.ToTable("Empresas", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.EmpresaFoto", b =>
@@ -268,7 +268,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasIndex("EmpresaId");
 
-                    b.ToTable("EmpresaFotos");
+                    b.ToTable("EmpresaFotos", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.ImagemAcomodacao", b =>
@@ -306,7 +306,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasIndex("AcomodacaoId");
 
-                    b.ToTable("ImagensAcomodacao");
+                    b.ToTable("ImagensAcomodacao", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.Pagamento", b =>
@@ -347,7 +347,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasIndex("ReservaId");
 
-                    b.ToTable("Pagamentos");
+                    b.ToTable("Pagamentos", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.Pais", b =>
@@ -370,7 +370,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Paises");
+                    b.ToTable("Paises", (string)null);
                 });
 
             modelBuilder.Entity("GerenciadorHotel.Models.Reserva", b =>
@@ -455,7 +455,7 @@ namespace GerenciadorHotel.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reservas");
+                    b.ToTable("Reservas", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
