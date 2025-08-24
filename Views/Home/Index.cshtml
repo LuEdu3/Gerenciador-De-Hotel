@@ -93,8 +93,8 @@
                             <p>@acomodacao.Descricao</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button type="button" class="btn btn-room" onclick="handleReservaClick(event, @acomodacao.Id)">Reservar</button>
-                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="text-primary-custom">
-                                    Detalhes <i class="fas fa-arrow-right"></i>
+                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="btn-details-outline btn-details-sm">
+                                    <i class="bi bi-eye"></i> Detalhes
                                 </a>
                             </div>
                         </div>
