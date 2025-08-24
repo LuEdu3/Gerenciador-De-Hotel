@@ -68,7 +68,7 @@
         <div class="row">
             @foreach (var acomodacao in Model.Take(3))
             {
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-4 col-md-6 mb-4 d-flex">
                     <div class="room-card">
                         @if (!string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
                         {
@@ -93,7 +93,7 @@
                             <p>@acomodacao.Descricao</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button type="button" class="btn btn-room" onclick="handleReservaClick(event, @acomodacao.Id)">Reservar</button>
-                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="btn-details-outline btn-details-sm">
+                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="btn-details-outline">
                                     <i class="bi bi-eye"></i> Detalhes
                                 </a>
                             </div>
