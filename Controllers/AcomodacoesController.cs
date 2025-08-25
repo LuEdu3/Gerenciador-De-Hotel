@@ -50,7 +50,7 @@ namespace GerenciadorHotel.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nome,Descricao,QuantidadeCamas,QuantidadeCamasCasal,Preco,MinimoNoites,Status,Ativa")] Acomodacao acomodacao)
+    public async Task<IActionResult> Create([Bind("Nome,Descricao,QuantidadeCamasCasal,QuantidadeCamasSolteiro,Preco,MinimoNoites,Status,Ativa")] Acomodacao acomodacao)
         {
             var files = Request.Form.Files;
             int principalIndex = 0;
@@ -167,7 +167,7 @@ namespace GerenciadorHotel.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,QuantidadeCamas,QuantidadeCamasCasal,Preco,MinimoNoites,Status,ImagemPrincipalUrl,Ativa,DataCriacao")] Acomodacao acomodacao)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,QuantidadeCamasCasal,QuantidadeCamasSolteiro,Preco,MinimoNoites,Status,ImagemPrincipalUrl,Ativa,DataCriacao")] Acomodacao acomodacao)
         {
             if (id != acomodacao.Id)
             {

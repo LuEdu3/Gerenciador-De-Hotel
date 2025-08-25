@@ -162,7 +162,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Domo",
                         Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
-                        QuantidadeCamas = 1,
+                        QuantidadeCamasCasal = 1,
+                        QuantidadeCamasSolteiro = 0,
                         Preco = 280.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -174,7 +175,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Charrua (Bus)",
                         Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
-                        QuantidadeCamas = 2,
+                        QuantidadeCamasCasal = 0,
+                        QuantidadeCamasSolteiro = 2,
                         Preco = 180.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -186,7 +188,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Suíte com Cozinha",
                         Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
-                        QuantidadeCamas = 1,
+                        QuantidadeCamasCasal = 1,
+                        QuantidadeCamasSolteiro = 0,
                         Preco = 350.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -198,7 +201,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Chalé Família",
                         Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
-                        QuantidadeCamas = 4,
+                        QuantidadeCamasCasal = 2,
+                        QuantidadeCamasSolteiro = 2,
                         Preco = 450.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -210,7 +214,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Cabana",
                         Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
-                        QuantidadeCamas = 1,
+                        QuantidadeCamasCasal = 1,
+                        QuantidadeCamasSolteiro = 0,
                         Preco = 220.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -222,7 +227,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Estacionamento para Overlanders",
                         Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
-                        QuantidadeCamas = 2,
+                        QuantidadeCamasCasal = 0,
+                        QuantidadeCamasSolteiro = 2,
                         Preco = 80.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -254,7 +260,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Domo",
                         Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
-                        QuantidadeCamas = 1,
+                        QuantidadeCamasCasal = 1,
+                        QuantidadeCamasSolteiro = 0,
                         Preco = 280.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -266,7 +273,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Charrua (Bus)",
                         Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
-                        QuantidadeCamas = 2,
+                        QuantidadeCamasCasal = 0,
+                        QuantidadeCamasSolteiro = 2,
                         Preco = 180.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -278,7 +286,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Suíte com Cozinha",
                         Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
-                        QuantidadeCamas = 1,
+                        QuantidadeCamasCasal = 1,
+                        QuantidadeCamasSolteiro = 0,
                         Preco = 350.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -290,7 +299,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Chalé Família",
                         Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
-                        QuantidadeCamas = 4,
+                        QuantidadeCamasCasal = 2,
+                        QuantidadeCamasSolteiro = 2,
                         Preco = 450.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -302,7 +312,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Cabana",
                         Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
-                        QuantidadeCamas = 1,
+                        QuantidadeCamasCasal = 1,
+                        QuantidadeCamasSolteiro = 0,
                         Preco = 220.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -314,7 +325,8 @@ namespace GerenciadorHotel.Services
                     {
                         Nome = "Estacionamento para Overlanders",
                         Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
-                        QuantidadeCamas = 2,
+                        QuantidadeCamasCasal = 0,
+                        QuantidadeCamasSolteiro = 2,
                         Preco = 80.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,

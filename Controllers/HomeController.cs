@@ -63,12 +63,12 @@ public class HomeController : Controller
             if (Capacidade.Contains("-"))
             {
                 var capacidades = Capacidade.Split('-').Select(int.Parse).ToList();
-                query = query.Where(a => a.QuantidadeCamas >= capacidades[0] && a.QuantidadeCamas <= capacidades[1]);
+                query = query.Where(a => (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) >= capacidades[0] && (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) <= capacidades[1]);
             }
             else
             {
                 var capacidade = int.Parse(Capacidade);
-                query = query.Where(a => a.QuantidadeCamas >= capacidade);
+                query = query.Where(a => (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) >= capacidade);
             }
             ViewBag.FiltroCapacidade = Capacidade;
         }

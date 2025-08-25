@@ -23,11 +23,15 @@
 - ✅ Visualização de dados pessoais e nível de acesso
 
 ### 3. Gestão de Acomodações [✅ 100%]
-- ✅ Cadastro/edição/exclusão de acomodações
-- ✅ Descrição, quantidade de camas, preço, imagens
-- ✅ Check-in/check-out por acomodação
-- ✅ Mínimo de noites
-- ✅ Status da acomodação
+
+✅ Cadastro/edição/exclusão de acomodações
+✅ Descrição, quantidade de camas de solteiro e casal, preço, imagens
+✅ Exibição dinâmica: só mostra camas com quantidade maior que zero
+✅ Remoção do campo QuantidadeCamas (agora só solteiro/casal)
+✅ Validação e atualização das views para os novos campos
+✅ Check-in/check-out por acomodação
+✅ Mínimo de noites
+✅ Status da acomodação
 
 ### 4. Amenidades [✅ 100%]
 - ✅ Sistema de amenidades fixas (8 amenidades pré-definidas)
@@ -152,26 +156,12 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 	
 #### Guilherme
 
-- Mostrar camas de solteiros e de casal nos detalhes da acomodação
-	- Status: Não implementado
-	- Observação: O modelo `Acomodacao` atualmente só tem `QuantidadeCamas` (total). Não há informações separadas para camas de solteiro e casal.
-	- Próximo passo: estender `Models/Acomodacao.cs` com campos como `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal`, atualizar validações e views (Create/Edit/Details) e ajustar seed/migrations.
-
 - Horário do check-in
 	- Status: Parcial / Não apresentado ao usuário
 	- Observação: `Reserva` usa `DataCheckIn`/`DataCheckOut` (DateTime) mas as views exibem apenas a data (`dd/MM/yyyy`). Não existe um campo dedicado de "horário do check-in" visível ao usuário.
 	- Próximo passo: se desejar um campo separado, criar `HorarioCheckIn` em `Reserva` ou formatar `DataCheckIn` para exibir hora nas views; atualizar formulários e validações conforme necessário.
 
 ### Como Administrador
-
-- Mostrar diferenças de cama de solteiro e cama de casal - IOLANDA
-	- Status: Não implementado
-	- Observação: depende de modelagem (ver item acima). Sem campos separados não é possível apresentar diferenças.
-	- Próximo passo: adicionar campos no model e novo UI no painel admin para exibir/filtrar por tipo de cama.
-
-- Quantidades de cama deve ser maior ou igual a quantidades de cama de casal
-	- Status: Não implementado
-	- Observação: regra de validação depende da existência de `QuantidadeCamasCasal`. Após adicionar campos, aplicar DataAnnotation/validação customizada no `Acomodacao` e no servidor (Create/Edit POST).
 
 - Escolher ficheiros deve ficar salvo os arquivos que ja foram upados
 	- Status: Parcialmente implementado
@@ -194,8 +184,7 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 ## Próximos passos sugeridos (técnicos)
 
 1. Para "clicar na reserva vai direto pro quarto": alterar `Views/Reservas/MinhasReservas.cshtml` e atualizar botão/link. Testar com usuário hóspede.
-2. Para camas separadas: adicionar `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal` em `Models/Acomodacao.cs`, criar migração EF Core, atualizar formulários Create/Edit e `Views/Acomodacoes/Details.cshtml` para exibir ambos os valores.
-3. Implementar painel de gerenciamento de imagens em Edit (listar imagens já salvas, criar endpoints para remover/definir principal, e ajustar POST Edit para respeitar alterações de ordem/atributos).
-4. Definir formato de exibição do horário de check-in (usar `DataCheckIn` ou campo separado) e atualizar views de reservas e detalhes.
+2. Implementar painel de gerenciamento de imagens em Edit (listar imagens já salvas, criar endpoints para remover/definir principal, e ajustar POST Edit para respeitar alterações de ordem/atributos).
+3. Definir formato de exibição do horário de check-in (usar `DataCheckIn` ou campo separado) e atualizar views de reservas e detalhes.
 
 Se quiser, eu já posso: (A) aplicar a mudança simples em `MinhasReservas.cshtml` para que o botão "Ver Detalhes" direcione para a acomodação; (B) adicionar os campos de cama ao model + migration inicial; ou (C) implementar o painel de imagens (essa é a maior tarefa entre as opções). Diga qual prefere que eu faça primeiro.
