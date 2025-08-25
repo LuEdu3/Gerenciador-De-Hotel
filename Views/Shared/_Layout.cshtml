@@ -86,6 +86,10 @@
                                 <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
                                     asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservas" && ViewContext.RouteData.Values["action"]?.ToString() == "MinhasReservas" ? "active" : "")"
+                                        asp-controller="Reservas" asp-action="MinhasReservas">Minhas Reservas</a>
+                                </li>
                             <li class="nav-item">
                                 <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Acomodacao" ? "active" : "")"
                                     asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
