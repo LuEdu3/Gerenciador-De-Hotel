@@ -113,78 +113,35 @@
                     <div class="mb-3">
                         <label class="form-label">Amenidades</label>
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="ar" id="amenidade_ar" />
-                                    <label class="form-check-label" for="amenidade_ar">
-                                        <i class="bi bi-snow"></i> Ar-condicionado
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="wifi" id="amenidade_wifi" />
-                                    <label class="form-check-label" for="amenidade_wifi">
-                                        <i class="bi bi-wifi"></i> Wi-Fi
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="tv" id="amenidade_tv" />
-                                    <label class="form-check-label" for="amenidade_tv">
-                                        <i class="bi bi-tv"></i> TV
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="frigobar" id="amenidade_frigobar" />
-                                    <label class="form-check-label" for="amenidade_frigobar">
-                                        <i class="bi bi-cup"></i> Frigobar
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="ducha" id="amenidade_ducha" />
-                                    <label class="form-check-label" for="amenidade_ducha">
-                                        <i class="bi bi-droplet"></i> Ducha
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="banheira" id="amenidade_banheira" />
-                                    <label class="form-check-label" for="amenidade_banheira">
-                                        <i class="bi bi-bucket"></i> Banheira
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="cozinha" id="amenidade_cozinha" />
-                                    <label class="form-check-label" for="amenidade_cozinha">
-                                        <i class="bi bi-house-door"></i> Cozinha
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="toalha" id="amenidade_toalha" />
-                                    <label class="form-check-label" for="amenidade_toalha">
-                                        <i class="bi bi-badge-tm"></i> Toalha
-                                    </label>
-                                </div>
-                            </div>
+                            @{
+                                var amenidades = ViewBag.Amenidades as List<GerenciadorHotel.Models.Amenidade> ?? new
+                                List<GerenciadorHotel.Models.Amenidade>();
+                                foreach (var am in amenidades)
+                                {
+                                    var iconClass = am.Nome.ToLower() switch
+                                    {
+                                        "wi-fi" => "bi bi-wifi text-dark",
+                                        "ar-condicionado" => "bi bi-thermometer-half text-dark",
+                                        "tv" => "bi bi-tv text-dark",
+                                        "frigobar" => "bi bi-snow2 text-dark",
+                                        "ducha" => "bi bi-droplet text-dark",
+                                        "banheira" => "bi bi-water text-dark",
+                                        "cozinha" => "bi bi-house-gear text-dark",
+                                        "toalha" => "bi bi-clipboard-check text-dark",
+                                        _ => "bi bi-check-circle text-dark"
+                                    };
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                                value="@am.Id" id="amenidade_@am.Id" />
+                                            <label class="form-check-label" for="amenidade_@am.Id">
+                                                <i class="@iconClass" style="margin-right:6px;"></i>
+                                                @am.Nome
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            }
                         </div>
                     </div>
 

@@ -108,21 +108,28 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        @foreach (var amenidade in Model.AcomodacaoAmenidades.Select(aa => aa.Amenidade))
-                        {
-                            <div class="col-md-4 mb-2">
-                                <div class="d-flex align-items-center">
-                                    @if (!string.IsNullOrEmpty(amenidade.ImagemUrl))
-                                    {
-                                        <img src="@amenidade.ImagemUrl" alt="@amenidade.Nome" class="me-2" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px;">
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-star me-2"></i>
-                                    }
-                                    <span>@amenidade.Nome</span>
+                        @{
+                            foreach (var amenidade in Model.AcomodacaoAmenidades.Select(aa => aa.Amenidade))
+                            {
+                                var iconClass = amenidade.Nome.ToLower() switch
+                                {
+                                    "wi-fi" => "bi bi-wifi text-dark me-2",
+                                    "ar-condicionado" => "bi bi-thermometer-half text-dark me-2",
+                                    "tv" => "bi bi-tv text-dark me-2",
+                                    "frigobar" => "bi bi-snow2 text-dark me-2",
+                                    "ducha" => "bi bi-droplet text-dark me-2",
+                                    "banheira" => "bi bi-water text-dark me-2",
+                                    "cozinha" => "bi bi-house-gear text-dark me-2",
+                                    "toalha" => "bi bi-clipboard-check text-dark me-2",
+                                    _ => "bi bi-check-circle text-dark me-2"
+                                };
+                                <div class="col-md-4 mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <i class="@iconClass"></i>
+                                        <span>@amenidade.Nome</span>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
                     </div>
                 </div>

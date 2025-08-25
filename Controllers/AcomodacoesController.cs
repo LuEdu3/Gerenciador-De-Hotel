@@ -138,6 +138,38 @@ namespace GerenciadorHotel.Controllers
                     // Não falhar o fluxo se algo der errado ao processar urls; apenas ignora.
                 }
                 await _context.SaveChangesAsync();
+                // Processar amenidades selecionadas (form usa checkboxes name="AmenidadesSelecionadas" com valores contendo os IDs)
+                try
+                {
+                    var selected = Request.Form["AmenidadesSelecionadas"].ToArray();
+
+                    if (selected != null && selected.Length > 0)
+                    {
+                        var ids = selected.Select(s => int.TryParse(s, out var id) ? id : 0).Where(i => i > 0).Distinct().ToList();
+                        if (ids.Any())
+                        {
+                            var existentes = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).Select(aa => aa.AmenidadeId).ToList();
+                            // Adicionar novos
+                            foreach (var id in ids)
+                            {
+                                if (!existentes.Contains(id))
+                                {
+                                    _context.AcomodacaoAmenidades.Add(new AcomodacaoAmenidade
+                                    {
+                                        AcomodacaoId = acomodacao.Id,
+                                        AmenidadeId = id,
+                                        DataAssociacao = DateTime.Now
+                                    });
+                                }
+                            }
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+                catch
+                {
+                    // Não falhar o fluxo se algo der errado ao processar amenidades
+                }
                 TempData["SuccessMessage"] = "Acomodação criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
@@ -154,11 +186,14 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
-            var acomodacao = await _context.Acomodacoes.FindAsync(id);
+            var acomodacao = await _context.Acomodacoes
+                .Include(a => a.AcomodacaoAmenidades)
+                .FirstOrDefaultAsync(a => a.Id == id);
             if (acomodacao == null)
             {
                 return NotFound();
             }
+
             ViewBag.Amenidades = _context.Amenidades.Where(a => a.Ativa).ToList();
             return View(acomodacao);
         }
@@ -243,6 +278,56 @@ namespace GerenciadorHotel.Controllers
                     acomodacao.DataAtualizacao = DateTime.Now;
                     _context.Update(acomodacao);
                     await _context.SaveChangesAsync();
+                    // Atualizar amenidades associadas com base na seleção do formulário
+                    try
+                    {
+                        var selected = Request.Form["AmenidadesSelecionadas"].ToArray();
+
+                        var ids = selected.Select(s => int.TryParse(s, out var id) ? id : 0).Where(i => i > 0).Distinct().ToList();
+
+                        // Se não houver seleção, remover todas as associações
+                        if (ids == null || !ids.Any())
+                        {
+                            var existentes = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).ToList();
+                            if (existentes.Any())
+                            {
+                                _context.AcomodacaoAmenidades.RemoveRange(existentes);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                        else
+                        {
+                            var existentesIds = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).Select(aa => aa.AmenidadeId).ToList();
+                            // Remover associações que não estão na lista desejada
+                            var existentes2 = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).ToList();
+                            foreach (var ex in existentes2)
+                            {
+                                if (!ids.Contains(ex.AmenidadeId))
+                                {
+                                    _context.AcomodacaoAmenidades.Remove(ex);
+                                }
+                            }
+
+                            // Adicionar novas associações
+                            foreach (var amenId in ids)
+                            {
+                                if (!existentesIds.Contains(amenId))
+                                {
+                                    _context.AcomodacaoAmenidades.Add(new AcomodacaoAmenidade
+                                    {
+                                        AcomodacaoId = acomodacao.Id,
+                                        AmenidadeId = amenId,
+                                        DataAssociacao = DateTime.Now
+                                    });
+                                }
+                            }
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    catch
+                    {
+                        // Ignorar falhas na atualização de amenidades
+                    }
                     TempData["SuccessMessage"] = "Acomodação atualizada com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)

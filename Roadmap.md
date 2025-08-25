@@ -151,6 +151,21 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 ##### Luiz
 
 - Mostrar amenidades nos detalhes da acomodação como usuário
+
+	- Status: ✅ Resolvido
+	- Problema identificado: Não havia amenidades no banco de dados. Adicionado método `SeedAmenidades` no `SeedDataService` que insere 8 amenidades padrão (Wi-Fi, Ar-condicionado, TV, Frigobar, Ducha, Banheira, Cozinha, Toalha).
+	- Ação tomada: 
+	  1. Criado seed para amenidades no banco
+	  2. Atualizado controller para carregar amenidades corretamente nas views Create/Edit
+	  3. Controller agora usa IDs numéricos ao invés de slugs para persistir associações
+	  4. View de detalhes da acomodação (`DetalhesAcomodacao.cshtml`) implementada com exibição das amenidades
+	- Status atual: ✅ Funcionando - amenidades são exibidas nas páginas de detalhes e podem ser associadas durante criação/edição de acomodações
+
+- Mostrar camas de solteiros e de casal nos detalhes da acomodação
+	- Status: Não implementado
+	- Observação: O modelo `Acomodacao` atualmente só tem `QuantidadeCamas` (total). Não há informações separadas para camas de solteiro e casal.
+	- Próximo passo: estender `Models/Acomodacao.cs` com campos como `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal`, atualizar validações e views (Create/Edit/Details) e ajustar seed/migrations.
+
 	- Status: Implementado
 	- Onde: `Views/Acomodacoes/Details.cshtml` já renderiza `Model.AcomodacaoAmenidades` com imagens e nomes.
 	
