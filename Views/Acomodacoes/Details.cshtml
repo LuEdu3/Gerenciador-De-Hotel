@@ -51,10 +51,19 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <strong><i class="bi bi-bed"></i> Camas:</strong>
-                            <div class="d-flex gap-2 align-items-center mt-2">
-                                <span class="badge bg-warning text-dark fs-6"><i class="bi bi-person"></i> Solteiro: @Model.QuantidadeCamasSolteiro</span>
-                                <span class="badge bg-primary fs-6"><i class="bi bi-people"></i> Casal: @Model.QuantidadeCamasCasal</span>
-                            </div>
+                            @if (Model.QuantidadeCamasSolteiro > 0)
+                            {
+                                <span class="badge bg-info fs-6">@Model.QuantidadeCamasSolteiro cama@(Model.QuantidadeCamasSolteiro > 1 ? "s" : "") de solteiro</span>
+                            }
+                            @if (Model.QuantidadeCamasSolteiro > 0 && Model.QuantidadeCamasCasal > 0)
+                            {
+                                <span> </span>
+                            }
+                            @if (Model.QuantidadeCamasCasal > 0)
+                            {
+                                <span class="badge bg-info fs-6">@Model.QuantidadeCamasCasal cama@(Model.QuantidadeCamasCasal > 1 ? "s" : "") de casal</span>
+                            }
+
                         </div>
 
                         <div class="mb-3">
