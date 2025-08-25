@@ -50,7 +50,7 @@ namespace GerenciadorHotel.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Nome,Descricao,QuantidadeCamasCasal,QuantidadeCamasSolteiro,Preco,MinimoNoites,Status,Ativa")] Acomodacao acomodacao)
+        public async Task<IActionResult> Create([Bind("Nome,Descricao,QuantidadeCamasCasal,QuantidadeCamasSolteiro,Preco,MinimoNoites,Status,Ativa")] Acomodacao acomodacao)
         {
             var files = Request.Form.Files;
             int principalIndex = 0;
@@ -187,7 +187,8 @@ namespace GerenciadorHotel.Controllers
             }
 
             var acomodacao = await _context.Acomodacoes
-                .Include(a => a.AcomodacaoAmenidades)
+        .Include(a => a.AcomodacaoAmenidades)
+        .Include(a => a.Imagens)
                 .FirstOrDefaultAsync(a => a.Id == id);
             if (acomodacao == null)
             {
@@ -198,11 +199,97 @@ namespace GerenciadorHotel.Controllers
             return View(acomodacao);
         }
 
+        // POST: Acomodacoes/RemoverImagem
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> RemoverImagem(int id, int acomodacaoId)
+        {
+            var imagem = await _context.ImagensAcomodacao.FirstOrDefaultAsync(i => i.Id == id && i.AcomodacaoId == acomodacaoId);
+            if (imagem == null)
+            {
+                TempData["ErrorMessage"] = "Imagem não encontrada.";
+                return RedirectToAction(nameof(Edit), new { id = acomodacaoId });
+            }
+
+            var acomodacao = await _context.Acomodacoes.FirstOrDefaultAsync(a => a.Id == acomodacaoId);
+            if (acomodacao == null)
+            {
+                TempData["ErrorMessage"] = "Acomodação não encontrada.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Se a imagem removida for a principal, limpar e tentar definir outra automaticamente
+            bool eraPrincipal = !string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl) && imagem.ImagemUrl == acomodacao.ImagemPrincipalUrl;
+
+            _context.ImagensAcomodacao.Remove(imagem);
+            await _context.SaveChangesAsync();
+
+            // Tentar excluir arquivo físico apenas se for do storage local (wwwroot/imagens)
+            try
+            {
+                if (!string.IsNullOrEmpty(imagem.ImagemUrl) && imagem.ImagemUrl.StartsWith("/imagens/", StringComparison.OrdinalIgnoreCase))
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagem.ImagemUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignorar erros de exclusão de arquivo físico
+            }
+
+            if (eraPrincipal)
+            {
+                var novaPrincipal = await _context.ImagensAcomodacao
+                    .Where(i => i.AcomodacaoId == acomodacaoId)
+                    .OrderBy(i => i.Ordem)
+                    .Select(i => i.ImagemUrl)
+                    .FirstOrDefaultAsync();
+                acomodacao.ImagemPrincipalUrl = novaPrincipal; // pode ficar null se não houver mais imagens
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["SuccessMessage"] = "Imagem removida com sucesso.";
+            return RedirectToAction(nameof(Edit), new { id = acomodacaoId });
+        }
+
+        // POST: Acomodacoes/DefinirImagemPrincipal
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> DefinirImagemPrincipal(int id, int acomodacaoId)
+        {
+            var imagem = await _context.ImagensAcomodacao.FirstOrDefaultAsync(i => i.Id == id && i.AcomodacaoId == acomodacaoId);
+            if (imagem == null)
+            {
+                TempData["ErrorMessage"] = "Imagem não encontrada.";
+                return RedirectToAction(nameof(Edit), new { id = acomodacaoId });
+            }
+
+            var acomodacao = await _context.Acomodacoes.FirstOrDefaultAsync(a => a.Id == acomodacaoId);
+            if (acomodacao == null)
+            {
+                TempData["ErrorMessage"] = "Acomodação não encontrada.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            acomodacao.ImagemPrincipalUrl = imagem.ImagemUrl;
+            acomodacao.DataAtualizacao = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Imagem principal definida com sucesso.";
+            return RedirectToAction(nameof(Edit), new { id = acomodacaoId });
+        }
+
         // POST: Acomodacoes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador")]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,QuantidadeCamasCasal,QuantidadeCamasSolteiro,Preco,MinimoNoites,Status,ImagemPrincipalUrl,Ativa,DataCriacao")] Acomodacao acomodacao)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,QuantidadeCamasCasal,QuantidadeCamasSolteiro,Preco,MinimoNoites,Status,ImagemPrincipalUrl,Ativa,DataCriacao")] Acomodacao acomodacao)
         {
             if (id != acomodacao.Id)
             {
