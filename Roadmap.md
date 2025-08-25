@@ -40,6 +40,11 @@
 - ❌ **Horário do check-in** - apenas data é exibida, não hora específica
 - ✅ Acesso às reservas implementado
 
+- ❌ Diminuir fonte da descrição
+
+- ❌ Retirar esse número do quarto na acomodacao
+
+
 ### Para Administradores  
 **Luiz**
 - ✅ Upload de imagens funcional (`Controllers/AcomodacoesController.cs` + `wwwroot/imagens`)
@@ -48,7 +53,11 @@
 
 **Guilherme ✅**
 - ✅ Amenidades visíveis nas acomodações
+--- 
 
+- ❌ Quantidades de hospedes que suporta ao editar
+
+- ❌ Mostrar ao editar a quantidade mínimas de noites
 ---
 
 ## Próximos Passos Técnicos
