@@ -53,8 +53,8 @@
                         <!-- Removido campo QuantidadeCamas -->
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input asp-for="QuantidadeCamasSolteiro" class="form-control" placeholder="Camas de Solteiro"
-                                    type="number" min="0" max="10" />
+                                <input asp-for="QuantidadeCamasSolteiro" class="form-control"
+                                    placeholder="Camas de Solteiro" type="number" min="0" max="10" />
                                 <label asp-for="QuantidadeCamasSolteiro"></label>
                                 <span asp-validation-for="QuantidadeCamasSolteiro" class="text-danger"></span>
                             </div>
@@ -188,6 +188,69 @@
                         <i class="bi bi-image display-4 text-muted"></i>
                         <p class="text-muted mt-2">Preview da imagem aparecerá aqui</p>
                     </div>
+                }
+            </div>
+        </div>
+
+        <!-- Gerenciamento de imagens já enviadas -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-images"></i> Imagens da Acomodação</h6>
+                <small class="text-muted">@((Model.Imagens?.Count ?? 0)) arquivo(s)</small>
+            </div>
+            <div class="card-body">
+                @if (Model.Imagens != null && Model.Imagens.Any())
+                {
+                    var imagensOrdenadas = Model.Imagens.OrderBy(i => i.Ordem).ToList();
+                    <div class="list-group small">
+                        @foreach (var img in imagensOrdenadas)
+                        {
+                            var isPrincipal = !string.IsNullOrEmpty(Model.ImagemPrincipalUrl) && img.ImagemUrl ==
+                            Model.ImagemPrincipalUrl;
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center" style="gap:10px;">
+                                    <img src="@img.ImagemUrl" alt="thumb"
+                                        style="width:56px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e5e5e5;" />
+                                    <div>
+                                        <div class="fw-semibold text-truncate" style="max-width: 220px;">
+                                            @img.ImagemUrl
+                                        </div>
+                                        <div class="text-muted">Ordem: @img.Ordem @if (isPrincipal){
+                                        <span
+                                                class="badge bg-success ms-2"><i class="bi bi-star-fill"></i> Principal</span>
+                                    }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center" style="gap:6px;">
+                                @if (!isPrincipal)
+                                {
+                                    <form asp-action="DefinirImagemPrincipal" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@img.Id" />
+                                        <input type="hidden" name="acomodacaoId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-star"></i> Definir principal
+                                        </button>
+                                    </form>
+                                }
+                                <form asp-action="RemoverImagem" method="post" class="d-inline"
+                                    onsubmit="return confirm('Remover esta imagem?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@img.Id" />
+                                    <input type="hidden" name="acomodacaoId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+                                }
+                                else
+                {
+                    <div class="text-muted">Nenhuma imagem enviada ainda.</div>
                 }
             </div>
         </div>
