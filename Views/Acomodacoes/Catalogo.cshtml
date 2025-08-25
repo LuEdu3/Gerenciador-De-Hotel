@@ -15,7 +15,21 @@
                     <p class="card-text">@acomodacao.Descricao</p>
                     <ul class="list-unstyled">
                         <li><strong>Preço:</strong> @acomodacao.Preco.ToString("C")</li>
-                        <li><strong>Quantidade de Camas:</strong> @acomodacao.QuantidadeCamas</li>
+                        <li>
+                            <strong>Camas:</strong>
+                            @if (acomodacao.QuantidadeCamasSolteiro > 0)
+                            {
+                                <span>@acomodacao.QuantidadeCamasSolteiro cama@(acomodacao.QuantidadeCamasSolteiro > 1 ? "s" : "") de solteiro</span>
+                            }
+                            @if (acomodacao.QuantidadeCamasSolteiro > 0 && acomodacao.QuantidadeCamasCasal > 0)
+                            {
+                                <span> </span>
+                            }
+                            @if (acomodacao.QuantidadeCamasCasal > 0)
+                            {
+                                <span>@acomodacao.QuantidadeCamasCasal cama@(acomodacao.QuantidadeCamasCasal > 1 ? "s" : "") de casal</span>
+                            }
+                        </li>
                         <li><strong>Status:</strong> @acomodacao.Status</li>
                     </ul>
                     <a asp-controller="Reservas" asp-action="Create" asp-route-acomodacaoId="@acomodacao.Id" class="btn btn-primary">Reservar</a>

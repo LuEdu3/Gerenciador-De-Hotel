@@ -68,7 +68,7 @@
         <div class="row">
             @foreach (var acomodacao in Model.Take(3))
             {
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-4 col-md-6 mb-4 d-flex">
                     <div class="room-card">
                         @if (!string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
                         {
@@ -86,15 +86,22 @@
                             <h3 class="room-title">@acomodacao.Nome</h3>
                             <div class="room-price">R$ @acomodacao.Preco.ToString("N2") <small>/noite</small></div>
                             <div class="room-features">
-                                <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamas Camas</span>
+                                @if (acomodacao.QuantidadeCamasSolteiro > 0)
+                                {
+                                    <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamasSolteiro cama(s) de solteiro</span>
+                                }
+                                @if (acomodacao.QuantidadeCamasCasal > 0)
+                                {
+                                    <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamasCasal cama(s) de casal</span>
+                                }
                                 <span><i class="fas fa-moon"></i> Min. @acomodacao.MinimoNoites Noites</span>
                                 <span><i class="fas fa-ruler-combined"></i> Quarto @acomodacao.Id</span>
                             </div>
                             <p>@acomodacao.Descricao</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <button type="button" class="btn btn-room" onclick="handleReservaClick(event, @acomodacao.Id)">Reservar</button>
-                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="text-primary-custom">
-                                    Detalhes <i class="fas fa-arrow-right"></i>
+                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="btn-details-outline">
+                                    <i class="bi bi-eye"></i> Detalhes
                                 </a>
                             </div>
                         </div>

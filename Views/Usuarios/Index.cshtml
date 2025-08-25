@@ -170,10 +170,10 @@
                             <td>@(item.UltimoLogin?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Detalhes">
-                                        <i class="bi bi-eye"></i>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-details-outline btn-details-outline-sm" title="Detalhes">
+                                        <i class="bi bi-eye"></i> Detalhes
                                     </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Editar">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">

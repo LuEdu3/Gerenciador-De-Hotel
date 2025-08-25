@@ -23,11 +23,15 @@
 - ✅ Visualização de dados pessoais e nível de acesso
 
 ### 3. Gestão de Acomodações [✅ 100%]
-- ✅ Cadastro/edição/exclusão de acomodações
-- ✅ Descrição, quantidade de camas, preço, imagens
-- ✅ Check-in/check-out por acomodação
-- ✅ Mínimo de noites
-- ✅ Status da acomodação
+
+✅ Cadastro/edição/exclusão de acomodações
+✅ Descrição, quantidade de camas de solteiro e casal, preço, imagens
+✅ Exibição dinâmica: só mostra camas com quantidade maior que zero
+✅ Remoção do campo QuantidadeCamas (agora só solteiro/casal)
+✅ Validação e atualização das views para os novos campos
+✅ Check-in/check-out por acomodação
+✅ Mínimo de noites
+✅ Status da acomodação
 
 ### 4. Amenidades [✅ 100%]
 - ✅ Sistema de amenidades fixas (8 amenidades pré-definidas)
@@ -129,8 +133,8 @@ Este roadmap será atualizado conforme avançarmos no desenvolvimento.
 Abaixo estão as modificações que você listou, o estado atual com base na inspeção do código e sugestões rápidas do que precisa ser feito para cada item.
 
 ### Como usuário
-#### Pedro
-- Clicar na reserva vai direto pro quarto selecionado na página de reservas
+#### Pedro ✅
+-  Clicar na reserva vai direto pro quarto selecionado na página de reservas
 	- Status: Pendente (prioridade alta)
 	- Observação: Na view `Views/Reservas/MinhasReservas.cshtml` o botão atualmente direciona para os detalhes da reserva (`Reservas/Details/{reserva.Id}`), o que pode abrir uma tela genérica (ex.: sempre para o tipo "domo"). O comportamento desejado é abrir a página da acomodação associada à reserva.
 	- Próximo passo: alterar o link do botão para apontar para a acomodação. Exemplo de alteração sugerida na view:
@@ -147,6 +151,7 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 ##### Luiz
 
 - Mostrar amenidades nos detalhes da acomodação como usuário
+
 	- Status: ✅ Resolvido
 	- Problema identificado: Não havia amenidades no banco de dados. Adicionado método `SeedAmenidades` no `SeedDataService` que insere 8 amenidades padrão (Wi-Fi, Ar-condicionado, TV, Frigobar, Ducha, Banheira, Cozinha, Toalha).
 	- Ação tomada: 
@@ -161,21 +166,21 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 	- Observação: O modelo `Acomodacao` atualmente só tem `QuantidadeCamas` (total). Não há informações separadas para camas de solteiro e casal.
 	- Próximo passo: estender `Models/Acomodacao.cs` com campos como `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal`, atualizar validações e views (Create/Edit/Details) e ajustar seed/migrations.
 
+	- Status: Implementado
+	- Onde: `Views/Acomodacoes/Details.cshtml` já renderiza `Model.AcomodacaoAmenidades` com imagens e nomes.
+	
+#### Guilherme
+
 - Horário do check-in
 	- Status: Parcial / Não apresentado ao usuário
 	- Observação: `Reserva` usa `DataCheckIn`/`DataCheckOut` (DateTime) mas as views exibem apenas a data (`dd/MM/yyyy`). Não existe um campo dedicado de "horário do check-in" visível ao usuário.
 	- Próximo passo: se desejar um campo separado, criar `HorarioCheckIn` em `Reserva` ou formatar `DataCheckIn` para exibir hora nas views; atualizar formulários e validações conforme necessário.
 
+
+- Adicionar local para o Usuário ter acesso as suas reservas
+	- Status: Não implementado
+
 ### Como Administrador
-
-- Mostrar diferenças de cama de solteiro e cama de casal
-	- Status: Não implementado
-	- Observação: depende de modelagem (ver item acima). Sem campos separados não é possível apresentar diferenças.
-	- Próximo passo: adicionar campos no model e novo UI no painel admin para exibir/filtrar por tipo de cama.
-
-- Quantidades de cama deve ser maior ou igual a quantidades de cama de casal
-	- Status: Não implementado
-	- Observação: regra de validação depende da existência de `QuantidadeCamasCasal`. Após adicionar campos, aplicar DataAnnotation/validação customizada no `Acomodacao` e no servidor (Create/Edit POST).
 
 - Escolher ficheiros deve ficar salvo os arquivos que ja foram upados
 	- Status: Parcialmente implementado
@@ -198,10 +203,7 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 ## Próximos passos sugeridos (técnicos)
 
 1. Para "clicar na reserva vai direto pro quarto": alterar `Views/Reservas/MinhasReservas.cshtml` e atualizar botão/link. Testar com usuário hóspede.
-2. Para camas separadas: adicionar `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal` em `Models/Acomodacao.cs`, criar migração EF Core, atualizar formulários Create/Edit e `Views/Acomodacoes/Details.cshtml` para exibir ambos os valores.
-3. Implementar painel de gerenciamento de imagens em Edit (listar imagens já salvas, criar endpoints para remover/definir principal, e ajustar POST Edit para respeitar alterações de ordem/atributos).
-4. Definir formato de exibição do horário de check-in (usar `DataCheckIn` ou campo separado) e atualizar views de reservas e detalhes.
+2. Implementar painel de gerenciamento de imagens em Edit (listar imagens já salvas, criar endpoints para remover/definir principal, e ajustar POST Edit para respeitar alterações de ordem/atributos).
+3. Definir formato de exibição do horário de check-in (usar `DataCheckIn` ou campo separado) e atualizar views de reservas e detalhes.
 
 Se quiser, eu já posso: (A) aplicar a mudança simples em `MinhasReservas.cshtml` para que o botão "Ver Detalhes" direcione para a acomodação; (B) adicionar os campos de cama ao model + migration inicial; ou (C) implementar o painel de imagens (essa é a maior tarefa entre as opções). Diga qual prefere que eu faça primeiro.
-
-
