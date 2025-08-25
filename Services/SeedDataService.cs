@@ -97,11 +97,102 @@ namespace GerenciadorHotel.Services
             await LimparEInserirAcomodacoesQuintaYpua(context);
         }
 
+        public static async Task SeedAmenidades(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await SeedAmenidadesPrivate(context);
+        }
+
         public static async Task AtualizarImagensAcomodacoes(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
             await AtualizarImagensAcomodacoes(context);
+        }
+
+        private static async Task SeedAmenidadesPrivate(ApplicationDbContext context)
+        {
+            // Só inserir amenidades se a tabela estiver vazia
+            if (!context.Amenidades.Any())
+            {
+                var amenidades = new List<Amenidade>
+                {
+                    new()
+                    {
+                        Nome = "Wi-Fi",
+                        Descricao = "Internet sem fio gratuita",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-wifi
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Ar-condicionado",
+                        Descricao = "Sistema de climatização",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-thermometer-half
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "TV",
+                        Descricao = "Televisão com canais por assinatura",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-tv
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Frigobar",
+                        Descricao = "Refrigerador pequeno",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-snow2
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Ducha",
+                        Descricao = "Banheiro com ducha",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-droplet
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Banheira",
+                        Descricao = "Banheira para relaxamento",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-water
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Cozinha",
+                        Descricao = "Cozinha equipada",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-house-gear
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Toalha",
+                        Descricao = "Toalhas de banho incluídas",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-clipboard-check
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    }
+                };
+
+                await context.Amenidades.AddRangeAsync(amenidades);
+                await context.SaveChangesAsync();
+
+                Console.WriteLine($"✅ {amenidades.Count} amenidades inseridas com sucesso!");
+            }
+            else
+            {
+                Console.WriteLine("⚠️ Amenidades já existem no banco, pulando seed para preservar dados existentes.");
+            }
         }
 
         private static async Task AtualizarImagensAcomodacoes(ApplicationDbContext context)

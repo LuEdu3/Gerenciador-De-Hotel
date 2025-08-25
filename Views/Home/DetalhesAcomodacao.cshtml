@@ -64,23 +64,46 @@
                     </div>
 
                     <!-- Amenidades -->
-                    @if (Model.AcomodacaoAmenidades != null && Model.AcomodacaoAmenidades.Any())
+                    @if (Model.AcomodacaoAmenidades != null && Model.AcomodacaoAmenidades.Any(a => a.Amenidade != null && !string.IsNullOrWhiteSpace(a.Amenidade.Nome)))
                     {
                         <div class="mb-4">
-                            <h5>Amenidades</h5>
+                            <h5><i class="bi bi-star text-dark me-2"></i>Amenidades</h5>
                             <div class="row">
-                                @foreach (var amenidade in Model.AcomodacaoAmenidades)
+                                @foreach (var amenidade in Model.AcomodacaoAmenidades.Where(a => a.Amenidade != null && !string.IsNullOrWhiteSpace(a.Amenidade.Nome)))
                                 {
                                     <div class="col-md-6 mb-2">
+                                        @{
+                                            var iconClass = amenidade.Amenidade.Nome.ToLower() switch {
+                                                "wi-fi" => "bi bi-wifi text-dark me-2",
+                                                "ar-condicionado" => "bi bi-thermometer-half text-dark me-2",
+                                                "tv" => "bi bi-tv text-dark me-2",
+                                                "frigobar" => "bi bi-snow2 text-dark me-2",
+                                                "ducha" => "bi bi-droplet text-dark me-2",
+                                                "banheira" => "bi bi-water text-dark me-2",
+                                                "cozinha" => "bi bi-house-gear text-dark me-2",
+                                                "toalha" => "bi bi-clipboard-check text-dark me-2",
+                                                _ => "bi bi-check-circle text-dark me-2"
+                                            };
+                                        }
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-check text-success me-2"></i>
-                                            <span>@amenidade.Amenidade?.Nome</span>
+                                            <i class="@iconClass"></i>
+                                            <label for="amenidade_@amenidade.Amenidade.Id" class="mb-0">
+                                                <span id="amenidade_@amenidade.Amenidade.Id">@amenidade.Amenidade.Nome</span>
+                                            </label>
                                         </div>
                                     </div>
                                 }
                             </div>
                         </div>
                     }
+                    else
+                    {
+                        <div class="mb-4">
+                            <h5><i class="bi bi-star text-dark me-2"></i>Amenidades</h5>
+                            <p class="text-muted">Nenhuma amenidade disponível para esta acomodação.</p>
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>

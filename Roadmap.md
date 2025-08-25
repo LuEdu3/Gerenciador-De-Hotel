@@ -147,17 +147,14 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 ##### Luiz
 
 - Mostrar amenidades nos detalhes da acomodação como usuário
-	- Status: ⚠️ Em depuração
-	- Problema identificado: O formulário não está enviando os dados de amenidades (`AmenidadesSelecionadas` não aparece no DevTools), então as associações não são criadas no banco.
-	- Ação tomada: Adicionado logging temporário no controller para diagnosticar o problema. Possíveis causas:
-	  1. Mismatch entre nomes das amenidades no banco vs. mapeamento do controller
-	  2. Problema no HTML dos checkboxes (name ou value incorretos)
-	  3. JavaScript ou validação interferindo no envio do form
-	- Próximos passos: 
-	  1. Rodar a aplicação e tentar criar/editar uma acomodação
-	  2. Verificar os logs de debug no console do Visual Studio/terminal
-	  3. Comparar nomes das amenidades no banco com o mapeamento no controller
-	  4. Se necessário, corrigir os nomes ou o HTML dos checkboxes
+	- Status: ✅ Resolvido
+	- Problema identificado: Não havia amenidades no banco de dados. Adicionado método `SeedAmenidades` no `SeedDataService` que insere 8 amenidades padrão (Wi-Fi, Ar-condicionado, TV, Frigobar, Ducha, Banheira, Cozinha, Toalha).
+	- Ação tomada: 
+	  1. Criado seed para amenidades no banco
+	  2. Atualizado controller para carregar amenidades corretamente nas views Create/Edit
+	  3. Controller agora usa IDs numéricos ao invés de slugs para persistir associações
+	  4. View de detalhes da acomodação (`DetalhesAcomodacao.cshtml`) implementada com exibição das amenidades
+	- Status atual: ✅ Funcionando - amenidades são exibidas nas páginas de detalhes e podem ser associadas durante criação/edição de acomodações
 
 - Mostrar camas de solteiros e de casal nos detalhes da acomodação
 	- Status: Não implementado

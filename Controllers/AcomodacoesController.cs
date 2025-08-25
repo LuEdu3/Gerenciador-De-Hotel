@@ -140,58 +140,32 @@ namespace GerenciadorHotel.Controllers
                     // Não falhar o fluxo se algo der errado ao processar urls; apenas ignora.
                 }
                 await _context.SaveChangesAsync();
-                // Processar amenidades selecionadas (form usa checkboxes name="AmenidadesSelecionadas" com valores simples)
+                // Processar amenidades selecionadas (form usa checkboxes name="AmenidadesSelecionadas" com valores contendo os IDs)
                 try
                 {
-                    // DEBUG: verificar o que está chegando no form
-                    var allFormKeys = Request.Form.Keys.ToArray();
-                    System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Form keys: {string.Join(", ", allFormKeys)}");
-
                     var selected = Request.Form["AmenidadesSelecionadas"].ToArray();
-                    System.Diagnostics.Debug.WriteLine($"[DEBUG Create] AmenidadesSelecionadas values: [{string.Join(", ", selected)}]");
 
                     if (selected != null && selected.Length > 0)
                     {
-                        // Mapear os valores curtos do formulário para nomes de amenidades no banco
-                        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                        var ids = selected.Select(s => int.TryParse(s, out var id) ? id : 0).Where(i => i > 0).Distinct().ToList();
+                        if (ids.Any())
                         {
-                            { "ar", "Ar-condicionado" },
-                            { "wifi", "Wi-Fi" },
-                            { "tv", "TV" },
-                            { "frigobar", "Frigobar" },
-                            { "ducha", "Ducha" },
-                            { "banheira", "Banheira" },
-                            { "cozinha", "Cozinha" },
-                            { "toalha", "Toalha" }
-                        };
-
-                        // DEBUG: listar amenidades existentes no banco
-                        var amenidadesDB = _context.Amenidades.Select(a => new { a.Id, a.Nome }).ToList();
-                        System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Amenidades no banco: {string.Join(", ", amenidadesDB.Select(a => $"Id={a.Id} Nome='{a.Nome}'"))}");
-
-                        foreach (var key in selected)
-                        {
-                            if (string.IsNullOrWhiteSpace(key)) continue;
-                            if (!map.TryGetValue(key, out var amenidadeNome)) continue;
-
-                            System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Procurando amenidade: '{amenidadeNome}'");
-                            var amenidade = _context.Amenidades.FirstOrDefault(a => a.Nome == amenidadeNome);
-                            System.Diagnostics.Debug.WriteLine($"[DEBUG Create] Amenidade encontrada: {(amenidade != null ? $"Id={amenidade.Id}, Nome='{amenidade.Nome}'" : "NULL")}");
-
-                            if (amenidade == null) continue;
-                            // Evitar duplicatas
-                            var exists = _context.AcomodacaoAmenidades.Any(aa => aa.AcomodacaoId == acomodacao.Id && aa.AmenidadeId == amenidade.Id);
-                            if (!exists)
+                            var existentes = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).Select(aa => aa.AmenidadeId).ToList();
+                            // Adicionar novos
+                            foreach (var id in ids)
                             {
-                                _context.AcomodacaoAmenidades.Add(new AcomodacaoAmenidade
+                                if (!existentes.Contains(id))
                                 {
-                                    AcomodacaoId = acomodacao.Id,
-                                    AmenidadeId = amenidade.Id,
-                                    DataAssociacao = DateTime.Now
-                                });
+                                    _context.AcomodacaoAmenidades.Add(new AcomodacaoAmenidade
+                                    {
+                                        AcomodacaoId = acomodacao.Id,
+                                        AmenidadeId = id,
+                                        DataAssociacao = DateTime.Now
+                                    });
+                                }
                             }
+                            await _context.SaveChangesAsync();
                         }
-                        await _context.SaveChangesAsync();
                     }
                 }
                 catch
@@ -214,11 +188,14 @@ namespace GerenciadorHotel.Controllers
                 return NotFound();
             }
 
-            var acomodacao = await _context.Acomodacoes.FindAsync(id);
+            var acomodacao = await _context.Acomodacoes
+                .Include(a => a.AcomodacaoAmenidades)
+                .FirstOrDefaultAsync(a => a.Id == id);
             if (acomodacao == null)
             {
                 return NotFound();
             }
+
             ViewBag.Amenidades = _context.Amenidades.Where(a => a.Ativa).ToList();
             return View(acomodacao);
         }
@@ -306,29 +283,12 @@ namespace GerenciadorHotel.Controllers
                     // Atualizar amenidades associadas com base na seleção do formulário
                     try
                     {
-                        // DEBUG: verificar o que está chegando no form
-                        var allFormKeys = Request.Form.Keys.ToArray();
-                        System.Diagnostics.Debug.WriteLine($"[DEBUG Edit] Form keys: {string.Join(", ", allFormKeys)}");
-
                         var selected = Request.Form["AmenidadesSelecionadas"].ToArray();
-                        System.Diagnostics.Debug.WriteLine($"[DEBUG Edit] AmenidadesSelecionadas values: [{string.Join(", ", selected)}]");
-                        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                        {
-                            { "ar", "Ar-condicionado" },
-                            { "wifi", "Wi-Fi" },
-                            { "tv", "TV" },
-                            { "frigobar", "Frigobar" },
-                            { "ducha", "Ducha" },
-                            { "banheira", "Banheira" },
-                            { "cozinha", "Cozinha" },
-                            { "toalha", "Toalha" }
-                        };
 
-                        // Buscar todas as amenidades existentes para mapear nomes
-                        var allAmenidades = _context.Amenidades.ToList();
+                        var ids = selected.Select(s => int.TryParse(s, out var id) ? id : 0).Where(i => i > 0).Distinct().ToList();
 
                         // Se não houver seleção, remover todas as associações
-                        if (selected == null || selected.Length == 0)
+                        if (ids == null || !ids.Any())
                         {
                             var existentes = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).ToList();
                             if (existentes.Any())
@@ -339,31 +299,21 @@ namespace GerenciadorHotel.Controllers
                         }
                         else
                         {
-                            // Converter seleção para IDs de amenidade desejados
-                            var desejados = new List<int>();
-                            foreach (var key in selected)
-                            {
-                                if (string.IsNullOrWhiteSpace(key)) continue;
-                                if (!map.TryGetValue(key, out var nome)) continue;
-                                var a = allAmenidades.FirstOrDefault(x => x.Nome == nome);
-                                if (a != null) desejados.Add(a.Id);
-                            }
-
+                            var existentesIds = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).Select(aa => aa.AmenidadeId).ToList();
                             // Remover associações que não estão na lista desejada
                             var existentes2 = _context.AcomodacaoAmenidades.Where(aa => aa.AcomodacaoId == acomodacao.Id).ToList();
                             foreach (var ex in existentes2)
                             {
-                                if (!desejados.Contains(ex.AmenidadeId))
+                                if (!ids.Contains(ex.AmenidadeId))
                                 {
                                     _context.AcomodacaoAmenidades.Remove(ex);
                                 }
                             }
 
                             // Adicionar novas associações
-                            foreach (var amenId in desejados)
+                            foreach (var amenId in ids)
                             {
-                                var exists = _context.AcomodacaoAmenidades.Any(aa => aa.AcomodacaoId == acomodacao.Id && aa.AmenidadeId == amenId);
-                                if (!exists)
+                                if (!existentesIds.Contains(amenId))
                                 {
                                     _context.AcomodacaoAmenidades.Add(new AcomodacaoAmenidade
                                     {
