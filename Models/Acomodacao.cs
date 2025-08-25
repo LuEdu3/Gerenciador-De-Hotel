@@ -27,8 +27,6 @@ namespace GerenciadorHotel.Models
         [StringLength(1000, ErrorMessage = "A descrição deve ter no máximo 1000 caracteres")]
         [Display(Name = "Descrição")]
         public string? Descricao { get; set; }
-
-
     [Required(ErrorMessage = "A quantidade de camas é obrigatória")]
     [Range(1, 10, ErrorMessage = "A quantidade de camas deve ser entre 1 e 10")]
     [Display(Name = "Quantidade de Camas")]
@@ -41,6 +39,7 @@ namespace GerenciadorHotel.Models
     [NotMapped]
     [Display(Name = "Quantidade de Camas de Solteiro")]
     public int QuantidadeCamasSolteiro => QuantidadeCamas - QuantidadeCamasCasal;
+
 
         [Required(ErrorMessage = "O preço é obrigatório")]
         [Range(0.01, 9999.99, ErrorMessage = "O preço deve ser maior que zero")]

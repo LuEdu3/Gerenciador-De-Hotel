@@ -149,6 +149,8 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 - Mostrar amenidades nos detalhes da acomodação como usuário
 	- Status: Implementado
 	- Onde: `Views/Acomodacoes/Details.cshtml` já renderiza `Model.AcomodacaoAmenidades` com imagens e nomes.
+	
+#### Guilherme
 
 - Mostrar camas de solteiros e de casal nos detalhes da acomodação
 	- Status: Não implementado

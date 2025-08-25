@@ -29,8 +29,8 @@
 						<th>Imagem</th>
 						<th>Nome</th>
 						<th>Descrição</th>
-						<th>Qtd. Camas</th>
-						<th>Qtd. Camas Casal</th>
+                        <th>Camas de Solteiro</th>
+                        <th>Camas de Casal</th>
 						<th>Preço</th>
 						<th>Status</th>
 						<th>Ações</th>
@@ -52,8 +52,12 @@
 							</td>
 							<td><strong>@item.Nome</strong></td>
 							<td>@item.Descricao</td>
-							<td>@item.QuantidadeCamas</td>
-							<td><!-- Exibir quantidade de camas de casal se implementado --></td>
+                            <td>
+                                <span class="badge bg-warning text-dark">@item.QuantidadeCamasSolteiro</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">@item.QuantidadeCamasCasal</span>
+                            </td>
 							<td>@item.Preco.ToString("C")</td>
 							<td>
 								<span class="badge @(item.Status == GerenciadorHotel.Models.StatusAcomodacao.Disponivel ? "bg-success" : item.Status == GerenciadorHotel.Models.StatusAcomodacao.Ocupada ? "bg-warning text-dark" : "bg-secondary")">
