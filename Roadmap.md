@@ -24,14 +24,14 @@
 
 ### 3. Gestão de Acomodações [✅ 100%]
 
-✅ Cadastro/edição/exclusão de acomodações
-✅ Descrição, quantidade de camas de solteiro e casal, preço, imagens
-✅ Exibição dinâmica: só mostra camas com quantidade maior que zero
-✅ Remoção do campo QuantidadeCamas (agora só solteiro/casal)
-✅ Validação e atualização das views para os novos campos
-✅ Check-in/check-out por acomodação
-✅ Mínimo de noites
-✅ Status da acomodação
+- ✅ Cadastro/edição/exclusão de acomodações
+- ✅ Descrição, quantidade de camas de solteiro e casal, preço, imagens
+- ✅ Exibição dinâmica: só mostra camas com quantidade maior que zero (na view `Views/Acomodacoes/Details.cshtml`)
+- ✅ Remoção do campo QuantidadeCamas (agora só solteiro/casal)
+- ✅ Validação e atualização das views para os novos campos
+- ✅ Check-in/check-out por acomodação
+- ✅ Mínimo de noites
+- ✅ Status da acomodação
 
 ### 4. Amenidades [✅ 100%]
 - ✅ Sistema de amenidades fixas (8 amenidades pré-definidas)
@@ -121,10 +121,10 @@ Este roadmap será atualizado conforme avançarmos no desenvolvimento.
 
 ## Próximos Passos - Banco de Dados
 
-- Dados da empresa (Nome, logo, contato, email e galeria para fotos) - Guilherme
-- Adicionar Acomodações - Luiz
-- Adicionar filtros: Capacidade, Tipo de acomodação (Chalé, cabana, suíte, estacionamento e domo)
-- Adicionar no banco mais capacidades de fotos - Iolanda
+- Dados da empresa (Nome, logo, contato, email e galeria para fotos) - Guilherme ✅
+- Adicionar Acomodações - Luiz ✅
+- Adicionar filtros: Capacidade, Tipo de acomodação (Chalé, cabana, suíte, estacionamento e domo) ✅
+- Adicionar no banco mais capacidades de fotos - Iolanda ✅
 
 ---
 
@@ -162,12 +162,11 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 	- Status atual: ✅ Funcionando - amenidades são exibidas nas páginas de detalhes e podem ser associadas durante criação/edição de acomodações
 
 - Mostrar camas de solteiros e de casal nos detalhes da acomodação
-	- Status: Não implementado
-	- Observação: O modelo `Acomodacao` atualmente só tem `QuantidadeCamas` (total). Não há informações separadas para camas de solteiro e casal.
-	- Próximo passo: estender `Models/Acomodacao.cs` com campos como `QuantidadeCamasSolteiro` e `QuantidadeCamasCasal`, atualizar validações e views (Create/Edit/Details) e ajustar seed/migrations.
-
-	- Status: Implementado
-	- Onde: `Views/Acomodacoes/Details.cshtml` já renderiza `Model.AcomodacaoAmenidades` com imagens e nomes.
+	- Status: ✅ Implementado
+	- Onde: Campo separado adicionado no model `Models/Acomodacao.cs` (`QuantidadeCamasSolteiro` e `QuantidadeCamasCasal`). As views foram atualizadas:
+		- `Views/Acomodacoes/Create.cshtml` e `Edit.cshtml`: inputs numéricos por tipo de cama
+		- `Views/Acomodacoes/Details.cshtml`: exibe badges apenas quando a quantidade > 0
+		- `Views/Home/DetalhesAcomodacao.cshtml`: exibe contagem de camas por tipo
 	
 #### Guilherme
 
@@ -176,13 +175,13 @@ Abaixo estão as modificações que você listou, o estado atual com base na ins
 	- Observação: `Reserva` usa `DataCheckIn`/`DataCheckOut` (DateTime) mas as views exibem apenas a data (`dd/MM/yyyy`). Não existe um campo dedicado de "horário do check-in" visível ao usuário.
 	- Próximo passo: se desejar um campo separado, criar `HorarioCheckIn` em `Reserva` ou formatar `DataCheckIn` para exibir hora nas views; atualizar formulários e validações conforme necessário.
 
-
-- Adicionar local para o Usuário ter acesso as suas reservas
-	- Status: Não implementado
+- Adicionar local para o Usuário ter acesso às suas reservas - Pedro ✅
+	- Status: ✅ Implementado
+	- Onde: Rota e view `Reservas/MinhasReservas` com listagem (arquivo `Views/Reservas/MinhasReservas.cshtml`). O fluxo de criação (`POST /Reservas/Create`) redireciona para `MinhasReservas` após salvar.
 
 ### Como Administrador
 
-- Escolher ficheiros deve ficar salvo os arquivos que ja foram upados
+- Escolher ficheiros deve ficar salvo os arquivos que ja foram upados - Luiz
 	- Status: Parcialmente implementado
 	- Observação: O back-end já salva uploads em `wwwroot/imagens` e persiste `ImagemAcomodacao` (veja `Controllers/AcomodacoesController.cs`), e `Views/Acomodacoes/Details.cshtml` exibe as imagens. Entretanto o input `<input type="file">` não pode ser pre-populado por motivos de segurança do navegador. O que falta é uma UI de gerenciamento de imagens no Edit (listar arquivos já upados, permitir remover/definir principal) — assim o usuário verá e poderá reutilizar os arquivos já enviados.
 	- Próximo passo: implementar painel de imagens em `Views/Acomodacoes/Edit.cshtml` que lista `Model.Imagens` com botões (remover, definir principal, mover ordem) e preservar essas alterações no POST.
