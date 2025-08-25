@@ -57,6 +57,9 @@ namespace GerenciadorHotel.Migrations
                     b.Property<int>("QuantidadeCamas")
                         .HasColumnType("int");
 
+                    b.Property<int>("QuantidadeCamasCasal")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 

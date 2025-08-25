@@ -87,7 +87,20 @@
                                 <h3 class="room-title">@acomodacao.Nome</h3>
                                 <div class="room-price">R$ @acomodacao.Preco.ToString("N2") <small>/noite</small></div>
                                 <div class="room-features">
-                                    <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamas Camas</span>
+                                    <span><i class="fas fa-bed"></i>
+                                        @if (acomodacao.QuantidadeCamasSolteiro > 0)
+                                        {
+                                            <span>@acomodacao.QuantidadeCamasSolteiro cama@(acomodacao.QuantidadeCamasSolteiro > 1 ? "s" : "") de solteiro</span>
+                                        }
+                                        @if (acomodacao.QuantidadeCamasSolteiro > 0 && acomodacao.QuantidadeCamasCasal > 0)
+                                        {
+                                            <span>, </span>
+                                        }
+                                        @if (acomodacao.QuantidadeCamasCasal > 0)
+                                        {
+                                            <span>@acomodacao.QuantidadeCamasCasal cama@(acomodacao.QuantidadeCamasCasal > 1 ? "s" : "") de casal</span>
+                                        }
+                                    </span>
                                     <span><i class="fas fa-moon"></i> Min. @acomodacao.MinimoNoites Noites</span>
                                     <span><i class="fas fa-ruler-combined"></i> Quarto @acomodacao.Id</span>
                                 </div>
