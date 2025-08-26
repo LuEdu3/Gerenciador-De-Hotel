@@ -103,13 +103,13 @@
 
 4. ✅ Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz 
 
-5. **Horário do check-in** - apenas data é exibida, não hora específica - Luiz
+5. ✅ **Horário do check-in** - apenas data é exibida, não hora específica - Luiz
 
 6. Diminuir fonte da descrição
 
 7. **Navbar não fecha no mobile**
 
-8. Não existem esses endpoints
+8. Não existem esses endpoints - Luiz
 
 http://localhost:5116/Usuarios/DeleteConfirmed
 Failed to load resource: the server responded with a status of 404 ()
@@ -122,6 +122,6 @@ http://localhost:5116/Reservas/DeleteConfirmed/8
 
 http://localhost:5116/Reservas/DeleteConfirmed/9 esse é ao tentar excuir uma reserva como administrador
 
-9. Amenidades não estão salvando - Luiz
+9. ✅ Amenidades não estão salvando - Luiz
 
 Futuramente. Ao tentar resetar a senha de um usuário como Administrador o site buga. Dropshadow bootstrap
