@@ -26,6 +26,7 @@
 
 ## Modificações Pendentes
 
+
 ### Para Usuários
 **Pedro ✅**
 - ✅ "Minhas Reservas" implementado
@@ -62,6 +63,21 @@
 
 - ❌ Mostrar ao editar a quantidade mínimas de noites
 ---
+
+## Lembretes
+
+- Mudar bloqueio de acesso ao endpoint 'Reservas/MinhasReservas" para redirecionamento para o index
+
+## Próximos Passos Técnicos
+
+1. **Fix simples**: Alterar link "Ver Detalhes" em MinhasReservas para ir à acomodação
+2. **Melhorar gerenciamento de imagens**: Expandir painel em Edit para gerenciar imagens existentes
+3. **Horário check-in**: Definir se usar campo separado ou formatar `DataCheckIn` para mostrar hora
+
+## Arquivos Principais
+- Controllers: `AcomodacoesController.cs`, `ReservasController.cs`  
+- Views: `Acomodacoes/Details.cshtml`, `Reservas/MinhasReservas.cshtml`
+- Seed: `Services/SeedDataService.cs`
 
 ## Próximos Passos Técnicos
 

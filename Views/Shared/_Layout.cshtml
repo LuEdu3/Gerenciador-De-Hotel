@@ -89,21 +89,20 @@
                                 <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
                                     asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
+                            @if (User.IsInRole("Administrador") || User.IsInRole("Hospede"))
+                            {
                                 <li class="nav-item">
                                     <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Reservas" && ViewContext.RouteData.Values["action"]?.ToString() == "MinhasReservas" ? "active" : "")"
                                         asp-controller="Reservas" asp-action="MinhasReservas">Minhas Reservas</a>
                                 </li>
+                            }
                             <li class="nav-item">
                                 <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Acomodacao" ? "active" : "")"
                                     asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" && ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
+                                    asp-area="" asp-controller="Empresa" asp-action="Sobre">Sobre</a>
                             </li>
                             
                             <!-- Botões para usuários logados (não administradores) -->
@@ -138,12 +137,8 @@
                                     asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" && ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
+                                    asp-area="" asp-controller="Empresa" asp-action="Sobre">Sobre</a>
                             </li>
                             
                             <!-- Botões de login/cadastro para usuários não logados -->
