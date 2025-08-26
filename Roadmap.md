@@ -53,6 +53,9 @@
 
 **Guilherme ✅**
 - ✅ Amenidades visíveis nas acomodações
+
+**Iolanda**
+- ❌ Capacidade de pessoas em cada quarto.
 --- 
 
 - ❌ Quantidades de hospedes que suporta ao editar
