@@ -53,8 +53,8 @@
                         <!-- Removido campo QuantidadeCamas -->
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
-                                <input asp-for="QuantidadeCamasSolteiro" class="form-control" placeholder="Camas de Solteiro"
-                                    type="number" min="0" max="10" />
+                                <input asp-for="QuantidadeCamasSolteiro" class="form-control"
+                                    placeholder="Camas de Solteiro" type="number" min="0" max="10" />
                                 <label asp-for="QuantidadeCamasSolteiro"></label>
                                 <span asp-validation-for="QuantidadeCamasSolteiro" class="text-danger"></span>
                             </div>
@@ -120,78 +120,38 @@
                     <div class="mb-3">
                         <label class="form-label">Amenidades</label>
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="ar" id="amenidade_ar" />
-                                    <label class="form-check-label" for="amenidade_ar">
-                                        <i class="bi bi-snow"></i> Ar-condicionado
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="wifi" id="amenidade_wifi" />
-                                    <label class="form-check-label" for="amenidade_wifi">
-                                        <i class="bi bi-wifi"></i> Wi-Fi
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="tv" id="amenidade_tv" />
-                                    <label class="form-check-label" for="amenidade_tv">
-                                        <i class="bi bi-tv"></i> TV
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="frigobar" id="amenidade_frigobar" />
-                                    <label class="form-check-label" for="amenidade_frigobar">
-                                        <i class="bi bi-cup"></i> Frigobar
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="ducha" id="amenidade_ducha" />
-                                    <label class="form-check-label" for="amenidade_ducha">
-                                        <i class="bi bi-droplet"></i> Ducha
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="banheira" id="amenidade_banheira" />
-                                    <label class="form-check-label" for="amenidade_banheira">
-                                        <i class="bi bi-bucket"></i> Banheira
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="cozinha" id="amenidade_cozinha" />
-                                    <label class="form-check-label" for="amenidade_cozinha">
-                                        <i class="bi bi-house-door"></i> Cozinha
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
-                                        value="toalha" id="amenidade_toalha" />
-                                    <label class="form-check-label" for="amenidade_toalha">
-                                        <i class="bi bi-badge-tm"></i> Toalha
-                                    </label>
-                                </div>
-                            </div>
+                            @{
+                                var amenidades = ViewBag.Amenidades as List<GerenciadorHotel.Models.Amenidade> ?? new
+                                List<GerenciadorHotel.Models.Amenidade>();
+                                var selecionadas = new HashSet<int>(Model.AcomodacaoAmenidades?.Select(aa => aa.AmenidadeId)
+                                ?? Enumerable.Empty<int>());
+                                foreach (var am in amenidades)
+                                {
+                                    var isChecked = selecionadas.Contains(am.Id) ? "checked" : "";
+                                    var iconClass = am.Nome.ToLower() switch
+                                    {
+                                        "wi-fi" => "bi bi-wifi text-dark",
+                                        "ar-condicionado" => "bi bi-thermometer-half text-dark",
+                                        "tv" => "bi bi-tv text-dark",
+                                        "frigobar" => "bi bi-snow2 text-dark",
+                                        "ducha" => "bi bi-droplet text-dark",
+                                        "banheira" => "bi bi-water text-dark",
+                                        "cozinha" => "bi bi-house-gear text-dark",
+                                        "toalha" => "bi bi-clipboard-check text-dark",
+                                        _ => "bi bi-check-circle text-dark"
+                                    };
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                                value="@am.Id" id="amenidade_@am.Id" @Html.Raw(isChecked) />
+                                            <label class="form-check-label" for="amenidade_@am.Id">
+                                                <i class="@iconClass" style="margin-right:6px;"></i>
+                                                @am.Nome
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            }
                         </div>
                     </div>
 
@@ -228,6 +188,69 @@
                         <i class="bi bi-image display-4 text-muted"></i>
                         <p class="text-muted mt-2">Preview da imagem aparecerá aqui</p>
                     </div>
+                }
+            </div>
+        </div>
+
+        <!-- Gerenciamento de imagens já enviadas -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-images"></i> Imagens da Acomodação</h6>
+                <small class="text-muted">@((Model.Imagens?.Count ?? 0)) arquivo(s)</small>
+            </div>
+            <div class="card-body">
+                @if (Model.Imagens != null && Model.Imagens.Any())
+                {
+                    var imagensOrdenadas = Model.Imagens.OrderBy(i => i.Ordem).ToList();
+                    <div class="list-group small">
+                        @foreach (var img in imagensOrdenadas)
+                        {
+                            var isPrincipal = !string.IsNullOrEmpty(Model.ImagemPrincipalUrl) && img.ImagemUrl ==
+                            Model.ImagemPrincipalUrl;
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center" style="gap:10px;">
+                                    <img src="@img.ImagemUrl" alt="thumb"
+                                        style="width:56px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e5e5e5;" />
+                                    <div>
+                                        <div class="fw-semibold text-truncate" style="max-width: 220px;">
+                                            @img.ImagemUrl
+                                        </div>
+                                        <div class="text-muted">Ordem: @img.Ordem @if (isPrincipal){
+                                        <span
+                                                class="badge bg-success ms-2"><i class="bi bi-star-fill"></i> Principal</span>
+                                    }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center" style="gap:6px;">
+                                @if (!isPrincipal)
+                                {
+                                    <form asp-action="DefinirImagemPrincipal" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@img.Id" />
+                                        <input type="hidden" name="acomodacaoId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-star"></i> Definir principal
+                                        </button>
+                                    </form>
+                                }
+                                <form asp-action="RemoverImagem" method="post" class="d-inline"
+                                    onsubmit="return confirm('Remover esta imagem?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@img.Id" />
+                                    <input type="hidden" name="acomodacaoId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+                                }
+                                else
+                {
+                    <div class="text-muted">Nenhuma imagem enviada ainda.</div>
                 }
             </div>
         </div>

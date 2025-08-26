@@ -4,20 +4,86 @@
     ViewData["Title"] = "Home Page";
 }
 
-<section class="hero-modern">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-7">
-                <h1 class="hero-title">Descubra o Luxo da Hospitalidade Autêntica</h1>
-                <p class="hero-subtitle">O Sereno Hotel combina elegância contemporânea com um serviço personalizado para criar experiências memoráveis.</p>
-                <div class="d-flex flex-wrap gap-3">
-                    <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-accent btn-lg px-4 py-3">Explorar Acomodações</a>
-                    <a href="@Url.Action("Acomodacao", "Home", new { FaixaPreco = "0-300" })" class="btn btn-outline-light btn-lg px-4 py-3">Ver Ofertas</a>
+<!-- Carrossel Hero -->
+<div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="4000">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    
+    <div class="carousel-inner">
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+            <img src="https://static.wixstatic.com/media/b87f83_579ca8506aae4096b4ce90218e1ef239~mv2.jpg/v1/fill/w_1107,h_748,q_90,enc_avif,quality_auto/b87f83_579ca8506aae4096b4ce90218e1ef239~mv2.jpg" 
+                 class="d-block w-100 carousel-image" alt="Vista externa do hotel">
+            <div class="carousel-caption">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h1 class="hero-title">Descubra o Luxo da Hospitalidade Autêntica</h1>
+                            <p class="hero-subtitle">O Quinta do Ypuã combina elegância contemporânea com um serviço personalizado para criar experiências memoráveis.</p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-carousel-primary btn-lg px-4 py-3">Ver Acomodações</a>
+                                <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-carousel-secondary btn-lg px-4 py-3">Sobre Nós</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+            <img src="https://static.wixstatic.com/media/b87f83_56923e1bbcc74419b614629e2930f9f8~mv2.jpg/v1/fill/w_1107,h_748,q_90,enc_avif,quality_auto/b87f83_56923e1bbcc74419b614629e2930f9f8~mv2.jpg" 
+                 class="d-block w-100 carousel-image" alt="Interior do hotel">
+            <div class="carousel-caption">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h1 class="hero-title">Conforto e Elegância em Cada Detalhe</h1>
+                            <p class="hero-subtitle">Nossas instalações foram cuidadosamente projetadas para proporcionar máximo conforto e sofisticação.</p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-carousel-primary btn-lg px-4 py-3">Ver Acomodações</a>
+                                <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-carousel-secondary btn-lg px-4 py-3">Sobre Nós</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3 -->
+        <div class="carousel-item">
+            <img src="https://static.wixstatic.com/media/b87f83_5d8d3cfa379e45f4b83dfdbd44b72882~mv2.jpg/v1/fill/w_980,h_748,q_90,enc_avif,quality_auto/b87f83_5d8d3cfa379e45f4b83dfdbd44b72882~mv2.jpg" 
+                 class="d-block w-100 carousel-image" alt="Área de lazer do hotel">
+            <div class="carousel-caption">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h1 class="hero-title">Experiências Únicas Aguardam por Você</h1>
+                            <p class="hero-subtitle">Desfrute de momentos inesquecíveis em um ambiente que combina natureza, luxo e tranquilidade.</p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-carousel-primary btn-lg px-4 py-3">Ver Acomodações</a>
+                                <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-carousel-secondary btn-lg px-4 py-3">Sobre Nós</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+    
+    <!-- Controles do carrossel -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Próximo</span>
+    </button>
+</div>
 
 <main class="accommodations">
     <div class="container">
@@ -127,9 +193,18 @@
             </div>
             <div class="col-lg-6">
                 <div class="about-content">
-                    <h2 class="section-title text-start">Sobre o Sereno Hotel</h2>
-                    <p class="lead">Um refúgio de luxo onde a elegância contemporânea encontra a hospitalidade tradicional.</p>
-                    <p>Fundado em 2005, o Sereno Hotel nasceu da paixão por oferecer experiências memoráveis de hospedagem. Localizado em uma área privilegiada, nosso hotel oferece não apenas acomodações de alto padrão, mas também um ambiente que convida ao relaxamento e reconexão.</p>
+                    @if (ViewBag.Empresa != null)
+                    {
+                        <h2 class="section-title text-start">Sobre @ViewBag.Empresa.Nome</h2>
+                        <p class="lead">@(ViewBag.Empresa.Slogan ?? "Um refúgio de luxo onde a elegância contemporânea encontra a hospitalidade tradicional.")</p>
+                        <p>@(ViewBag.Empresa.DescricaoSobre ?? "Fundado em 2005, o nosso hotel nasceu da paixão por oferecer experiências memoráveis de hospedagem. Localizado em uma área privilegiada, nosso hotel oferece não apenas acomodações de alto padrão, mas também um ambiente que convida ao relaxamento e reconexão.")</p>
+                    }
+                    else
+                    {
+                        <h2 class="section-title text-start">Sobre o Hotel</h2>
+                        <p class="lead">Um refúgio de luxo onde a elegância contemporânea encontra a hospitalidade tradicional.</p>
+                        <p>Nosso hotel oferece experiências memoráveis de hospedagem. Localizado em uma área privilegiada, oferecemos não apenas acomodações de alto padrão, mas também um ambiente que convida ao relaxamento e reconexão.</p>
+                    }
                     
                     <div class="about-features">
                         <div class="feature-item">
@@ -163,9 +238,24 @@
                         </div>
                     </div>
                     
-                    <a href="#" class="btn btn-accent">Conheça Nossa História</a>
+                    <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-accent">Conheça Nossa História</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar o carrossel
+        const heroCarousel = document.getElementById('heroCarousel');
+        if (heroCarousel) {
+            const carousel = new bootstrap.Carousel(heroCarousel, {
+                interval: 4000,
+                wrap: true,
+                pause: 'hover',
+                ride: 'carousel'
+            });
+        }
+    });
+</script>

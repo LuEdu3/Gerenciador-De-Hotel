@@ -1,0 +1,27 @@
+@model GerenciadorHotel.Models.Empresa
+
+@if (Model != null)
+{
+    <!-- Logo da empresa no header -->
+    <a class="navbar-brand navbar-brand-modern" asp-area="" asp-controller="Home" asp-action="Index">
+        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+        {
+            <img src="@Model.LogoUrl" alt="@Model.Nome" class="navbar-logo">
+        }
+        else if (!string.IsNullOrEmpty(Model.NomeResumido))
+        {
+            @Model.NomeResumido<span>@(Model.Nome?.Replace(Model.NomeResumido, "").Trim())</span>
+        }
+        else
+        {
+            @Model.Nome
+        }
+    </a>
+}
+else
+{
+    <!-- Fallback para quando não há empresa cadastrada -->
+    <a class="navbar-brand navbar-brand-modern" asp-area="" asp-controller="Home" asp-action="Index">
+        Sistema<span>Hotel</span>
+    </a>
+}

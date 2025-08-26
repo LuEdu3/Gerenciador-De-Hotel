@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GerenciadorHotel.Models;
 using GerenciadorHotel.Data;
+using GerenciadorHotel.Services;
 
 namespace GerenciadorHotel.Controllers;
 
@@ -11,15 +12,17 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly ApplicationDbContext _context;
+    private readonly IEmpresaService _empresaService;
 
-    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+    public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, IEmpresaService empresaService)
     {
         _logger = logger;
         _context = context;
+        _empresaService = empresaService;
     }
 
     [AllowAnonymous]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var acomodacoes = _context.Acomodacoes
             .Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel)
@@ -32,6 +35,10 @@ public class HomeController : Controller
             .Select(a => a.Nome)
             .Distinct()
             .ToList();
+
+        // Buscar dados da empresa para exibir na view
+        var empresa = await _empresaService.GetEmpresaAtivaAsync();
+        ViewBag.Empresa = empresa;
 
         return View(acomodacoes);
     }
@@ -96,15 +103,30 @@ public class HomeController : Controller
     }
 
     [Authorize(Roles = "Administrador")]
-    public IActionResult Dashboard()
+    public async Task<IActionResult> Dashboard()
     {
-    // Dados do dashboard para administradores
-    var hoje = DateTime.Today;
-    ViewBag.ReservasHoje = _context.Reservas.Count(r => r.DataReserva.Date == hoje);
-    ViewBag.QuartosOcupados = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Ocupada);
-    ViewBag.CheckInsHoje = _context.Reservas.Count(r => r.DataCheckIn.Date == hoje);
-    ViewBag.CheckOutsHoje = _context.Reservas.Count(r => r.DataCheckOut.Date == hoje);
-    return View();
+        // Dados básicos do dashboard
+        var hoje = DateTime.Today;
+        
+        // Dados do dashboard para administradores
+        ViewBag.TotalAcomodacoes = _context.Acomodacoes.Count();
+        ViewBag.AcomodacoesDisponiveis = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Disponivel);
+        ViewBag.AcomodacoesOcupadas = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Ocupada);
+        ViewBag.TotalUsuarios = _context.Users.Count();
+        ViewBag.TotalReservas = _context.Reservas?.Count() ?? 0;
+        
+        // Dados específicos do dia
+        ViewBag.ReservasHoje = _context.Reservas?.Count(r => r.DataReserva.Date == hoje) ?? 0;
+        ViewBag.QuartosOcupados = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Ocupada);
+        ViewBag.CheckInsHoje = _context.Reservas?.Count(r => r.DataCheckIn.Date == hoje) ?? 0;
+        ViewBag.CheckOutsHoje = _context.Reservas?.Count(r => r.DataCheckOut.Date == hoje) ?? 0;
+        
+        // Dados da empresa
+        var empresa = await _empresaService.GetEmpresaAtivaAsync();
+        ViewBag.Empresa = empresa;
+        ViewBag.EmpresaConfigurada = empresa != null;
+        
+        return View();
     }
 
     [AllowAnonymous]

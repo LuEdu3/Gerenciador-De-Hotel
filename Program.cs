@@ -33,6 +33,9 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddControllersWithViews();
 
+// Registrar serviços personalizados
+builder.Services.AddScoped<IEmpresaService, EmpresaService>();
+
 var app = builder.Build();
 
 // Seed de dados inicial
@@ -43,8 +46,9 @@ using (var scope = app.Services.CreateScope())
     {
         await SeedDataService.SeedRolesAndAdminUser(services);
         await SeedDataService.SeedPaises(services);
+        await SeedDataService.SeedAmenidades(services);
         await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
-        await SeedDataService.AtualizarImagensAcomodacoes(services);
+        await SeedDataService.CriarImagensAcomodacoes(services.GetRequiredService<ApplicationDbContext>());
     }
     catch (Exception ex)
     {

@@ -18,9 +18,7 @@
     <header class="header-modern py-3">
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-light p-0">
-                <a class="navbar-brand navbar-brand-modern" asp-area="" asp-controller="Home" asp-action="Index">
-                    Sereno<span>Hotel</span>
-                </a>
+                @await Component.InvokeAsync("EmpresaInfo")
                 <button class="navbar-toggler-modern" type="button" data-bs-toggle="collapse" data-bs-target="#navbarModern"
                     aria-controls="navbarModern" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon-modern"></span>
@@ -55,6 +53,11 @@
                                     Mais Opções
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" ? "active" : "")" asp-controller="Empresa" asp-action="Index">
+                                            <i class="bi bi-building me-2"></i>Gerenciar Empresa
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item" href="#">
                                             <i class="bi bi-stars me-2"></i>Gerenciar Amenidades
@@ -98,12 +101,8 @@
                                     asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" && ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
+                                    asp-area="" asp-controller="Empresa" asp-action="Sobre">Sobre</a>
                             </li>
                             
                             <!-- Botões para usuários logados (não administradores) -->
@@ -138,12 +137,8 @@
                                     asp-controller="Home" asp-action="Acomodacao">Acomodações</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Sobre">Sobre</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["action"]?.ToString() == "Contato" ? "active" : "")"
-                                    asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" && ViewContext.RouteData.Values["action"]?.ToString() == "Sobre" ? "active" : "")"
+                                    asp-area="" asp-controller="Empresa" asp-action="Sobre">Sobre</a>
                             </li>
                             
                             <!-- Botões de login/cadastro para usuários não logados -->

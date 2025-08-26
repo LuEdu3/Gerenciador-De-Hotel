@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using GerenciadorHotel.Models;
 using GerenciadorHotel.Data;
 
@@ -97,46 +98,101 @@ namespace GerenciadorHotel.Services
             await LimparEInserirAcomodacoesQuintaYpua(context);
         }
 
-        public static async Task AtualizarImagensAcomodacoes(IServiceProvider serviceProvider)
+        public static async Task ForcarRecriacaoAcomodacoes(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
-            await AtualizarImagensAcomodacoes(context);
+            await ForcarRecriacaoAcomodacoesPrivate(context);
         }
 
-        private static async Task AtualizarImagensAcomodacoes(ApplicationDbContext context)
+        public static async Task SeedAmenidades(IServiceProvider serviceProvider)
         {
-            // Definir as URLs das imagens para cada acomodação
-            var imagensAcomodacoes = new Dictionary<string, string>
-            {
-                { "Domo", "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg" },
-                { "Charrua (Bus)", "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg" },
-                { "Suíte com Cozinha", "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg" },
-                { "Chalé Família", "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg" },
-                { "Cabana", "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg" },
-                { "Estacionamento para Overlanders", "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg" }
-            };
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await SeedAmenidadesPrivate(context);
+        }
 
-            var atualizacoes = 0;
-            foreach (var item in imagensAcomodacoes)
+        private static async Task SeedAmenidadesPrivate(ApplicationDbContext context)
+        {
+            // Só inserir amenidades se a tabela estiver vazia
+            if (!context.Amenidades.Any())
             {
-                var acomodacao = context.Acomodacoes.FirstOrDefault(a => a.Nome == item.Key);
-                if (acomodacao != null)
+                var amenidades = new List<Amenidade>
                 {
-                    acomodacao.ImagemPrincipalUrl = item.Value;
-                    acomodacao.DataAtualizacao = DateTime.Now;
-                    atualizacoes++;
-                }
-            }
+                    new()
+                    {
+                        Nome = "Wi-Fi",
+                        Descricao = "Internet sem fio gratuita",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-wifi
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Ar-condicionado",
+                        Descricao = "Sistema de climatização",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-thermometer-half
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "TV",
+                        Descricao = "Televisão com canais por assinatura",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-tv
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Frigobar",
+                        Descricao = "Refrigerador pequeno",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-snow2
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Ducha",
+                        Descricao = "Banheiro com ducha",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-droplet
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Banheira",
+                        Descricao = "Banheira para relaxamento",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-water
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Cozinha",
+                        Descricao = "Cozinha equipada",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-house-gear
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    },
+                    new()
+                    {
+                        Nome = "Toalha",
+                        Descricao = "Toalhas de banho incluídas",
+                        ImagemUrl = "", // Usará ícone Bootstrap bi-clipboard-check
+                        Ativa = true,
+                        DataCriacao = DateTime.Now
+                    }
+                };
 
-            if (atualizacoes > 0)
-            {
+                await context.Amenidades.AddRangeAsync(amenidades);
                 await context.SaveChangesAsync();
-                Console.WriteLine($"🖼️ {atualizacoes} imagens de acomodações atualizadas e fixadas!");
+
+                Console.WriteLine($"✅ {amenidades.Count} amenidades inseridas com sucesso!");
             }
             else
             {
-                Console.WriteLine("⚠️ Nenhuma acomodação encontrada para atualizar imagens.");
+                Console.WriteLine("⚠️ Amenidades já existem no banco, pulando seed para preservar dados existentes.");
             }
         }
 
@@ -167,7 +223,7 @@ namespace GerenciadorHotel.Services
                         Preco = 280.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_442829334f1b4dd1879b3231151437a3~mv2.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     },
@@ -180,7 +236,7 @@ namespace GerenciadorHotel.Services
                         Preco = 180.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bus_example.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     },
@@ -193,7 +249,7 @@ namespace GerenciadorHotel.Services
                         Preco = 350.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_suite_example.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     },
@@ -206,7 +262,7 @@ namespace GerenciadorHotel.Services
                         Preco = 450.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_chale_example.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     },
@@ -219,7 +275,7 @@ namespace GerenciadorHotel.Services
                         Preco = 220.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_cabana_example.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     },
@@ -232,7 +288,7 @@ namespace GerenciadorHotel.Services
                         Preco = 80.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_parking_example.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     }
@@ -374,6 +430,141 @@ namespace GerenciadorHotel.Services
             else
             {
                 Console.WriteLine("⚠️  Países já existem no banco, pulando seed para preservar dados existentes.");
+            }
+        }
+
+        private static async Task ForcarRecriacaoAcomodacoesPrivate(ApplicationDbContext context)
+        {
+            Console.WriteLine("🔄 Forçando recriação de todas as acomodações...");
+            
+            // Remove TODAS as acomodações existentes
+            var acomodacoesExistentes = context.Acomodacoes.ToList();
+            if (acomodacoesExistentes.Any())
+            {
+                context.Acomodacoes.RemoveRange(acomodacoesExistentes);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"🗑️ {acomodacoesExistentes.Count} acomodações existentes removidas.");
+            }
+
+            // Cria todas as acomodações da Quinta do Ypuã
+            var acomodacoes = new List<Acomodacao>
+            {
+                new()
+                {
+                    Nome = "Domo",
+                    Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
+                    QuantidadeCamasCasal = 1,
+                    QuantidadeCamasSolteiro = 0,
+                    Preco = 280.00m,
+                    MinimoNoites = 2,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Charrua (Bus)",
+                    Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
+                    QuantidadeCamasCasal = 0,
+                    QuantidadeCamasSolteiro = 2,
+                    Preco = 180.00m,
+                    MinimoNoites = 1,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Suíte com Cozinha",
+                    Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
+                    QuantidadeCamasCasal = 1,
+                    QuantidadeCamasSolteiro = 0,
+                    Preco = 350.00m,
+                    MinimoNoites = 2,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Chalé Família",
+                    Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
+                    QuantidadeCamasCasal = 2,
+                    QuantidadeCamasSolteiro = 2,
+                    Preco = 450.00m,
+                    MinimoNoites = 2,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Cabana",
+                    Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
+                    QuantidadeCamasCasal = 1,
+                    QuantidadeCamasSolteiro = 0,
+                    Preco = 220.00m,
+                    MinimoNoites = 1,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Estacionamento para Overlanders",
+                    Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
+                    QuantidadeCamasCasal = 0,
+                    QuantidadeCamasSolteiro = 2,
+                    Preco = 80.00m,
+                    MinimoNoites = 1,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                }
+            };
+
+            await context.Acomodacoes.AddRangeAsync(acomodacoes);
+            await context.SaveChangesAsync();
+
+            Console.WriteLine($"✅ {acomodacoes.Count} acomodações da Quinta do Ypuã criadas com sucesso!");
+        }
+
+        public static async Task CriarImagensAcomodacoes(ApplicationDbContext context)
+        {
+            var acomodacoesSemImagens = await context.Acomodacoes
+                .Where(a => a.Ativa && !string.IsNullOrEmpty(a.ImagemPrincipalUrl) && !a.Imagens.Any())
+                .ToListAsync();
+
+            if (acomodacoesSemImagens.Any())
+            {
+                foreach (var acomodacao in acomodacoesSemImagens)
+                {
+                    var imagemAcomodacao = new ImagemAcomodacao
+                    {
+                        AcomodacaoId = acomodacao.Id,
+                        ImagemUrl = acomodacao.ImagemPrincipalUrl!,
+                        Titulo = $"Imagem Principal - {acomodacao.Nome}",
+                        Descricao = $"Foto principal da acomodação {acomodacao.Nome}",
+                        Ordem = 1,
+                        Ativa = true,
+                        DataUpload = DateTime.Now
+                    };
+
+                    context.ImagensAcomodacao.Add(imagemAcomodacao);
+                }
+
+                await context.SaveChangesAsync();
+                Console.WriteLine($"🖼️ {acomodacoesSemImagens.Count} registros de imagens de acomodações criados!");
+            }
+            else
+            {
+                Console.WriteLine("ℹ️ Todas as acomodações já possuem imagens registradas.");
             }
         }
     }

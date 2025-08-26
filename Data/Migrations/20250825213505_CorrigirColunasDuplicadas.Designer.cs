@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GerenciadorHotel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250821140957_CamasSeparadas")]
-    partial class CamasSeparadas
+    [Migration("20250825213505_CorrigirColunasDuplicadas")]
+    partial class CorrigirColunasDuplicadas
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,10 +57,10 @@ namespace GerenciadorHotel.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<int>("QuantidadeCamas")
+                    b.Property<int>("QuantidadeCamasCasal")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuantidadeCamasCasal")
+                    b.Property<int>("QuantidadeCamasSolteiro")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
