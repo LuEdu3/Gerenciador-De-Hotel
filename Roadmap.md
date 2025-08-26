@@ -91,3 +91,10 @@
 - Controllers: `AcomodacoesController.cs`, `ReservasController.cs`  
 - Views: `Acomodacoes/Details.cshtml`, `Reservas/MinhasReservas.cshtml`
 - Seed: `Services/SeedDataService.cs`
+
+
+## Bugs ou Melhoras
+
+1. Reservas/Delete: Ao tentar excluir uma reserva como Administrador, o site não funciona corretamente.
+2. Ao tentar excluir um usuário como Administrador o site buga.
+3. Ao tentar resetar a senha de um usuário como Administrador o site buga.
