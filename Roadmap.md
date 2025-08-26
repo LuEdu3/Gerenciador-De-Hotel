@@ -61,7 +61,7 @@
 
 - ❌ Quantidades de hospedes que suporta ao editar
 
-- ❌ Mostrar ao editar a quantidade mínimas de noites
+- ❌ Mostrar ao editar a quantidade mínimas de noites - Luiz
 ---
 
 ## Lembretes
