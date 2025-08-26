@@ -24,6 +24,80 @@ namespace GerenciadorHotel.Controllers
             _logger = logger;
         }
 
+        // Compat: GET /Usuarios/DeleteConfirmed?id={id} -> redireciona para a tela de confirmação padrão
+        [HttpGet("Usuarios/DeleteConfirmed")]
+        public IActionResult DeleteConfirmedGet([FromQuery] string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction("Delete", new { id });
+        }
+
+        // Compat: GET /Usuarios/DeleteConfirmed/{id}
+        [HttpGet("Usuarios/DeleteConfirmed/{id}")]
+        public IActionResult DeleteConfirmedGetRoute(string id)
+            => RedirectToAction("Delete", new { id });
+
+        // Compat: POST /Usuarios/DeleteConfirmed?id={id} -> efetiva a exclusão
+        [HttpPost("Usuarios/DeleteConfirmed")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmedRoute([FromQuery] string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            var currentUserId = _userManager.GetUserId(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            if (user.Id == currentUserId)
+            {
+                TempData["Erro"] = "Você não pode excluir o próprio usuário logado.";
+                return RedirectToAction(nameof(Index));
+            }
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation($"Usuário {user.Email} removido pelo administrador (via DeleteConfirmed). ");
+                TempData["Sucesso"] = "Usuário removido com sucesso!";
+            }
+            else
+            {
+                TempData["Erro"] = "Erro ao remover usuário.";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Compat: POST /Usuarios/DeleteConfirmed/{id}
+        [HttpPost("Usuarios/DeleteConfirmed/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmedRouteWithId(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            var currentUserId = _userManager.GetUserId(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            if (user.Id == currentUserId)
+            {
+                TempData["Erro"] = "Você não pode excluir o próprio usuário logado.";
+                return RedirectToAction(nameof(Index));
+            }
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation($"Usuário {user.Email} removido pelo administrador (via DeleteConfirmed). ");
+                TempData["Sucesso"] = "Usuário removido com sucesso!";
+            }
+            else
+            {
+                TempData["Erro"] = "Erro ao remover usuário.";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Usuarios
         public async Task<IActionResult> Index(string busca, string nivelAcesso, string status)
         {
