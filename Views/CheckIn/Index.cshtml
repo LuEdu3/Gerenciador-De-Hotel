@@ -1,0 +1,50 @@
+@model IEnumerable<GerenciadorHotel.Models.Reserva>
+@using GerenciadorHotel.Models
+@{
+    ViewData["Title"] = "Check-in do Dia";
+}
+<h2 class="mb-4">Reservas para Check-in Hoje</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Hóspede</th>
+            <th>Quarto</th>
+            <th>Data Check-in</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reserva in Model)
+        {
+            <tr>
+                <td>@reserva.NomeCompleto</td>
+                <td>@reserva.Acomodacao?.Nome</td>
+                <td>@reserva.DataCheckIn.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @if (reserva.Status == StatusReserva.CheckInRealizado)
+                    {
+                        <span class="text-success">Check-in confirmado</span>
+                    }
+                    else
+                    {
+                        <span class="text-warning">Pendente</span>
+                    }
+                </td>
+                <td>
+                    @if (reserva.Status != StatusReserva.CheckInRealizado)
+                    {
+                        <form asp-action="ConfirmarCheckin" method="post">
+                            <input type="hidden" name="id" value="@reserva.Id" />
+                            <button type="submit" class="btn btn-success">Confirmar checkin</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-success">✔</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

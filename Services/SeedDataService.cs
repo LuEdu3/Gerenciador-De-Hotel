@@ -7,6 +7,20 @@ namespace GerenciadorHotel.Services
 {
     public static class SeedDataService
     {
+        public static async Task SeedEmpresaBase(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await SeedEmpresaBase(context);
+        }
+
+        public static async Task ForcarAtualizacaoEmpresaBase(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await ForcarAtualizacaoEmpresaBasePrivate(context);
+        }
+
         public static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -193,6 +207,111 @@ namespace GerenciadorHotel.Services
             else
             {
                 Console.WriteLine("⚠️ Amenidades já existem no banco, pulando seed para preservar dados existentes.");
+            }
+        }
+
+        private static async Task ForcarAtualizacaoEmpresaBasePrivate(ApplicationDbContext context)
+        {
+            Console.WriteLine("🔄 Forçando atualização da empresa base...");
+            
+            // Busca a empresa ativa atual
+            var empresaAtual = await context.Empresas.FirstOrDefaultAsync(e => e.Ativo);
+            
+            if (empresaAtual != null)
+            {
+                // Atualiza todos os campos com os dados da empresaBase
+                empresaAtual.Nome = "Quinta do Ypuã";
+                empresaAtual.NomeResumido = "Ypuã";
+                empresaAtual.LogoUrl = "https://static.wixstatic.com/media/b87f83_9f4625b043a944daaf5fddefc7d73d0e~mv2.png/v1/fill/w_80,h_80,al_c,q_85,enc_avif,quality_auto/logo-pousada-quinta-do-ypua.png";
+                empresaAtual.Slogan = "Natureza, conforto e simplicidade";
+                empresaAtual.DescricaoBreve = "A pousada Quinta do Ypuã oferece ao seus clientes um recanto de aconchego e lazer, em ambiente rústico e agradável.  Ideal para quem gosta de fugir da rotina e procura um local de paz para descansar e curtir a natureza.";
+                empresaAtual.DescricaoSobre = "O Ypuã tem tudo a ver com a natureza, dá para sentir a energia do lugar. Eu me preocupo se você vai comer bem, dormir bem e se vai se sentir em casa. Vou te mostrar onde encontrar os melhores frutos do mar, onde curtir a melhor praia e as melhores ondas. Mas se você não quiser fazer nada eu também conheço o melhor lugar";
+                empresaAtual.AnoFundacao = 2005;
+                empresaAtual.Telefone = "+55 (00) 88790-000";
+                empresaAtual.WhatsApp = "+55 (00) 88790-000";
+                empresaAtual.Email = "pousadaquintadoypua@gmail.com";
+                empresaAtual.Endereco = "Estrada Ipua, nº 6";
+                empresaAtual.Cidade = "Laguna ";
+                empresaAtual.Estado = "SC";
+                empresaAtual.CEP = "00000-000";
+                empresaAtual.Pais = "Brasil";
+                empresaAtual.Website = "https://exemplo.com";
+                empresaAtual.Facebook = "https://exemplo.com";
+                empresaAtual.Instagram = "https://exemplo.com";
+                empresaAtual.Twitter = "https://exemplo.com";
+                empresaAtual.LinkedIn = "https://exemplo.com";
+                empresaAtual.HorarioCheckin = "14:00";
+                empresaAtual.HorarioCheckout = "12:00";
+                empresaAtual.DataAtualizacao = DateTime.Now;
+                
+                await context.SaveChangesAsync();
+                Console.WriteLine("✅ Empresa base atualizada com sucesso!");
+            }
+            else
+            {
+                // Se não existe empresa ativa, cria uma nova
+                await SeedEmpresaBase(context);
+            }
+        }
+
+        private static async Task SeedEmpresaBase(ApplicationDbContext context)
+        {
+            // Se já existe uma empresa ativa, não faz nada (preserva dados configurados pelo usuário)
+            var existeAtiva = await context.Empresas.AnyAsync(e => e.Ativo);
+            if (existeAtiva)
+            {
+                Console.WriteLine("ℹ️ Empresa ativa já existe. Mantendo configuração atual.");
+                return;
+            }
+
+            // Caso não exista nenhuma ativa, cria uma empresa base
+            var existeAlguma = await context.Empresas.AnyAsync();
+            if (!existeAlguma)
+            {
+                var empresaBase = new Empresa
+                {
+                    Nome = "Quinta do Ypuã",
+                    NomeResumido = "Ypuã",
+                    LogoUrl = "https://static.wixstatic.com/media/b87f83_9f4625b043a944daaf5fddefc7d73d0e~mv2.png/v1/fill/w_80,h_80,al_c,q_85,enc_avif,quality_auto/logo-pousada-quinta-do-ypua.png",
+                    Slogan = "Natureza, conforto e simplicidade",
+                    DescricaoBreve = "A pousada Quinta do Ypuã oferece ao seus clientes um recanto de aconchego e lazer, em ambiente rústico e agradável.  Ideal para quem gosta de fugir da rotina e procura um local de paz para descansar e curtir a natureza.",
+                    DescricaoSobre = "O Ypuã tem tudo a ver com a natureza, dá para sentir a energia do lugar. Eu me preocupo se você vai comer bem, dormir bem e se vai se sentir em casa. Vou te mostrar onde encontrar os melhores frutos do mar, onde curtir a melhor praia e as melhores ondas. Mas se você não quiser fazer nada eu também conheço o melhor lugar",
+                    AnoFundacao = 2005,
+                    Telefone = "+55 (00) 88790-000",
+                    WhatsApp = "+55 (00) 88790-000",
+                    Email = "pousadaquintadoypua@gmail.com",
+                    Endereco = "Estrada Ipua, nº 6",
+                    Cidade = "Laguna ",
+                    Estado = "SC",
+                    CEP = "00000-000",
+                    Pais = "Brasil",
+                    Website = "https://exemplo.com",
+                    Facebook = "https://exemplo.com",
+                    Instagram = "https://exemplo.com",
+                    Twitter = "https://exemplo.com",
+                    LinkedIn = "https://exemplo.com",
+                    HorarioCheckin = "14:00",
+                    HorarioCheckout = "12:00",
+                    Ativo = true,
+                    DataCriacao = DateTime.Now
+                };
+
+                await context.Empresas.AddAsync(empresaBase);
+                await context.SaveChangesAsync();
+                Console.WriteLine("✅ Empresa base criada e ativada.");
+                return;
+            }
+
+            // Existem empresas, porém nenhuma ativa: ativa a mais recente
+            var empresaMaisRecente = await context.Empresas
+                .OrderByDescending(e => e.DataCriacao)
+                .FirstOrDefaultAsync();
+            if (empresaMaisRecente != null)
+            {
+                empresaMaisRecente.Ativo = true;
+                empresaMaisRecente.DataAtualizacao = DateTime.Now;
+                await context.SaveChangesAsync();
+                Console.WriteLine($"✅ Empresa '{empresaMaisRecente.Nome}' ativada como padrão.");
             }
         }
 

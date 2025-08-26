@@ -13,6 +13,7 @@ namespace GerenciadorHotel.Services
         Task<List<EmpresaPremio>> GetPremiosAtivosAsync();
         Task<bool> AtualizarEmpresaAsync(Empresa empresa);
         Task<bool> CriarEmpresaAsync(Empresa empresa);
+        Task<bool> VerificarEmpresaExisteAsync(int id);
     }
 
     public class EmpresaService : IEmpresaService
@@ -92,17 +93,59 @@ namespace GerenciadorHotel.Services
         {
             try
             {
-                empresa.DataAtualizacao = DateTime.Now;
-                _context.Empresas.Update(empresa);
-                await _context.SaveChangesAsync();
+                // Buscar a empresa existente no banco com tracking
+                var empresaExistente = await _context.Empresas
+                    .Where(e => e.Id == empresa.Id)
+                    .FirstOrDefaultAsync();
+                
+                if (empresaExistente == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Empresa com ID {empresa.Id} não encontrada");
+                    return false;
+                }
+
+                // Atualizar apenas os campos necessários
+                empresaExistente.Nome = empresa.Nome;
+                empresaExistente.NomeResumido = empresa.NomeResumido;
+                empresaExistente.LogoUrl = empresa.LogoUrl;
+                empresaExistente.Slogan = empresa.Slogan;
+                empresaExistente.DescricaoSobre = empresa.DescricaoSobre;
+                empresaExistente.DescricaoBreve = empresa.DescricaoBreve;
+                empresaExistente.AnoFundacao = empresa.AnoFundacao;
+                empresaExistente.Telefone = empresa.Telefone;
+                empresaExistente.WhatsApp = empresa.WhatsApp;
+                empresaExistente.Email = empresa.Email;
+                empresaExistente.Endereco = empresa.Endereco;
+                empresaExistente.Cidade = empresa.Cidade;
+                empresaExistente.Estado = empresa.Estado;
+                empresaExistente.CEP = empresa.CEP;
+                empresaExistente.Pais = empresa.Pais;
+                empresaExistente.Website = empresa.Website;
+                empresaExistente.Facebook = empresa.Facebook;
+                empresaExistente.Instagram = empresa.Instagram;
+                empresaExistente.Twitter = empresa.Twitter;
+                empresaExistente.LinkedIn = empresa.LinkedIn;
+                empresaExistente.HorarioCheckin = empresa.HorarioCheckin;
+                empresaExistente.HorarioCheckout = empresa.HorarioCheckout;
+                empresaExistente.DataAtualizacao = DateTime.Now;
+
+                // Marcar como modificado explicitamente
+                _context.Entry(empresaExistente).State = EntityState.Modified;
+                
+                var resultado = await _context.SaveChangesAsync();
+                
+                System.Diagnostics.Debug.WriteLine($"Resultado SaveChanges: {resultado} registros afetados");
                 
                 // Limpar cache
                 _empresaCache = null;
                 
-                return true;
+                return resultado > 0;
             }
-            catch
+            catch (Exception ex)
             {
+                // Log do erro para debugging
+                System.Diagnostics.Debug.WriteLine($"Erro ao atualizar empresa: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
                 return false;
             }
         }
@@ -111,12 +154,11 @@ namespace GerenciadorHotel.Services
         {
             try
             {
-                // Desativar outras empresas se existirem
-                var empresasExistentes = await _context.Empresas.Where(e => e.Ativo).ToListAsync();
-                foreach (var emp in empresasExistentes)
+                // Bloquear criação se já existir alguma empresa (política: apenas uma empresa padrão)
+                var existeQualquer = await _context.Empresas.AnyAsync();
+                if (existeQualquer)
                 {
-                    emp.Ativo = false;
-                    emp.DataAtualizacao = DateTime.Now;
+                    return false;
                 }
 
                 empresa.Ativo = true;
@@ -134,6 +176,11 @@ namespace GerenciadorHotel.Services
             {
                 return false;
             }
+        }
+
+        public async Task<bool> VerificarEmpresaExisteAsync(int id)
+        {
+            return await _context.Empresas.AnyAsync(e => e.Id == id);
         }
     }
 }

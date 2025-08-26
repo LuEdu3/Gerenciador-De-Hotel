@@ -36,6 +36,14 @@
                 </div>
             }
 
+            @if (TempData["Info"] != null)
+            {
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>@TempData["Info"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
             <!-- Informações Básicas -->
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">

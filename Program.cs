@@ -47,6 +47,7 @@ using (var scope = app.Services.CreateScope())
         await SeedDataService.SeedRolesAndAdminUser(services);
         await SeedDataService.SeedPaises(services);
         await SeedDataService.SeedAmenidades(services);
+        await SeedDataService.SeedEmpresaBase(services);
         await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
         await SeedDataService.CriarImagensAcomodacoes(services.GetRequiredService<ApplicationDbContext>());
     }

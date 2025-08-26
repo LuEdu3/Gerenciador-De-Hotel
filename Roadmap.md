@@ -64,6 +64,8 @@
 
 - ✅ Mostrar ao editar a quantidade mínimas de noites
 
+---
+
 ## Lembretes
 
 - Mudar bloqueio de acesso ao endpoint 'Reservas/MinhasReservas" para redirecionamento para o index

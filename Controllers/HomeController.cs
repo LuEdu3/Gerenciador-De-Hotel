@@ -118,7 +118,9 @@ public class HomeController : Controller
         // Dados específicos do dia
         ViewBag.ReservasHoje = _context.Reservas?.Count(r => r.DataReserva.Date == hoje) ?? 0;
         ViewBag.QuartosOcupados = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Ocupada);
-        ViewBag.CheckInsHoje = _context.Reservas?.Count(r => r.DataCheckIn.Date == hoje) ?? 0;
+    ViewBag.CheckInsHoje = _context.Reservas?.Count(r => r.DataCheckIn.Date == hoje) ?? 0;
+    // Check-ins confirmados pelo recepcionista
+    ViewBag.CheckInsConfirmadosHoje = _context.Reservas?.Count(r => r.DataCheckInReal.HasValue && r.DataCheckInReal.Value.Date == hoje && r.Status == StatusReserva.CheckInRealizado) ?? 0;
         ViewBag.CheckOutsHoje = _context.Reservas?.Count(r => r.DataCheckOut.Date == hoje) ?? 0;
         
         // Dados da empresa
