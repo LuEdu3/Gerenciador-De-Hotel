@@ -99,7 +99,7 @@
 
 2. ✅Ao tentar excluir um usuário como Administrador o site buga. Dropshadow bootstrap - Luiz
 
-3. Ao editar ele sobreescreve as regras de capacidade e noites mínimas.
+3. Ao editar ele sobreescreve as regras de capacidade e noites mínimas. - Luiz
 
 4. ✅ Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz 
 
@@ -109,7 +109,7 @@
 
 7. **Navbar não fecha no mobile**
 
-8. Não existem esses endpoints - Luiz
+8. ✅ Não existem esses endpoints - Luiz
 
 http://localhost:5116/Usuarios/DeleteConfirmed
 Failed to load resource: the server responded with a status of 404 ()
