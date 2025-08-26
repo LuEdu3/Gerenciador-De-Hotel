@@ -113,6 +113,17 @@ namespace GerenciadorHotel.Controllers
                 ModelState.AddModelError("DataCheckIn", "A data de check-in não pode ser anterior à data atual.");
             }
 
+            // Validação do mínimo de noites
+            var acomodacaoMinNoites = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+            if (acomodacaoMinNoites != null && acomodacaoMinNoites.MinimoNoites > 0)
+            {
+                var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
+                if (quantidadeNoites < acomodacaoMinNoites.MinimoNoites)
+                {
+                    ModelState.AddModelError("DataCheckOut", $"A acomodação exige reserva mínima de {acomodacaoMinNoites.MinimoNoites} noite(s).");
+                }
+            }
+
             // Só prossegue se não houver erros
             if (ModelState.IsValid)
             {
