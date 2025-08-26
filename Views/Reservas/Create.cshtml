@@ -135,6 +135,7 @@
                     <label asp-for="NumeroHospedes" class="form-label"></label>
                     <input asp-for="NumeroHospedes" class="form-control" type="number" min="1" max="10" />
                     <span asp-validation-for="NumeroHospedes" class="text-danger"></span>
+                        <span id="limite-hospedes-info" class="text-info small"></span>
                 </div>
             </div>
             <div class="form-group mt-4">
@@ -154,6 +155,7 @@
             <img src="@ViewBag.AcomodacaoSelecionada.ImagemPrincipalUrl" alt="Imagem da acomodação"
                 class="img-fluid rounded mb-3" style="max-height:160px;object-fit:cover;" />
             <div><strong>Tipo de Acomodação:</strong> @ViewBag.AcomodacaoSelecionada.Nome</div>
+                <div><strong>Limite Máximo de Hóspedes:</strong> @ViewBag.AcomodacaoSelecionada.QuantidadeMaximaHospedes</div>
             <div><strong>Datas:</strong> @Model.DataCheckIn.ToString("dd/MM/yyyy") -
                 @Model.DataCheckOut.ToString("dd/MM/yyyy")</div>
             <div><strong>Nº de noites:</strong> @Model.QuantidadeNoites</div>
@@ -200,6 +202,22 @@
             var acomodacaoSelect = $('select[name="AcomodacaoId"]');
             var checkInInput = $('input[name="DataCheckIn"]');
             var checkOutInput = $('input[name="DataCheckOut"]');
+                var limiteHospedesInfo = $('#limite-hospedes-info');
+
+                function atualizarLimiteHospedes() {
+                    var acomodacoes = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Acomodacoes ?? new List<object>()));
+                    var acomodacaoId = acomodacaoSelect.val();
+                    var acomodacao = acomodacoes.find(a => a.Id == parseInt(acomodacaoId));
+                    if (acomodacao) {
+                        limiteHospedesInfo.text('Limite máximo: ' + acomodacao.QuantidadeMaximaHospedes + ' hóspedes');
+                        $('input[name="NumeroHospedes"]').attr('max', acomodacao.QuantidadeMaximaHospedes);
+                    } else {
+                        limiteHospedesInfo.text('');
+                        $('input[name="NumeroHospedes"]').attr('max', 10);
+                    }
+                }
+                acomodacaoSelect.on('change', atualizarLimiteHospedes);
+                atualizarLimiteHospedes();
 
             // Definir min dinamicamente como hoje (em tempo real)
             function setMinHoje() {

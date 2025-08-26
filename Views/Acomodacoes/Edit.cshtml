@@ -67,12 +67,27 @@
                                 <span asp-validation-for="QuantidadeCamasCasal" class="text-danger"></span>
                             </div>
                         </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="QuantidadeMaximaHospedes" class="form-control" placeholder="Máximo de Hóspedes"
+                                        type="number" min="1" max="20" />
+                                    <label asp-for="QuantidadeMaximaHospedes"></label>
+                                    <span asp-validation-for="QuantidadeMaximaHospedes" class="text-danger"></span>
+                                </div>
+                            </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
                                 <input asp-for="Preco" class="form-control" placeholder="Preço por Noite" type="number"
                                     step="0.01" min="0.01" max="9999.99" />
                                 <label asp-for="Preco"></label>
                                 <span asp-validation-for="Preco" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="MinimoNoites" class="form-control" placeholder="Quantidade mínima de noites" type="number" min="1" max="30" />
+                                <label asp-for="MinimoNoites">Quantidade mínima de noites</label>
+                                <span asp-validation-for="MinimoNoites" class="text-danger"></span>
                             </div>
                         </div>
                     </div>

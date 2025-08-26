@@ -65,6 +65,14 @@
                                 <span asp-validation-for="QuantidadeCamasCasal" class="text-danger"></span>
                             </div>
                         </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="QuantidadeMaximaHospedes" class="form-control" placeholder="Máximo de Hóspedes"
+                                        type="number" min="1" max="20" />
+                                    <label asp-for="QuantidadeMaximaHospedes"></label>
+                                    <span asp-validation-for="QuantidadeMaximaHospedes" class="text-danger"></span>
+                                </div>
+                            </div>
                         <div class="col-md-4">
                             <div class="form-floating mb-3">
                                 <input asp-for="Preco" class="form-control" placeholder="Preço por Noite" type="number"
