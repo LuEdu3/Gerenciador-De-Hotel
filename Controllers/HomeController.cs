@@ -70,12 +70,12 @@ public class HomeController : Controller
             if (Capacidade.Contains("-"))
             {
                 var capacidades = Capacidade.Split('-').Select(int.Parse).ToList();
-                query = query.Where(a => a.QuantidadeCamas >= capacidades[0] && a.QuantidadeCamas <= capacidades[1]);
+                query = query.Where(a => (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) >= capacidades[0] && (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) <= capacidades[1]);
             }
             else
             {
                 var capacidade = int.Parse(Capacidade);
-                query = query.Where(a => a.QuantidadeCamas >= capacidade);
+                query = query.Where(a => (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) >= capacidade);
             }
             ViewBag.FiltroCapacidade = Capacidade;
         }
@@ -105,6 +105,7 @@ public class HomeController : Controller
     [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Dashboard()
     {
+
         // Dados do dashboard para administradores
         ViewBag.TotalAcomodacoes = _context.Acomodacoes.Count();
         ViewBag.AcomodacoesDisponiveis = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Disponivel);
@@ -118,6 +119,15 @@ public class HomeController : Controller
         ViewBag.EmpresaConfigurada = empresa != null;
         
         return View();
+
+    // Dados do dashboard para administradores
+    var hoje = DateTime.Today;
+    ViewBag.ReservasHoje = _context.Reservas.Count(r => r.DataReserva.Date == hoje);
+    ViewBag.QuartosOcupados = _context.Acomodacoes.Count(a => a.Status == StatusAcomodacao.Ocupada);
+    ViewBag.CheckInsHoje = _context.Reservas.Count(r => r.DataCheckIn.Date == hoje);
+    ViewBag.CheckOutsHoje = _context.Reservas.Count(r => r.DataCheckOut.Date == hoje);
+    return View();
+
     }
 
     [AllowAnonymous]

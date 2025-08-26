@@ -1,232 +1,153 @@
 @model GerenciadorHotel.Models.Acomodacao
 @using GerenciadorHotel.Models
-@using GerenciadorHotel.Extensions
 
 @{
     ViewData["Title"] = "Detalhes da Acomodação";
 }
 
-<div class="accommodation-details">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-8">
-                <!-- Galeria de Imagens Premium -->
-                @if (Model.Imagens != null && Model.Imagens.Any())
-                {
-                    <div class="details-carousel mb-4">
-                        <div id="carouselImages" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                            <!-- Indicadores -->
-                            @if (Model.Imagens.Count > 1)
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Galeria de Imagens -->
+            @if (Model.Imagens != null && Model.Imagens.Any())
+            {
+                <div class="card mb-4">
+                    <div id="carouselImages" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @for (int i = 0; i < Model.Imagens.Count; i++)
                             {
-                                <div class="carousel-indicators">
-                                    @for (int i = 0; i < Model.Imagens.Count; i++)
-                                    {
-                                        <button type="button" data-bs-target="#carouselImages" data-bs-slide-to="@i" 
-                                                class="@(i == 0 ? "active" : "")" 
-                                                aria-current="@(i == 0 ? "true" : "false")" 
-                                                aria-label="Slide @(i + 1)"></button>
-                                    }
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@Model.Imagens.ElementAt(i).ImagemUrl" class="d-block w-100" alt="@Model.Nome" style="height: 400px; object-fit: cover;">
                                 </div>
                             }
-                            
-                            <!-- Imagens -->
-                            <div class="carousel-inner">
-                                @for (int i = 0; i < Model.Imagens.Count; i++)
+                        </div>
+                        @if (Model.Imagens.Count > 1)
+                        {
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselImages" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Próximo</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Informações da Acomodação -->
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="h3 mb-3">@Model.Nome</h1>
+                    <p class="text-muted mb-4">@Model.Descricao</p>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-bed text-primary me-2"></i>
+                                <span>@Model.QuantidadeCamasSolteiro cama(s) de solteiro</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-bed text-primary me-2"></i>
+                                <span>@Model.QuantidadeCamasCasal cama(s) de casal</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <!-- Removido campo de capacidade geral -->
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-moon text-primary me-2"></i>
+                                <span>Mín. @Model.MinimoNoites noites</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amenidades -->
+                    @if (Model.AcomodacaoAmenidades != null && Model.AcomodacaoAmenidades.Any(a => a.Amenidade != null && !string.IsNullOrWhiteSpace(a.Amenidade.Nome)))
+                    {
+                        <div class="mb-4">
+                            <h5><i class="bi bi-star text-dark me-2"></i>Amenidades</h5>
+                            <div class="row">
+                                @foreach (var amenidade in Model.AcomodacaoAmenidades.Where(a => a.Amenidade != null && !string.IsNullOrWhiteSpace(a.Amenidade.Nome)))
                                 {
-                                    <div class="carousel-item @(i == 0 ? "active" : "")">
-                                        <img src="@Model.Imagens.ElementAt(i).ImagemUrl" 
-                                             class="d-block w-100 carousel-image" 
-                                             alt="@Model.Nome - Imagem @(i + 1)">
-                                        <div class="carousel-overlay">
-                                            <div class="carousel-overlay-content">
-                                                <span class="image-counter">
-                                                    <i class="fas fa-camera me-1"></i>
-                                                    @(i + 1) de @Model.Imagens.Count
-                                                </span>
-                                            </div>
+                                    <div class="col-md-6 mb-2">
+                                        @{
+                                            var iconClass = amenidade.Amenidade.Nome.ToLower() switch {
+                                                "wi-fi" => "bi bi-wifi text-dark me-2",
+                                                "ar-condicionado" => "bi bi-thermometer-half text-dark me-2",
+                                                "tv" => "bi bi-tv text-dark me-2",
+                                                "frigobar" => "bi bi-snow2 text-dark me-2",
+                                                "ducha" => "bi bi-droplet text-dark me-2",
+                                                "banheira" => "bi bi-water text-dark me-2",
+                                                "cozinha" => "bi bi-house-gear text-dark me-2",
+                                                "toalha" => "bi bi-clipboard-check text-dark me-2",
+                                                _ => "bi bi-check-circle text-dark me-2"
+                                            };
+                                        }
+                                        <div class="d-flex align-items-center">
+                                            <i class="@iconClass"></i>
+                                            <label for="amenidade_@amenidade.Amenidade.Id" class="mb-0">
+                                                <span id="amenidade_@amenidade.Amenidade.Id">@amenidade.Amenidade.Nome</span>
+                                            </label>
                                         </div>
                                     </div>
                                 }
                             </div>
-                            
-                            <!-- Controles de Navegação -->
-                            @if (Model.Imagens.Count > 1)
-                            {
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages" data-bs-slide="prev">
-                                    <div class="carousel-control-icon">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </div>
-                                    <span class="visually-hidden">Anterior</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carouselImages" data-bs-slide="next">
-                                    <div class="carousel-control-icon">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </div>
-                                    <span class="visually-hidden">Próximo</span>
-                                </button>
-                            }
                         </div>
-                    </div>
-                }
-
-                <!-- Informações da Acomodação -->
-                <div class="accommodation-info-card">
-                    <div class="card-header">
-                        <h1 class="accommodation-title">@Model.Nome</h1>
-                        <div class="accommodation-rating">
-                            @for (int i = 0; i < 5; i++)
-                            {
-                                <i class="fas fa-star"></i>
-                            }
-                            <span class="rating-text">Quarto Premium</span>
+                    }
+                    else
+                    {
+                        <div class="mb-4">
+                            <h5><i class="bi bi-star text-dark me-2"></i>Amenidades</h5>
+                            <p class="text-muted">Nenhuma amenidade disponível para esta acomodação.</p>
                         </div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <p class="accommodation-description">@Model.Descricao</p>
+                    }
 
-                        <!-- Informações Principais -->
-                        <div class="accommodation-specs">
-                            <div class="spec-item">
-                                <div class="spec-icon">
-                                    <i class="fas fa-bed"></i>
-                                </div>
-                                <div class="spec-content">
-                                    <span class="spec-title">Camas</span>
-                                    <span class="spec-value">@Model.QuantidadeCamas</span>
-                                </div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <div class="spec-content">
-                                    <span class="spec-title">Capacidade</span>
-                                    <span class="spec-value">Até @Model.QuantidadeCamas pessoas</span>
-                                </div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-icon">
-                                    <i class="fas fa-moon"></i>
-                                </div>
-                                <div class="spec-content">
-                                    <span class="spec-title">Mínimo</span>
-                                    <span class="spec-value">@Model.MinimoNoites noites</span>
-                                </div>
-                            </div>
-                            <div class="spec-item">
-                                <div class="spec-icon">
-                                    <i class="fas fa-ruler-combined"></i>
-                                </div>
-                                <div class="spec-content">
-                                    <span class="spec-title">Área</span>
-                                    <span class="spec-value">25m²</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Amenidades Premium -->
-                        @if (Model.AcomodacaoAmenidades != null && Model.AcomodacaoAmenidades.Any())
-                        {
-                            <div class="amenities-section">
-                                <h3 class="amenities-title">
-                                    <i class="fas fa-star me-2"></i>
-                                    Amenidades e Serviços
-                                </h3>
-                                <div class="amenities-grid">
-                                    @foreach (var amenidade in Model.AcomodacaoAmenidades)
-                                    {
-                                        <div class="amenity-item">
-                                            <div class="amenity-icon">
-                                                <i class="@(amenidade.Amenidade?.GetIconClass() ?? "fas fa-star")"></i>
-                                            </div>
-                                            <div class="amenity-content">
-                                                <span class="amenity-name">@amenidade.Amenidade?.Nome</span>
-                                                <span class="amenity-description">@(amenidade.Amenidade?.GetDescription() ?? "Amenidade disponível")</span>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        }
-                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Sidebar de Reserva Premium -->
-            <div class="col-lg-4">
-                <div class="reservation-card">
-                    <div class="price-display">
-                        <div class="price-main">
-                            <span class="price-value">@Model.Preco.ToString("C")</span>
-                            <span class="price-period">por noite</span>
-                        </div>
-                        <div class="price-savings">
-                            <i class="fas fa-tag me-1"></i>
-                            Melhor preço garantido
-                        </div>
+        <!-- Sidebar de Reserva -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h4 class="text-success mb-0">@Model.Preco.ToString("C")</h4>
+                        <small class="text-muted">por noite</small>
                     </div>
 
-                    <div class="reservation-status">
-                        <div class="status-item">
-                            <span class="status-label">Status:</span>
-                            <span class="badge status-badge @(Model.Status switch {
-                                GerenciadorHotel.Models.StatusAcomodacao.Disponivel => "status-available",
-                                GerenciadorHotel.Models.StatusAcomodacao.Ocupada => "status-occupied",
-                                GerenciadorHotel.Models.StatusAcomodacao.Manutencao => "status-maintenance",
-                                _ => "status-unavailable"
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Status:</span>
+                            <span class="badge @(Model.Status switch {
+                                GerenciadorHotel.Models.StatusAcomodacao.Disponivel => "bg-success",
+                                GerenciadorHotel.Models.StatusAcomodacao.Ocupada => "bg-danger",
+                                GerenciadorHotel.Models.StatusAcomodacao.Manutencao => "bg-warning text-dark",
+                                _ => "bg-secondary"
                             })">
-                                <i class="fas @(Model.Status switch {
-                                    GerenciadorHotel.Models.StatusAcomodacao.Disponivel => "fa-check-circle",
-                                    GerenciadorHotel.Models.StatusAcomodacao.Ocupada => "fa-times-circle",
-                                    GerenciadorHotel.Models.StatusAcomodacao.Manutencao => "fa-tools",
-                                    _ => "fa-exclamation-circle"
-                                }) me-1"></i>
                                 @(Model.Status == StatusAcomodacao.Disponivel ? "Disponível" : Model.Status.ToString())
                             </span>
                         </div>
                     </div>
 
-                    <div class="reservation-actions">
-                        @if (Model.Status == StatusAcomodacao.Disponivel)
-                        {
-                            <button type="button" class="btn btn-reserve" onclick="handleReservaClick(event, @Model.Id)">
-                                <i class="fas fa-calendar-check me-2"></i>
-                                Reservar Agora
-                            </button>
-                            <div class="reserve-note">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Confirmação instantânea
-                            </div>
-                        }
-                        else
-                        {
-                            <button class="btn btn-reserve btn-disabled" disabled>
-                                <i class="fas fa-times me-2"></i>
-                                Indisponível
-                            </button>
-                        }
-                    </div>
+                    @if (Model.Status == StatusAcomodacao.Disponivel)
+                    {
+                        <button type="button" class="btn btn-primary w-100 mb-3" onclick="handleReservaClick(event, @Model.Id)">
+                            <i class="fas fa-calendar-check me-2"></i>Reservar Agora
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary w-100 mb-3" disabled>
+                            <i class="fas fa-times me-2"></i>Indisponível
+                        </button>
+                    }
 
-                    <div class="additional-info">
-                        <div class="info-item">
-                            <i class="fas fa-shield-alt text-success me-2"></i>
-                            <span>Cancelamento grátis até 24h antes</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-clock text-primary me-2"></i>
-                            <span>Check-in: 14h | Check-out: 12h</span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-utensils text-warning me-2"></i>
-                            <span>Café da manhã incluído</span>
-                        </div>
-                    </div>
-
-                    <div class="navigation-actions">
-                        <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-arrow-left me-2"></i>
-                            Ver Outras Acomodações
+                    <div class="text-center">
+                        <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Ver Outras Acomodações
                         </a>
                     </div>
                 </div>

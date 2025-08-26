@@ -54,7 +54,10 @@ namespace GerenciadorHotel.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<int>("QuantidadeCamas")
+                    b.Property<int>("QuantidadeCamasCasal")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantidadeCamasSolteiro")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
