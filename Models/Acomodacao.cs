@@ -65,6 +65,16 @@ namespace GerenciadorHotel.Models
         [Display(Name = "Data de Atualização")]
         public DateTime? DataAtualizacao { get; set; }
 
+    [Required]
+    [Display(Name = "Horário de Check-in")]
+    [DataType(DataType.Time)]
+    public TimeSpan HoraCheckIn { get; set; } = new TimeSpan(14, 0, 0);
+
+    [Required]
+    [Display(Name = "Horário de Check-out")]
+    [DataType(DataType.Time)]
+    public TimeSpan HoraCheckOut { get; set; } = new TimeSpan(12, 0, 0);
+
         
         [Range(1, 20, ErrorMessage = "A quantidade máxima de hóspedes deve ser entre 1 e 20")]
         [Display(Name = "Quantidade Máxima de Hóspedes")]

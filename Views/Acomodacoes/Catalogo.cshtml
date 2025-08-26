@@ -16,6 +16,17 @@
                     <ul class="list-unstyled">
                         <li><strong>Preço:</strong> @acomodacao.Preco.ToString("C")</li>
                         <li><strong>Capacidade:</strong> @acomodacao.QuantidadeMaximaHospedes hóspede@(acomodacao.QuantidadeMaximaHospedes > 1 ? "s" : "")</li>
+                        <hr class="my-2" />
+                        <li class="d-flex justify-content-between">
+                            <div>
+                                <span class="text-muted">Check-in</span><br />
+                                <span class="fw-bold">@acomodacao.HoraCheckIn.ToString(@"hh\\:mm")</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-muted">Check-out</span><br />
+                                <span class="fw-bold">@acomodacao.HoraCheckOut.ToString(@"hh\\:mm")</span>
+                            </div>
+                        </li>
                         <li>
                             <strong>Camas:</strong>
                             @if (acomodacao.QuantidadeCamasSolteiro > 0)

@@ -90,6 +90,24 @@
                         <span asp-validation-for="MinimoNoites" class="text-danger"></span>
                     </div>
 
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="HoraCheckIn" class="form-control" type="time" />
+                                <label asp-for="HoraCheckIn"></label>
+                                <span asp-validation-for="HoraCheckIn" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="HoraCheckOut" class="form-control" type="time" />
+                                <label asp-for="HoraCheckOut"></label>
+                                <span asp-validation-for="HoraCheckOut" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Fotos da Acomodação (mínimo 1, máximo 10)</label>
                         <input type="file" name="Imagens" id="Imagens" class="form-control" accept="image/*" multiple
