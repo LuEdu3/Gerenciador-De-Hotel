@@ -21,11 +21,32 @@ if (int.TryParse(portEnv, out var port))
 // Monta a connection string a partir das variáveis do Railway, se existirem
 string BuildConnectionString()
 {
-    var host = Environment.GetEnvironmentVariable("mysql.railway.internal");
-    var db = Environment.GetEnvironmentVariable("railway");
-    var user = Environment.GetEnvironmentVariable("root");
-    var pwd = Environment.GetEnvironmentVariable("zxdGCGxLDnGKJFkiereMhzuENaKyFrxn");
-    var portVar = Environment.GetEnvironmentVariable("3306");
+    // Primeiro tenta usar a MYSQL_URL do Railway (mais direto)
+    var mysqlUrl = Environment.GetEnvironmentVariable("MYSQL_URL");
+    if (!string.IsNullOrWhiteSpace(mysqlUrl))
+    {
+        // Railway fornece: mysql://user:password@host:port/database
+        // Converte para format MySQL .NET: Server=host;Port=port;Database=db;Uid=user;Pwd=pwd;SslMode=Preferred;
+        try
+        {
+            var uri = new Uri(mysqlUrl);
+            var hostName = uri.Host;
+            var portNumber = uri.Port > 0 ? uri.Port.ToString() : "3306";
+            var databaseName = uri.PathAndQuery.TrimStart('/');
+            var userName = uri.UserInfo.Split(':')[0];
+            var userPassword = uri.UserInfo.Split(':')[1];
+            
+            return $"Server={hostName};Port={portNumber};Database={databaseName};Uid={userName};Pwd={userPassword};SslMode=Preferred;";
+        }
+        catch { /* fallback para variáveis individuais */ }
+    }
+    
+    // Fallback: tenta variáveis individuais do Railway
+    var host = Environment.GetEnvironmentVariable("MYSQLHOST");
+    var db = Environment.GetEnvironmentVariable("MYSQLDATABASE");
+    var user = Environment.GetEnvironmentVariable("MYSQLUSER");
+    var pwd = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
+    var portVar = Environment.GetEnvironmentVariable("MYSQLPORT");
     if (!string.IsNullOrWhiteSpace(host) && !string.IsNullOrWhiteSpace(db) && !string.IsNullOrWhiteSpace(user) && !string.IsNullOrWhiteSpace(pwd))
     {
         var mysqlPort = string.IsNullOrWhiteSpace(portVar) ? "3306" : portVar;
