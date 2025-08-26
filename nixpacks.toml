@@ -1,8 +1,8 @@
 [build]
 cmds = [
   "dotnet restore GerenciadorHotel.csproj",
-  "dotnet publish GerenciadorHotel.csproj -c Release -o /app/publish"
+  "dotnet publish GerenciadorHotel.csproj --configuration Release --output /app/publish --no-restore"
 ]
 
-[deploy]
-startCommand = "dotnet /app/publish/GerenciadorHotel.dll"
+[start]
+cmd = "dotnet /app/publish/GerenciadorHotel.dll"
