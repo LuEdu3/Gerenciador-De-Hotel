@@ -56,6 +56,18 @@
             letter-spacing: 1px;
         }
         
+        .navbar-brand-modern .navbar-logo {
+            height: 45px;
+            max-width: 200px;
+            width: auto;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand-modern:hover .navbar-logo {
+            transform: scale(1.05);
+        }
+        
         .navbar-brand-modern span {
             color: var(--accent-color);
         }
@@ -259,6 +271,10 @@
             }
             .navbar-brand-modern {
                 font-size: 1.3rem;
+            }
+            .navbar-brand-modern .navbar-logo {
+                height: 35px;
+                max-width: 150px;
             }
             .hero-modern {
                 min-height: 400px;
