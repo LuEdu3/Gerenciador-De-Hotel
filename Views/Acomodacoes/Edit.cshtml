@@ -92,6 +92,24 @@
                         </div>
                     </div>
 
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="HoraCheckIn" class="form-control" type="time" />
+                                <label asp-for="HoraCheckIn"></label>
+                                <span asp-validation-for="HoraCheckIn" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="HoraCheckOut" class="form-control" type="time" />
+                                <label asp-for="HoraCheckOut"></label>
+                                <span asp-validation-for="HoraCheckOut" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-floating mb-3">
                         <input asp-for="ImagemPrincipalUrl" class="form-control"
                             placeholder="URL da Imagem Principal" />

@@ -98,6 +98,19 @@
                                 <span class="text-muted">@Model.DataAtualizacao.Value.ToString("dd/MM/yyyy HH:mm")</span>
                             </div>
                         }
+                        <hr />
+                        <div class="mb-3">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-sm-6">
+                                    <span class="text-muted">Horário de Check-in</span><br />
+                                    <span class="fw-bold">@Model.HoraCheckIn.ToString(@"hh\:mm")</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <span class="text-muted">Horário de Check-out</span><br />
+                                    <span class="fw-bold">@Model.HoraCheckOut.ToString(@"hh\:mm")</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

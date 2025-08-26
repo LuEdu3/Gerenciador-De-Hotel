@@ -103,7 +103,7 @@
 
 4. ✅ Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz 
 
-5. **Horário do check-in** - apenas data é exibida, não hora específica
+5. **Horário do check-in** - apenas data é exibida, não hora específica - Luiz
 
 6. Diminuir fonte da descrição
 
