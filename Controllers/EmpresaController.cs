@@ -189,5 +189,25 @@ namespace GerenciadorHotel.Controllers
                 }
             });
         }
+
+        // GET: Empresa/Sobre - Página pública sobre a empresa
+        [AllowAnonymous]
+        public async Task<IActionResult> Sobre()
+        {
+            var empresa = await _empresaService.GetEmpresaComDetalhesAsync();
+            
+            if (empresa == null)
+            {
+                return NotFound("Informações da empresa não encontradas.");
+            }
+
+            // Buscar fotos da galeria
+            var fotos = await _empresaService.GetFotosPorTipoAsync(TipoFotoEmpresa.Galeria);
+            
+            var viewModel = EmpresaViewModel.FromEmpresa(empresa);
+            ViewBag.FotosGaleria = fotos;
+            
+            return View(viewModel);
+        }
     }
 }
