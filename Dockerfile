@@ -17,7 +17,7 @@ RUN dotnet restore "GerenciadorHotel.csproj"
 COPY . .
 
 # Publica a aplicação
-RUN dotnet publish "GerenciadorHotel.csproj" -c ${BUILD_CONFIGURATION} -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "GerenciadorHotel.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
