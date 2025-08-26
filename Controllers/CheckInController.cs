@@ -34,6 +34,12 @@ namespace Gerenciador_De_Hotel.Controllers
             {
                 reserva.Status = StatusReserva.CheckInRealizado;
                 reserva.DataCheckInReal = DateTime.Now;
+                // Atualiza status da acomodação para Ocupada
+                var acomodacao = _context.Acomodacoes.FirstOrDefault(a => a.Id == reserva.AcomodacaoId);
+                if (acomodacao != null)
+                {
+                    acomodacao.Status = StatusAcomodacao.Ocupada;
+                }
                 _context.SaveChanges();
             }
             return RedirectToAction("Index");
