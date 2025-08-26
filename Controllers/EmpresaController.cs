@@ -85,6 +85,21 @@ namespace GerenciadorHotel.Controllers
                 return View(viewModel);
             }
 
+            // Verificar se o ID da empresa é válido
+            if (viewModel.Id <= 0)
+            {
+                TempData["Error"] = "ID da empresa inválido. Tente novamente.";
+                return View(viewModel);
+            }
+
+            // Verificar se a empresa existe no banco
+            var empresaExiste = await _empresaService.VerificarEmpresaExisteAsync(viewModel.Id);
+            if (!empresaExiste)
+            {
+                TempData["Error"] = "Empresa não encontrada no banco de dados.";
+                return RedirectToAction(nameof(Create));
+            }
+
             var empresa = viewModel.ToEmpresa();
             var sucesso = await _empresaService.AtualizarEmpresaAsync(empresa);
 
@@ -94,7 +109,7 @@ namespace GerenciadorHotel.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            TempData["Error"] = "Erro ao atualizar empresa. Tente novamente.";
+            TempData["Error"] = "Erro ao atualizar empresa. Verifique os dados e tente novamente.";
             return View(viewModel);
         }
 
