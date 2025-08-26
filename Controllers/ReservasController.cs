@@ -150,7 +150,7 @@ namespace GerenciadorHotel.Controllers
             return View(reserva);
         }
         // GET: Reservas/MinhasReservas
-        [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
+    [Authorize(Roles = "Administrador,Hospede")]
         public async Task<IActionResult> MinhasReservas()
         {
             string? userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
