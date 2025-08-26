@@ -51,24 +51,10 @@
                                     <i class="bi bi-people me-1"></i>Usuários
                                 </a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button"
-                                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                    <i class="bi bi-gear-fill me-1"></i>
-                                    Mais Opções
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" ? "active" : "")" asp-controller="Empresa" asp-action="Index">
+                                    <i class="bi bi-building me-1"></i>Gerenciar Empresa
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" ? "active" : "")" asp-controller="Empresa" asp-action="Index">
-                                            <i class="bi bi-building me-2"></i>Gerenciar Empresa
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bi bi-stars me-2"></i>Gerenciar Amenidades
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
                             <!-- Botão Sair para Administrador -->
                             <li class="nav-item d-none d-lg-block">
