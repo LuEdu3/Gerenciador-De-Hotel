@@ -31,11 +31,6 @@ public class HomeController : Controller
             .Take(3)
             .ToList();
 
-        ViewBag.TiposAcomodacao = _context.Acomodacoes
-            .Select(a => a.Nome)
-            .Distinct()
-            .ToList();
-
         // Buscar dados da empresa para exibir na view
         var empresa = await _empresaService.GetEmpresaAtivaAsync();
         ViewBag.Empresa = empresa;
@@ -44,7 +39,7 @@ public class HomeController : Controller
     }
 
     [AllowAnonymous]
-    public IActionResult Acomodacao(string? TipoAcomodacao, string? FaixaPreco, string? Capacidade, int page = 1)
+    public IActionResult Acomodacao(string? NomeAcomodacao, string? FaixaPreco, string? Capacidade, int page = 1)
     {
         var query = _context.Acomodacoes
             .Where(a => a.Ativa && a.Status == StatusAcomodacao.Disponivel)
@@ -52,10 +47,10 @@ public class HomeController : Controller
             .AsQueryable();
 
         // Aplica filtros
-        if (!string.IsNullOrEmpty(TipoAcomodacao))
+        if (!string.IsNullOrEmpty(NomeAcomodacao))
         {
-            query = query.Where(a => a.Nome == TipoAcomodacao);
-            ViewBag.FiltroTipo = TipoAcomodacao;
+            query = query.Where(a => a.Nome.Contains(NomeAcomodacao));
+            ViewBag.FiltroNome = NomeAcomodacao;
         }
 
         if (!string.IsNullOrEmpty(FaixaPreco))
@@ -70,12 +65,12 @@ public class HomeController : Controller
             if (Capacidade.Contains("-"))
             {
                 var capacidades = Capacidade.Split('-').Select(int.Parse).ToList();
-                query = query.Where(a => (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) >= capacidades[0] && (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) <= capacidades[1]);
+                query = query.Where(a => a.QuantidadeMaximaHospedes >= capacidades[0] && a.QuantidadeMaximaHospedes <= capacidades[1]);
             }
             else
             {
                 var capacidade = int.Parse(Capacidade);
-                query = query.Where(a => (a.QuantidadeCamasCasal + a.QuantidadeCamasSolteiro) >= capacidade);
+                query = query.Where(a => a.QuantidadeMaximaHospedes >= capacidade);
             }
             ViewBag.FiltroCapacidade = Capacidade;
         }
@@ -93,11 +88,6 @@ public class HomeController : Controller
 
         ViewBag.CurrentPage = page;
         ViewBag.TotalPages = totalPages;
-
-        ViewBag.TiposAcomodacao = _context.Acomodacoes
-            .Select(a => a.Nome)
-            .Distinct()
-            .ToList();
 
         return View(acomodacoes);
     }

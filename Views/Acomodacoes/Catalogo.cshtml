@@ -15,6 +15,7 @@
                     <p class="card-text">@acomodacao.Descricao</p>
                     <ul class="list-unstyled">
                         <li><strong>Preço:</strong> @acomodacao.Preco.ToString("C")</li>
+                        <li><strong>Capacidade:</strong> @acomodacao.QuantidadeMaximaHospedes hóspede@(acomodacao.QuantidadeMaximaHospedes > 1 ? "s" : "")</li>
                         <li>
                             <strong>Camas:</strong>
                             @if (acomodacao.QuantidadeCamasSolteiro > 0)
