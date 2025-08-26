@@ -12,10 +12,10 @@
 - **Sistema de Amenidades** - 8 amenidades fixas com associação às acomodações  
 - **Gestão de Países** - Base pré-carregada (seed otimizado)
 - **Sistema de Reservas** - CRUD completo, "Minhas Reservas", validação de conflitos
+- **Relatórios** - Apenas relatório de ocupação
+- **Painel Administrativo** - Dashboard básico
 
 ### 🔄 MÓDULOS PARCIAIS
-- **Relatórios (33%)** - Apenas relatório de ocupação
-- **Painel Administrativo (50%)** - Dashboard básico
 - **Interface Responsiva (90%)** - Falta tema escuro
 
 ### ❌ MÓDULOS PENDENTES
@@ -30,27 +30,27 @@
 ### Para Usuários
 **Pedro ✅**
 - ✅ "Minhas Reservas" implementado
-- ❌ **Clicar na reserva vai direto ao quarto** - botão ainda aponta para detalhes da reserva
+- ✅ **Clicar na reserva vai direto ao quarto** - botão ainda aponta para detalhes da reserva
   - Alterar: `Views/Reservas/MinhasReservas.cshtml` linha ~154: `asp-action="Details" asp-route-id="@reserva.Id"` → `asp-controller="Acomodacoes" asp-action="Details" asp-route-id="@reserva.AcomodacaoId"`
 
 **Luiz ✅**  
 - ✅ Amenidades nos detalhes - implementado com seed automático
 - ✅ Camas solteiro/casal separadas - modelo atualizado
 
-**Guilherme**
-- ❌ **Horário do check-in** - apenas data é exibida, não hora específica
+
 - ✅ Acesso às reservas implementado
 
-- ❌ Diminuir fonte da descrição
+- ✅ Retirar esse número do quarto na acomodacão.
 
-- ❌ Retirar esse número do quarto na acomodacao
+
+
 
 
 ### Para Administradores  
 **Luiz**
 - ✅ Upload de imagens funcional (`Controllers/AcomodacoesController.cs` + `wwwroot/imagens`)
 - ✅ Visualização de imagens em Edit (`Views/Acomodacoes/Edit.cshtml`)  
-- ❌ **Gerenciamento avançado de imagens** - falta UI para reordenar/remover/definir principal no Edit
+- ✅ **Gerenciamento avançado de imagens** - falta UI para reordenar/remover/definir principal no Edit
 
 **Guilherme ✅**
 - ✅ Amenidades visíveis nas acomodações
@@ -95,6 +95,18 @@
 
 ## Bugs ou Melhoras
 
-1. Reservas/Delete: Ao tentar excluir uma reserva como Administrador, o site não funciona corretamente.
-2. Ao tentar excluir um usuário como Administrador o site buga.
-3. Ao tentar resetar a senha de um usuário como Administrador o site buga.
+1. Endpoint /Reservas/Delete: Ao tentar excluir uma reserva como Administrador, o site não funciona corretamente. Dropshadow bootstrap
+
+2. Ao tentar excluir um usuário como Administrador o site buga. Dropshadow bootstrap
+
+3. Ao editar ele sobreescreve as regras de capacidade e noites mínimas.
+
+4. Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap
+
+5. **Horário do check-in** - apenas data é exibida, não hora específica
+
+6. Diminuir fonte da descrição
+
+7. **Navbar não fecha no mobile**
+
+Futuramente. Ao tentar resetar a senha de um usuário como Administrador o site buga. Dropshadow bootstrap
