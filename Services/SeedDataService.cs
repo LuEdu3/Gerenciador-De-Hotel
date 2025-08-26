@@ -339,6 +339,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
                         QuantidadeCamasCasal = 1,
                         QuantidadeCamasSolteiro = 0,
+                        QuantidadeMaximaHospedes = 3,
                         Preco = 280.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -352,6 +353,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
                         QuantidadeCamasCasal = 0,
                         QuantidadeCamasSolteiro = 2,
+                        QuantidadeMaximaHospedes = 2,
                         Preco = 180.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -365,6 +367,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
                         QuantidadeCamasCasal = 1,
                         QuantidadeCamasSolteiro = 0,
+                        QuantidadeMaximaHospedes = 3,
                         Preco = 350.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -378,6 +381,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
                         QuantidadeCamasCasal = 2,
                         QuantidadeCamasSolteiro = 2,
+                        QuantidadeMaximaHospedes = 5,
                         Preco = 450.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -391,6 +395,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
                         QuantidadeCamasCasal = 1,
                         QuantidadeCamasSolteiro = 0,
+                        QuantidadeMaximaHospedes = 3,
                         Preco = 220.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -404,6 +409,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
                         QuantidadeCamasCasal = 0,
                         QuantidadeCamasSolteiro = 2,
+                        QuantidadeMaximaHospedes = 4,
                         Preco = 80.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -437,6 +443,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
                         QuantidadeCamasCasal = 1,
                         QuantidadeCamasSolteiro = 0,
+                        QuantidadeMaximaHospedes = 3,
                         Preco = 280.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -450,6 +457,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
                         QuantidadeCamasCasal = 0,
                         QuantidadeCamasSolteiro = 2,
+                        QuantidadeMaximaHospedes = 2,
                         Preco = 180.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -463,6 +471,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
                         QuantidadeCamasCasal = 1,
                         QuantidadeCamasSolteiro = 0,
+                        QuantidadeMaximaHospedes = 3,
                         Preco = 350.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -476,6 +485,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
                         QuantidadeCamasCasal = 2,
                         QuantidadeCamasSolteiro = 2,
+                        QuantidadeMaximaHospedes = 5,
                         Preco = 450.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
@@ -489,6 +499,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
                         QuantidadeCamasCasal = 1,
                         QuantidadeCamasSolteiro = 0,
+                        QuantidadeMaximaHospedes = 3,
                         Preco = 220.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -502,6 +513,7 @@ namespace GerenciadorHotel.Services
                         Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
                         QuantidadeCamasCasal = 0,
                         QuantidadeCamasSolteiro = 2,
+                        QuantidadeMaximaHospedes = 4,
                         Preco = 80.00m,
                         MinimoNoites = 1,
                         Status = StatusAcomodacao.Disponivel,
@@ -574,6 +586,7 @@ namespace GerenciadorHotel.Services
                     Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
                     QuantidadeCamasCasal = 1,
                     QuantidadeCamasSolteiro = 0,
+                    QuantidadeMaximaHospedes = 3,
                     Preco = 280.00m,
                     MinimoNoites = 2,
                     Status = StatusAcomodacao.Disponivel,
@@ -587,6 +600,7 @@ namespace GerenciadorHotel.Services
                     Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
                     QuantidadeCamasCasal = 0,
                     QuantidadeCamasSolteiro = 2,
+                    QuantidadeMaximaHospedes = 2,
                     Preco = 180.00m,
                     MinimoNoites = 1,
                     Status = StatusAcomodacao.Disponivel,
@@ -600,6 +614,7 @@ namespace GerenciadorHotel.Services
                     Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
                     QuantidadeCamasCasal = 1,
                     QuantidadeCamasSolteiro = 0,
+                    QuantidadeMaximaHospedes = 3,
                     Preco = 350.00m,
                     MinimoNoites = 2,
                     Status = StatusAcomodacao.Disponivel,
@@ -613,6 +628,7 @@ namespace GerenciadorHotel.Services
                     Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
                     QuantidadeCamasCasal = 2,
                     QuantidadeCamasSolteiro = 2,
+                    QuantidadeMaximaHospedes = 5,
                     Preco = 450.00m,
                     MinimoNoites = 2,
                     Status = StatusAcomodacao.Disponivel,
@@ -626,6 +642,7 @@ namespace GerenciadorHotel.Services
                     Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
                     QuantidadeCamasCasal = 1,
                     QuantidadeCamasSolteiro = 0,
+                    QuantidadeMaximaHospedes = 3,
                     Preco = 220.00m,
                     MinimoNoites = 1,
                     Status = StatusAcomodacao.Disponivel,
@@ -639,6 +656,7 @@ namespace GerenciadorHotel.Services
                     Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
                     QuantidadeCamasCasal = 0,
                     QuantidadeCamasSolteiro = 2,
+                    QuantidadeMaximaHospedes = 4,
                     Preco = 80.00m,
                     MinimoNoites = 1,
                     Status = StatusAcomodacao.Disponivel,
@@ -652,6 +670,68 @@ namespace GerenciadorHotel.Services
             await context.SaveChangesAsync();
 
             Console.WriteLine($"✅ {acomodacoes.Count} acomodações da Quinta do Ypuã criadas com sucesso!");
+        }
+
+        public static async Task AtualizarQuantidadeMaximaHospedes(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await AtualizarQuantidadeMaximaHospedesPrivate(context);
+        }
+
+        private static async Task AtualizarQuantidadeMaximaHospedesPrivate(ApplicationDbContext context)
+        {
+            Console.WriteLine("🔄 Atualizando quantidade máxima de hóspedes das acomodações existentes...");
+            
+            var acomodacoes = await context.Acomodacoes.ToListAsync();
+            
+            if (acomodacoes.Any())
+            {
+                foreach (var acomodacao in acomodacoes)
+                {
+                    switch (acomodacao.Nome)
+                    {
+                        case "Domo":
+                            acomodacao.QuantidadeMaximaHospedes = 3;
+                            break;
+                        case "Charrua (Bus)":
+                            acomodacao.QuantidadeMaximaHospedes = 2;
+                            break;
+                        case "Suíte com Cozinha":
+                            acomodacao.QuantidadeMaximaHospedes = 3;
+                            break;
+                        case "Chalé Família":
+                            acomodacao.QuantidadeMaximaHospedes = 5;
+                            break;
+                        case "Cabana":
+                            acomodacao.QuantidadeMaximaHospedes = 3;
+                            break;
+                        case "Estacionamento para Overlanders":
+                            acomodacao.QuantidadeMaximaHospedes = 4;
+                            break;
+                        default:
+                            // Para outras acomodações, calcular baseado nas camas
+                            acomodacao.QuantidadeMaximaHospedes = (acomodacao.QuantidadeCamasCasal * 2) + acomodacao.QuantidadeCamasSolteiro;
+                            if (acomodacao.QuantidadeMaximaHospedes == 0)
+                                acomodacao.QuantidadeMaximaHospedes = 1; // Mínimo 1 hóspede
+                            break;
+                    }
+                    acomodacao.DataAtualizacao = DateTime.Now;
+                }
+
+                await context.SaveChangesAsync();
+                Console.WriteLine($"✅ {acomodacoes.Count} acomodações atualizadas com quantidade máxima de hóspedes!");
+                
+                // Mostrar detalhes das atualizações
+                foreach (var acomodacao in acomodacoes)
+                {
+                    Console.WriteLine($"   - {acomodacao.Nome}: {acomodacao.QuantidadeMaximaHospedes} hóspedes");
+                }
+            }
+            else
+            {
+                Console.WriteLine("⚠️ Nenhuma acomodação encontrada para atualizar.");
+            }
         }
 
         public static async Task CriarImagensAcomodacoes(ApplicationDbContext context)

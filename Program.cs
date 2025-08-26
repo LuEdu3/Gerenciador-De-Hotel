@@ -49,6 +49,7 @@ using (var scope = app.Services.CreateScope())
         await SeedDataService.SeedAmenidades(services);
         await SeedDataService.SeedEmpresaBase(services);
         await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
+        await SeedDataService.AtualizarQuantidadeMaximaHospedes(services);
         await SeedDataService.CriarImagensAcomodacoes(services.GetRequiredService<ApplicationDbContext>());
     }
     catch (Exception ex)
