@@ -56,12 +56,14 @@
 - ✅ Amenidades visíveis nas acomodações
 
 **Iolanda**
-- ❌ Capacidade de pessoas em cada quarto.
---- 
+- ✅ Capacidade de pessoas em cada quarto.
 
-- ❌ Quantidades de hospedes que suporta ao editar
+- ✅ Quantidades de hospedes que suporta ao editar
 
-- ❌ Mostrar ao editar a quantidade mínimas de noites - Luiz
+- ✅ Retirar esse número do quarto na acomodacao
+
+- ✅ Mostrar ao editar a quantidade mínimas de noites
+
 ---
 
 ## Lembretes

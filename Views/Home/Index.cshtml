@@ -152,16 +152,35 @@
                             <h3 class="room-title">@acomodacao.Nome</h3>
                             <div class="room-price">R$ @acomodacao.Preco.ToString("N2") <small>/noite</small></div>
                             <div class="room-features">
-                                @if (acomodacao.QuantidadeCamasSolteiro > 0)
-                                {
-                                    <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamasSolteiro cama(s) de solteiro</span>
-                                }
-                                @if (acomodacao.QuantidadeCamasCasal > 0)
-                                {
-                                    <span><i class="fas fa-bed"></i> @acomodacao.QuantidadeCamasCasal cama(s) de casal</span>
-                                }
-                                <span><i class="fas fa-moon"></i> Min. @acomodacao.MinimoNoites Noites</span>
-                                <span><i class="fas fa-ruler-combined"></i> Quarto @acomodacao.Id</span>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <div>
+                                        @if (acomodacao.QuantidadeCamasSolteiro > 0)
+                                        {
+                                            <span>@acomodacao.QuantidadeCamasSolteiro cama(s) de solteiro</span>
+                                        }
+                                        @if (acomodacao.QuantidadeCamasCasal > 0)
+                                        {
+                                            <span>@acomodacao.QuantidadeCamasCasal cama(s) de casal</span>
+                                        }
+                                    </div>
+                                    <div>
+                                        <span>Min. @acomodacao.MinimoNoites noite@(acomodacao.MinimoNoites > 1 ? "s" : "")</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <!-- Número do quarto removido -->
+                                    </div>
+                                    <div>
+                                        <span>
+                                            @(
+                                                acomodacao.QuantidadeMaximaHospedes == 0
+                                                    ? "Acomoda: hóspedes ilimitados"
+                                                    : $"Acomoda: {acomodacao.QuantidadeMaximaHospedes} hóspede{(acomodacao.QuantidadeMaximaHospedes > 1 ? "s" : "")}"
+                                            )
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                             <p>@acomodacao.Descricao</p>
                             <div class="d-flex justify-content-between align-items-center">

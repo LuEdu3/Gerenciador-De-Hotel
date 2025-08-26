@@ -44,6 +44,9 @@
                         </div>
 
                         <div class="mb-3">
+                                <strong><i class="bi bi-people"></i> Máximo de Hóspedes:</strong>
+                                <span class="badge bg-primary fs-6">@Model.QuantidadeMaximaHospedes hóspede@(Model.QuantidadeMaximaHospedes > 1 ? "s" : "")</span>
+                            </div>
                             <strong>Preço por Noite:</strong>
                             <span class="fs-4 text-success">@Model.Preco.ToString("C")</span>
                         </div>

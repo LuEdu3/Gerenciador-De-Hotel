@@ -25,16 +25,17 @@
 		<div class="table-responsive">
 			<table class="table table-hover align-middle">
 				<thead class="table-dark">
-					<tr>
-						<th>Imagem</th>
-						<th>Nome</th>
-						<th>Descrição</th>
+                    <tr>
+                        <th>Imagem</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
                         <th>Camas de Solteiro</th>
                         <th>Camas de Casal</th>
-						<th>Preço</th>
-						<th>Status</th>
-						<th>Ações</th>
-					</tr>
+                        <th>Limite de Hóspedes</th>
+                        <th>Preço</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
 				</thead>
 				<tbody>
 					@foreach (var item in Model)
@@ -57,6 +58,16 @@
                             </td>
                             <td>
                                 <span class="badge bg-primary">@item.QuantidadeCamasCasal</span>
+                            </td>
+                            <td>
+                                @if (item.QuantidadeMaximaHospedes > 0)
+                                {
+                                    <span class="badge bg-info">@item.QuantidadeMaximaHospedes hóspede@(item.QuantidadeMaximaHospedes > 1 ? "s" : "")</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Sem limite</span>
+                                }
                             </td>
 							<td>@item.Preco.ToString("C")</td>
 							<td>
@@ -210,13 +221,22 @@
                                     <i class="bi bi-bed text-muted"></i><br>
                                     <small>@item.QuantidadeCamasCasal cama(s) de casal</small>
                                 </div>
-                                <div class="col-4">
-                                    <i class="bi bi-currency-dollar text-muted"></i><br>
-                                    <small><strong>@item.Preco.ToString("C")</strong></small>
-                                </div>
-                                <div class="col-4">
+                            </div>
+                            <div class="row text-center mt-2">
+                                <div class="col-6">
                                     <i class="bi bi-calendar-range text-muted"></i><br>
                                     <small>Min. @item.MinimoNoites noite(s)</small>
+                                </div>
+                                <div class="col-6">
+                                    <i class="bi bi-person-bounding-box text-muted"></i><br>
+                                    @if (item.QuantidadeMaximaHospedes > 0)
+                                    {
+                                        <small>Limite: @item.QuantidadeMaximaHospedes hóspede@(item.QuantidadeMaximaHospedes > 1 ? "s" : "")</small>
+                                    }
+                                    else
+                                    {
+                                        <small>Sem limite de hóspedes</small>
+                                    }
                                 </div>
                             </div>
                         </div>

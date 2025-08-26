@@ -65,6 +65,10 @@ namespace GerenciadorHotel.Models
         [Display(Name = "Data de Atualização")]
         public DateTime? DataAtualizacao { get; set; }
 
+        
+        [Range(1, 20, ErrorMessage = "A quantidade máxima de hóspedes deve ser entre 1 e 20")]
+        [Display(Name = "Quantidade Máxima de Hóspedes")]
+        public int QuantidadeMaximaHospedes { get; set; } = 1;
         // Relacionamentos
         public virtual ICollection<AcomodacaoAmenidade> AcomodacaoAmenidades { get; set; } = new List<AcomodacaoAmenidade>();
         public virtual ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();

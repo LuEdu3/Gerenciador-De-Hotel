@@ -81,6 +81,7 @@ namespace GerenciadorHotel.Controllers
             var acomodacoes = _context.Acomodacoes.Where(a => a.Ativa).ToList();
             ViewBag.AcomodacaoId = new SelectList(acomodacoes, "Id", "Nome", id);
             ViewBag.PaisId = new SelectList(_context.Paises, "Id", "Nome");
+                ViewBag.Acomodacoes = acomodacoes;
 
             var reserva = new Reserva();
             if (id.HasValue)
@@ -95,52 +96,58 @@ namespace GerenciadorHotel.Controllers
         [Authorize(Roles = "Administrador,Recepcionista,Hospede")]
         public async Task<IActionResult> Create([Bind("NomeHospede,SobrenomeHospede,Email,Telefone,DataCheckIn,DataCheckOut,NumeroHospedes,PedidosEspeciais,AcomodacaoId,PaisId")] Reserva reserva)
         {
+            // Validação do limite de hóspedes
+            var acomodacaoLimite = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+            if (acomodacaoLimite != null && acomodacaoLimite.QuantidadeMaximaHospedes > 0 && reserva.NumeroHospedes > acomodacaoLimite.QuantidadeMaximaHospedes)
+            {
+                ModelState.AddModelError("NumeroHospedes", $"A acomodação selecionada suporta no máximo {acomodacaoLimite.QuantidadeMaximaHospedes} hóspedes.");
+            }
+
+            // Validar datas
+            if (reserva.DataCheckIn >= reserva.DataCheckOut)
+            {
+                ModelState.AddModelError("DataCheckOut", "A data de check-out deve ser posterior à data de check-in.");
+            }
+            else if (reserva.DataCheckIn < DateTime.Today)
+            {
+                ModelState.AddModelError("DataCheckIn", "A data de check-in não pode ser anterior à data atual.");
+            }
+
+            // Só prossegue se não houver erros
             if (ModelState.IsValid)
             {
-                // Validar datas
-                if (reserva.DataCheckIn >= reserva.DataCheckOut)
+                // Verificar conflitos de reserva sobreposta
+                var conflito = await _context.Reservas
+                    .Where(r => r.AcomodacaoId == reserva.AcomodacaoId && r.Status != StatusReserva.Cancelada)
+                    .Where(r =>
+                        (reserva.DataCheckIn < r.DataCheckOut && reserva.DataCheckOut > r.DataCheckIn)
+                    )
+                    .AnyAsync();
+                if (conflito)
                 {
-                    ModelState.AddModelError("DataCheckOut", "A data de check-out deve ser posterior à data de check-in.");
-                }
-                else if (reserva.DataCheckIn < DateTime.Today)
-                {
-                    ModelState.AddModelError("DataCheckIn", "A data de check-in não pode ser anterior à data atual.");
+                    ModelState.AddModelError("AcomodacaoId", "Já existe uma reserva para este quarto no período selecionado. Escolha outra acomodação ou datas.");
                 }
                 else
                 {
-                    // Verificar conflitos de reserva sobreposta
-                    var conflito = await _context.Reservas
-                        .Where(r => r.AcomodacaoId == reserva.AcomodacaoId && r.Status != StatusReserva.Cancelada)
-                        .Where(r =>
-                            (reserva.DataCheckIn < r.DataCheckOut && reserva.DataCheckOut > r.DataCheckIn)
-                        )
-                        .AnyAsync();
-                    if (conflito)
+                    var acomodacao = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+                    if (acomodacao != null)
                     {
-                        ModelState.AddModelError("AcomodacaoId", "Já existe uma reserva para este quarto no período selecionado. Escolha outra acomodação ou datas.");
-                    }
-                    else
-                    {
-                        var acomodacao = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
-                        if (acomodacao != null)
+                        // Calcular valor total
+                        var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
+                        reserva.ValorTotal = acomodacao.Preco * quantidadeNoites;
+                        reserva.DataReserva = DateTime.Now;
+                        reserva.Status = StatusReserva.Pendente;
+                        // Associar ao usuário logado
+                        if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            // Calcular valor total
-                            var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
-                            reserva.ValorTotal = acomodacao.Preco * quantidadeNoites;
-                            reserva.DataReserva = DateTime.Now;
-                            reserva.Status = StatusReserva.Pendente;
-                            // Associar ao usuário logado
-                            if (User.Identity != null && User.Identity.IsAuthenticated)
-                            {
-                                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
-                                reserva.UserId = userId;
-                            }
-
-                            _context.Add(reserva);
-                            await _context.SaveChangesAsync();
-                            TempData["SuccessMessage"] = "Reserva criada com sucesso!";
-                            return RedirectToAction("MinhasReservas");
+                            var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                            reserva.UserId = userId;
                         }
+
+                        _context.Add(reserva);
+                        await _context.SaveChangesAsync();
+                        TempData["SuccessMessage"] = "Reserva criada com sucesso!";
+                        return RedirectToAction("MinhasReservas");
                     }
                 }
             }
