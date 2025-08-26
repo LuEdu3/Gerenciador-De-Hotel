@@ -451,19 +451,42 @@
                 }
             };
 
+            // Helpers para modal/backdrop
+            const cleanupBackdrops = () => {
+                const anyModalOpen = document.querySelectorAll('.modal.show').length > 0;
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                // Se mais de um backdrop existir, manter apenas o último (ativo)
+                if (backdrops.length > 1) {
+                    backdrops.forEach((bd, idx) => {
+                        if (idx < backdrops.length - 1) bd.remove();
+                    });
+                }
+                // Se nenhum modal estiver visível, remover todos os backdrops (órfãos)
+                if (!anyModalOpen && backdrops.length) {
+                    backdrops.forEach(bd => bd.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('overflow');
+                    document.body.style.removeProperty('paddingRight');
+                }
+            };
+
+            const getModal = (id) => bootstrap.Modal.getOrCreateInstance(document.getElementById(id));
+
             // Modal handling
             const modalHandling = {
                 showLoginModal() {
-                    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
-                    if (registerModal) registerModal.hide();
-                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    cleanupBackdrops();
+                    const registerModal = getModal('registerModal');
+                    registerModal.hide();
+                    const loginModal = getModal('loginModal');
                     loginModal.show();
                 },
 
                 showRegisterModal() {
-                    const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-                    if (loginModal) loginModal.hide();
-                    const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                    cleanupBackdrops();
+                    const loginModal = getModal('loginModal');
+                    loginModal.hide();
+                    const registerModal = getModal('registerModal');
                     registerModal.show();
                 }
             };
@@ -593,7 +616,29 @@
                     const formId = modalId.replace('Modal', '') + 'Form';
                     document.getElementById(formId).reset();
                     utils.clearFormErrors(formId);
+                    cleanupBackdrops();
                 });
+            });
+
+            // Garantir limpeza de backdrops em eventos globais
+            document.addEventListener('hidden.bs.modal', cleanupBackdrops);
+            document.addEventListener('shown.bs.modal', (ev) => {
+                const modalEl = ev.target;
+                // Se o modal explicitamente não usa backdrop, remova qualquer backdrop e libere o body
+                if (modalEl && modalEl.getAttribute && modalEl.getAttribute('data-bs-backdrop') === 'false') {
+                    document.querySelectorAll('.modal-backdrop').forEach(bd => bd.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('overflow');
+                    document.body.style.removeProperty('paddingRight');
+                    return;
+                }
+                // Caso geral: no máximo um backdrop
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                if (backdrops.length > 1) {
+                    backdrops.forEach((bd, idx) => {
+                        if (idx < backdrops.length - 1) bd.remove();
+                    });
+                }
             });
 
             // Reserva button handling
@@ -627,7 +672,6 @@
             window.redirectToPendingReserva = reservaHandling.redirectToPendingReserva.bind(reservaHandling);
             });
         </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         @await RenderSectionAsync("Scripts", required: false)
     </body>
 

@@ -101,7 +101,7 @@
 
 3. Ao editar ele sobreescreve as regras de capacidade e noites mínimas.
 
-4. Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz
+4. ✅ Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz 
 
 5. **Horário do check-in** - apenas data é exibida, não hora específica
 
