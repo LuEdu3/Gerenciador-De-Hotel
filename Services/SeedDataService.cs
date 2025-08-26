@@ -2,11 +2,29 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using GerenciadorHotel.Models;
 using GerenciadorHotel.Data;
+using System.Text.Json;
 
 namespace GerenciadorHotel.Services
 {
     public static class SeedDataService
     {
+        // DTO simples para backup/restauração
+        private class AcomodacaoBackupDto
+        {
+            public string Nome { get; set; } = string.Empty;
+            public string? Descricao { get; set; }
+            public int QuantidadeCamasCasal { get; set; }
+            public int QuantidadeCamasSolteiro { get; set; }
+            public int QuantidadeMaximaHospedes { get; set; }
+            public decimal Preco { get; set; }
+            public int MinimoNoites { get; set; }
+            public string? ImagemPrincipalUrl { get; set; }
+            public bool Ativa { get; set; } = true;
+            public string HoraCheckIn { get; set; } = "14:00";
+            public string HoraCheckOut { get; set; } = "10:00";
+            public List<string> Amenidades { get; set; } = new();
+        }
+
         public static async Task SeedEmpresaBase(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
@@ -105,6 +123,13 @@ namespace GerenciadorHotel.Services
             await SeedAcomodacoes(context);
         }
 
+        public static async Task ImportarAcomodacoesDeBackup(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            await ImportarAcomodacoesDeBackupPrivate(context);
+        }
+
         public static async Task LimparEInserirAcomodacoesQuintaYpua(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
@@ -124,6 +149,20 @@ namespace GerenciadorHotel.Services
             using var scope = serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
             await SeedAmenidadesPrivate(context);
+        }
+
+        public static async Task SeedAcomodacaoAmenidades(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await SeedAcomodacaoAmenidadesPrivate(context);
+        }
+
+        public static async Task GarantirImagemPrincipalAcomodacoes(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await GarantirImagemPrincipalAcomodacoesPrivate(context);
         }
 
         private static async Task SeedAmenidadesPrivate(ApplicationDbContext context)
@@ -210,6 +249,224 @@ namespace GerenciadorHotel.Services
             }
         }
 
+        private static async Task SeedAcomodacaoAmenidadesPrivate(ApplicationDbContext context)
+        {
+            // Não remove nada. Apenas garante associações básicas para acomodações conhecidas.
+            if (!context.Acomodacoes.Any() || !context.Amenidades.Any())
+            {
+                return; // Sem dados para associar
+            }
+
+            // Mapa de amenidades por nome da acomodação
+            var mapa = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Domo"] = new[] { "Wi-Fi", "Ar-condicionado", "TV", "Ducha" },
+                ["Charrua (Bus)"] = new[] { "Wi-Fi", "Ducha" },
+                ["Suíte com Cozinha"] = new[] { "Wi-Fi", "Ar-condicionado", "TV", "Cozinha", "Ducha", "Toalha" },
+                ["Chalé Família"] = new[] { "Wi-Fi", "Ar-condicionado", "TV", "Ducha", "Toalha" },
+                ["Cabana"] = new[] { "Wi-Fi", "Ducha", "Toalha" },
+                ["Estacionamento para Overlanders"] = new[] { "Ducha" }
+            };
+
+            var amenidades = await context.Amenidades.Where(a => a.Ativa).ToListAsync();
+            var acomodacoes = await context.Acomodacoes.ToListAsync();
+
+            int novos = 0;
+            foreach (var a in acomodacoes)
+            {
+                if (!mapa.TryGetValue(a.Nome, out var nomesAmens))
+                    continue; // só cuidamos das padrão
+
+                var idsDesejados = amenidades
+                    .Where(am => nomesAmens.Contains(am.Nome, StringComparer.OrdinalIgnoreCase))
+                    .Select(am => am.Id)
+                    .ToHashSet();
+
+                if (!idsDesejados.Any()) continue;
+
+                var existentes = await context.AcomodacaoAmenidades
+                    .Where(aa => aa.AcomodacaoId == a.Id)
+                    .Select(aa => aa.AmenidadeId)
+                    .ToListAsync();
+
+                foreach (var amenId in idsDesejados)
+                {
+                    if (!existentes.Contains(amenId))
+                    {
+                        await context.AcomodacaoAmenidades.AddAsync(new AcomodacaoAmenidade
+                        {
+                            AcomodacaoId = a.Id,
+                            AmenidadeId = amenId,
+                            DataAssociacao = DateTime.Now
+                        });
+                        novos++;
+                    }
+                }
+            }
+
+            if (novos > 0)
+            {
+                await context.SaveChangesAsync();
+                Console.WriteLine($"🔗 {novos} associações Acomodacao-Amenidade criadas.");
+            }
+            else
+            {
+                Console.WriteLine("ℹ️ Associações Acomodacao-Amenidade já estão configuradas. Nenhuma criada.");
+            }
+        }
+
+        private static async Task ImportarAcomodacoesDeBackupPrivate(ApplicationDbContext context)
+        {
+            try
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Script", "backup_acomodacoes.json");
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine("ℹ️ Nenhum backup de acomodações encontrado em Script/backup_acomodacoes.json.");
+                    return;
+                }
+
+                var json = await File.ReadAllTextAsync(path);
+                var dados = JsonSerializer.Deserialize<List<AcomodacaoBackupDto>>(json) ?? new List<AcomodacaoBackupDto>();
+                if (!dados.Any())
+                {
+                    Console.WriteLine("ℹ️ Arquivo de backup vazio. Nada a importar.");
+                    return;
+                }
+
+                var amenidades = await context.Amenidades.ToListAsync();
+                int criadas = 0, atualizadas = 0, assocNovas = 0;
+
+                foreach (var dto in dados)
+                {
+                    var existente = await context.Acomodacoes.FirstOrDefaultAsync(a => a.Nome == dto.Nome);
+                    TimeSpan TryParseHora(string s, TimeSpan def)
+                        => TimeSpan.TryParse(s, out var ts) ? ts : def;
+
+                    if (existente == null)
+                    {
+                        var nova = new Acomodacao
+                        {
+                            Nome = dto.Nome,
+                            Descricao = dto.Descricao,
+                            QuantidadeCamasCasal = dto.QuantidadeCamasCasal,
+                            QuantidadeCamasSolteiro = dto.QuantidadeCamasSolteiro,
+                            QuantidadeMaximaHospedes = dto.QuantidadeMaximaHospedes > 0 ? dto.QuantidadeMaximaHospedes : 1,
+                            Preco = dto.Preco,
+                            MinimoNoites = dto.MinimoNoites > 0 ? dto.MinimoNoites : 1,
+                            ImagemPrincipalUrl = string.IsNullOrWhiteSpace(dto.ImagemPrincipalUrl) ? null : dto.ImagemPrincipalUrl,
+                            Ativa = dto.Ativa,
+                            HoraCheckIn = TryParseHora(dto.HoraCheckIn ?? "14:00", new TimeSpan(14,0,0)),
+                            HoraCheckOut = TryParseHora(dto.HoraCheckOut ?? "10:00", new TimeSpan(10,0,0)),
+                            Status = StatusAcomodacao.Disponivel,
+                            DataCriacao = DateTime.Now
+                        };
+                        // Fallback de imagem para nomes conhecidos
+                        if (string.IsNullOrEmpty(nova.ImagemPrincipalUrl))
+                        {
+                            nova.ImagemPrincipalUrl = ObterImagemPadraoPorNome(nova.Nome);
+                        }
+                        await context.Acomodacoes.AddAsync(nova);
+                        await context.SaveChangesAsync();
+                        existente = nova;
+                        criadas++;
+                    }
+                    else
+                    {
+                        // Atualiza campos principais (sem mexer em imagens existentes aqui)
+                        existente.Descricao = dto.Descricao ?? existente.Descricao;
+                        existente.QuantidadeCamasCasal = dto.QuantidadeCamasCasal;
+                        existente.QuantidadeCamasSolteiro = dto.QuantidadeCamasSolteiro;
+                        existente.QuantidadeMaximaHospedes = dto.QuantidadeMaximaHospedes > 0 ? dto.QuantidadeMaximaHospedes : existente.QuantidadeMaximaHospedes;
+                        existente.Preco = dto.Preco;
+                        existente.MinimoNoites = dto.MinimoNoites > 0 ? dto.MinimoNoites : existente.MinimoNoites;
+                        existente.HoraCheckIn = TryParseHora(dto.HoraCheckIn ?? "14:00", existente.HoraCheckIn);
+                        existente.HoraCheckOut = TryParseHora(dto.HoraCheckOut ?? "10:00", existente.HoraCheckOut);
+                        // Se backup não traz imagem e a existente está vazia, aplicar fallback
+                        if (string.IsNullOrWhiteSpace(dto.ImagemPrincipalUrl) && string.IsNullOrWhiteSpace(existente.ImagemPrincipalUrl))
+                        {
+                            existente.ImagemPrincipalUrl = ObterImagemPadraoPorNome(existente.Nome) ?? existente.ImagemPrincipalUrl;
+                        }
+                        existente.DataAtualizacao = DateTime.Now;
+                        atualizadas++;
+                    }
+
+                    // Associa amenidades por nome
+                    var nomesAmens = dto.Amenidades?.Distinct(StringComparer.OrdinalIgnoreCase).ToArray() ?? Array.Empty<string>();
+                    if (nomesAmens.Length > 0)
+                    {
+                        var idsDesejados = amenidades
+                            .Where(am => nomesAmens.Contains(am.Nome, StringComparer.OrdinalIgnoreCase))
+                            .Select(am => am.Id)
+                            .ToHashSet();
+                        var existentes = await context.AcomodacaoAmenidades
+                            .Where(aa => aa.AcomodacaoId == existente.Id)
+                            .Select(aa => aa.AmenidadeId)
+                            .ToListAsync();
+                        foreach (var idAm in idsDesejados)
+                        {
+                            if (!existentes.Contains(idAm))
+                            {
+                                await context.AcomodacaoAmenidades.AddAsync(new AcomodacaoAmenidade
+                                {
+                                    AcomodacaoId = existente.Id,
+                                    AmenidadeId = idAm,
+                                    DataAssociacao = DateTime.Now
+                                });
+                                assocNovas++;
+                            }
+                        }
+                    }
+                }
+
+                await context.SaveChangesAsync();
+                Console.WriteLine($"📥 Importação de acomodações: {criadas} criadas, {atualizadas} atualizadas, {assocNovas} associações novas.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Falha ao importar backup de acomodações: {ex.Message}");
+            }
+        }
+
+        private static async Task GarantirImagemPrincipalAcomodacoesPrivate(ApplicationDbContext context)
+        {
+            var semImagem = await context.Acomodacoes
+                .Where(a => a.Ativa && (a.ImagemPrincipalUrl == null || a.ImagemPrincipalUrl == ""))
+                .ToListAsync();
+
+            int atualizadas = 0;
+            foreach (var a in semImagem)
+            {
+                var fallback = ObterImagemPadraoPorNome(a.Nome);
+                if (!string.IsNullOrEmpty(fallback))
+                {
+                    a.ImagemPrincipalUrl = fallback;
+                    a.DataAtualizacao = DateTime.Now;
+                    atualizadas++;
+                }
+            }
+
+            if (atualizadas > 0)
+            {
+                await context.SaveChangesAsync();
+                Console.WriteLine($"🖼️ Imagem principal preenchida para {atualizadas} acomodação(ões) sem foto.");
+            }
+        }
+
+        private static string? ObterImagemPadraoPorNome(string nome)
+        {
+            return nome switch
+            {
+                "Domo" => "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
+                "Charrua (Bus)" => "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg",
+                "Suíte com Cozinha" => "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg",
+                "Chalé Família" => "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg",
+                "Cabana" => "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg",
+                "Estacionamento para Overlanders" => "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg",
+                _ => null
+            };
+        }
+
         private static async Task ForcarAtualizacaoEmpresaBasePrivate(ApplicationDbContext context)
         {
             Console.WriteLine("🔄 Forçando atualização da empresa base...");
@@ -241,7 +498,7 @@ namespace GerenciadorHotel.Services
                 empresaAtual.Twitter = "https://exemplo.com";
                 empresaAtual.LinkedIn = "https://exemplo.com";
                 empresaAtual.HorarioCheckin = "14:00";
-                empresaAtual.HorarioCheckout = "12:00";
+                empresaAtual.HorarioCheckout = "10:00";
                 empresaAtual.DataAtualizacao = DateTime.Now;
                 
                 await context.SaveChangesAsync();
@@ -291,7 +548,7 @@ namespace GerenciadorHotel.Services
                     Twitter = "https://exemplo.com",
                     LinkedIn = "https://exemplo.com",
                     HorarioCheckin = "14:00",
-                    HorarioCheckout = "12:00",
+                    HorarioCheckout = "10:00",
                     Ativo = true,
                     DataCriacao = DateTime.Now
                 };
@@ -325,109 +582,115 @@ namespace GerenciadorHotel.Services
                 Console.WriteLine("🗑️ Acomodação 'Teste' removida.");
             }
 
-            // Verificar se as acomodações da Quinta do Ypuã já existem
-            var acomodacoesExistentes = new[] { "Domo", "Charrua (Bus)", "Suíte com Cozinha", "Chalé Família", "Cabana", "Estacionamento para Overlanders" };
-            var existeAlguma = context.Acomodacoes.Any(a => acomodacoesExistentes.Contains(a.Nome));
-
-            if (!existeAlguma)
+            // Definições padrão da Quinta do Ypuã
+            var padrao = new List<Acomodacao>
             {
-                var acomodacoes = new List<Acomodacao>
+                new()
                 {
-                    new()
-                    {
-                        Nome = "Domo",
-                        Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
-                        QuantidadeCamasCasal = 1,
-                        QuantidadeCamasSolteiro = 0,
-                        QuantidadeMaximaHospedes = 3,
-                        Preco = 280.00m,
-                        MinimoNoites = 2,
-                        Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
-                        Ativa = true,
-                        DataCriacao = DateTime.Now
-                    },
-                    new()
-                    {
-                        Nome = "Charrua (Bus)",
-                        Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
-                        QuantidadeCamasCasal = 0,
-                        QuantidadeCamasSolteiro = 2,
-                        QuantidadeMaximaHospedes = 2,
-                        Preco = 180.00m,
-                        MinimoNoites = 1,
-                        Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg",
-                        Ativa = true,
-                        DataCriacao = DateTime.Now
-                    },
-                    new()
-                    {
-                        Nome = "Suíte com Cozinha",
-                        Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
-                        QuantidadeCamasCasal = 1,
-                        QuantidadeCamasSolteiro = 0,
-                        QuantidadeMaximaHospedes = 3,
-                        Preco = 350.00m,
-                        MinimoNoites = 2,
-                        Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg",
-                        Ativa = true,
-                        DataCriacao = DateTime.Now
-                    },
-                    new()
-                    {
-                        Nome = "Chalé Família",
-                        Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
-                        QuantidadeCamasCasal = 2,
-                        QuantidadeCamasSolteiro = 2,
-                        QuantidadeMaximaHospedes = 5,
-                        Preco = 450.00m,
-                        MinimoNoites = 2,
-                        Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg",
-                        Ativa = true,
-                        DataCriacao = DateTime.Now
-                    },
-                    new()
-                    {
-                        Nome = "Cabana",
-                        Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
-                        QuantidadeCamasCasal = 1,
-                        QuantidadeCamasSolteiro = 0,
-                        QuantidadeMaximaHospedes = 3,
-                        Preco = 220.00m,
-                        MinimoNoites = 1,
-                        Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg",
-                        Ativa = true,
-                        DataCriacao = DateTime.Now
-                    },
-                    new()
-                    {
-                        Nome = "Estacionamento para Overlanders",
-                        Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
-                        QuantidadeCamasCasal = 0,
-                        QuantidadeCamasSolteiro = 2,
-                        QuantidadeMaximaHospedes = 4,
-                        Preco = 80.00m,
-                        MinimoNoites = 1,
-                        Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg",
-                        Ativa = true,
-                        DataCriacao = DateTime.Now
-                    }
-                };
+                    Nome = "Domo",
+                    Descricao = "Obs: Os valores exibidos no site estão sujeitos a constantes atualizações. Nos feriados e datas comemorativas o valor da diária também é diferenciado. Para mais detalhes entre em contato por telefone. O Domo é a grande novidade da pousada. Uma acomodação totalmente diferenciada construída nos padrões arquitetônicos dos domos geodésicos modernos. (Arraste a imagem de capa para o lado para ver mais fotos da acomodação)",
+                    QuantidadeCamasCasal = 1,
+                    QuantidadeCamasSolteiro = 0,
+                    QuantidadeMaximaHospedes = 3,
+                    Preco = 590.00m,
+                    MinimoNoites = 2,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Charrua (Bus)",
+                    Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
+                    QuantidadeCamasCasal = 0,
+                    QuantidadeCamasSolteiro = 2,
+                    QuantidadeMaximaHospedes = 2,
+                    Preco = 180.00m,
+                    MinimoNoites = 1,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Suíte com Cozinha",
+                    Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
+                    QuantidadeCamasCasal = 1,
+                    QuantidadeCamasSolteiro = 0,
+                    QuantidadeMaximaHospedes = 3,
+                    Preco = 350.00m,
+                    MinimoNoites = 2,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Chalé Família",
+                    Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
+                    QuantidadeCamasCasal = 2,
+                    QuantidadeCamasSolteiro = 2,
+                    QuantidadeMaximaHospedes = 5,
+                    Preco = 450.00m,
+                    MinimoNoites = 2,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Cabana",
+                    Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
+                    QuantidadeCamasCasal = 1,
+                    QuantidadeCamasSolteiro = 0,
+                    QuantidadeMaximaHospedes = 3,
+                    Preco = 220.00m,
+                    MinimoNoites = 1,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                },
+                new()
+                {
+                    Nome = "Estacionamento para Overlanders",
+                    Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
+                    QuantidadeCamasCasal = 0,
+                    QuantidadeCamasSolteiro = 2,
+                    QuantidadeMaximaHospedes = 4,
+                    Preco = 80.00m,
+                    MinimoNoites = 1,
+                    Status = StatusAcomodacao.Disponivel,
+                    ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg",
+                    Ativa = true,
+                    DataCriacao = DateTime.Now
+                }
+            };
 
-                await context.Acomodacoes.AddRangeAsync(acomodacoes);
-                Console.WriteLine($"✅ {acomodacoes.Count} acomodações da Quinta do Ypuã inseridas!");
+            int inseridas = 0;
+            foreach (var def in padrao)
+            {
+                var existe = context.Acomodacoes.Any(a => a.Nome == def.Nome);
+                if (!existe)
+                {
+                    await context.Acomodacoes.AddAsync(def);
+                    inseridas++;
+                }
+            }
+
+            if (inseridas > 0)
+            {
+                await context.SaveChangesAsync();
+                Console.WriteLine($"✅ {inseridas} acomodações padrão inseridas (faltantes).");
             }
             else
             {
-                Console.WriteLine("⚠️ Acomodações da Quinta do Ypuã já existem no banco.");
+                Console.WriteLine("ℹ️ Todas as acomodações padrão já existem.");
             }
-
-            await context.SaveChangesAsync();
         }
 
         private static async Task SeedAcomodacoes(ApplicationDbContext context)
@@ -440,26 +703,26 @@ namespace GerenciadorHotel.Services
                     new()
                     {
                         Nome = "Domo",
-                        Descricao = "Uma experiência única em formato geodésico com vista panorâmica da natureza. Ideal para casais que buscam algo diferenciado e intimista.",
+                        Descricao = "Obs: Os valores exibidos no site estão sujeitos a constantes atualizações. Nos feriados e datas comemorativas o valor da diária também é diferenciado. Para mais detalhes entre em contato por telefone. O Domo é a grande novidade da pousada. Uma acomodação totalmente diferenciada construída nos padrões arquitetônicos dos domos geodésicos modernos. (Arraste a imagem de capa para o lado para ver mais fotos da acomodação)",
                         QuantidadeCamasCasal = 1,
                         QuantidadeCamasSolteiro = 0,
                         QuantidadeMaximaHospedes = 3,
-                        Preco = 280.00m,
+                        Preco = 590.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_442829334f1b4dd1879b3231151437a3~mv2.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     },
                     new()
                     {
                         Nome = "Charrua (Bus)",
-                        Descricao = "Acomodação única em ônibus convertido, oferecendo uma experiência alternativa e sustentável. Perfeita para aventureiros.",
+                        Descricao = "Obs: Os valores exibidos no site estão sujeitos a constantes atualizações. Nos feriados e datas comemorativas o valor da diária também é diferenciado. Para mais detalhes entre em contato por telefone. O Domo é a grande novidade da pousada. Uma acomodação totalmente diferenciada construída nos padrões arquitetônicos dos domos geodésicos modernos. (Arraste a imagem de capa para o lado para ver mais fotos da acomodação)",
                         QuantidadeCamasCasal = 0,
-                        QuantidadeCamasSolteiro = 2,
+                        QuantidadeCamasSolteiro = 1,
                         QuantidadeMaximaHospedes = 2,
-                        Preco = 180.00m,
-                        MinimoNoites = 1,
+                        Preco = 490.00m,
+                        MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
                         ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_bus_example.jpg",
                         Ativa = true,
@@ -468,11 +731,11 @@ namespace GerenciadorHotel.Services
                     new()
                     {
                         Nome = "Suíte com Cozinha",
-                        Descricao = "Suíte completa com cozinha equipada, ideal para estadias mais longas. Oferece conforto e praticidade para famílias ou casais.",
+                        Descricao = "Obs: Os valores exibidos no site estão sujeitos a constantes atualizações. Nos feriados e datas comemorativas o valor da diária também é diferenciado. Para mais detalhes entre em contato por telefone. O Domo é a grande novidade da pousada. Uma acomodação totalmente diferenciada construída nos padrões arquitetônicos dos domos geodésicos modernos. (Arraste a imagem de capa para o lado para ver mais fotos da acomodação)",
                         QuantidadeCamasCasal = 1,
-                        QuantidadeCamasSolteiro = 0,
+                        QuantidadeCamasSolteiro = 1,
                         QuantidadeMaximaHospedes = 3,
-                        Preco = 350.00m,
+                        Preco = 390.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
                         ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_suite_example.jpg",
@@ -482,11 +745,11 @@ namespace GerenciadorHotel.Services
                     new()
                     {
                         Nome = "Chalé Família",
-                        Descricao = "Chalé espaçoso ideal para famílias, com múltiplas camas e área de convivência. Ambiente aconchegante em meio à natureza.",
+                        Descricao = "Obs: Os valores exibidos no site estão sujeitos a constantes atualizações. Nos feriados e datas comemorativas o valor da diária também é diferenciado. Para mais detalhes entre em contato por telefone. O Domo é a grande novidade da pousada. Uma acomodação totalmente diferenciada construída nos padrões arquitetônicos dos domos geodésicos modernos. (Arraste a imagem de capa para o lado para ver mais fotos da acomodação)",
                         QuantidadeCamasCasal = 2,
-                        QuantidadeCamasSolteiro = 2,
+                        QuantidadeCamasSolteiro = 1,
                         QuantidadeMaximaHospedes = 5,
-                        Preco = 450.00m,
+                        Preco = 590.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
                         ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_chale_example.jpg",
@@ -496,12 +759,12 @@ namespace GerenciadorHotel.Services
                     new()
                     {
                         Nome = "Cabana",
-                        Descricao = "Cabana rústica e aconchegante, perfeita para quem busca uma conexão mais próxima com a natureza. Ideal para casais.",
+                        Descricao = "Obs: Os valores exibidos no site estão sujeitos a constantes atualizações. Nos feriados e datas comemorativas o valor da diária também é diferenciado. Para mais detalhes entre em contato por telefone. O Domo é a grande novidade da pousada. Uma acomodação totalmente diferenciada construída nos padrões arquitetônicos dos domos geodésicos modernos. (Arraste a imagem de capa para o lado para ver mais fotos da acomodação)",
                         QuantidadeCamasCasal = 1,
-                        QuantidadeCamasSolteiro = 0,
+                        QuantidadeCamasSolteiro = 1,
                         QuantidadeMaximaHospedes = 3,
-                        Preco = 220.00m,
-                        MinimoNoites = 1,
+                        Preco = 490.00m,
+                        MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
                         ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_cabana_example.jpg",
                         Ativa = true,
@@ -510,12 +773,12 @@ namespace GerenciadorHotel.Services
                     new()
                     {
                         Nome = "Estacionamento para Overlanders",
-                        Descricao = "Área especial para veículos de viajantes overlanders, com infraestrutura básica e acesso a banheiros compartilhados.",
+                        Descricao = "Obs: Os valores exibidos no site estão sujeitos a constantes atualizações. Nos feriados e datas comemorativas o valor da diária também é diferenciado. Para mais detalhes entre em contato por telefone. O Domo é a grande novidade da pousada. Uma acomodação totalmente diferenciada construída nos padrões arquitetônicos dos domos geodésicos modernos. (Arraste a imagem de capa para o lado para ver mais fotos da acomodação)",
                         QuantidadeCamasCasal = 0,
-                        QuantidadeCamasSolteiro = 2,
+                        QuantidadeCamasSolteiro = 0,
                         QuantidadeMaximaHospedes = 4,
-                        Preco = 80.00m,
-                        MinimoNoites = 1,
+                        Preco = 100.00m,
+                        MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
                         ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_parking_example.jpg",
                         Ativa = true,

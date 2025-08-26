@@ -45,10 +45,16 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await SeedDataService.SeedRolesAndAdminUser(services);
-        await SeedDataService.SeedPaises(services);
-        await SeedDataService.SeedAmenidades(services);
-        await SeedDataService.SeedEmpresaBase(services);
-        await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
+    await SeedDataService.SeedPaises(services);
+    await SeedDataService.SeedAmenidades(services);
+    await SeedDataService.SeedEmpresaBase(services);
+    // Primeiro tenta restaurar de backup se existir (não sobrescreve dados existentes)
+    await SeedDataService.ImportarAcomodacoesDeBackup(services);
+    // Garante as acomodações padrão caso não existam
+    await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
+    await SeedDataService.SeedAcomodacaoAmenidades(services);
+    // Garante imagem principal para acomodações conhecidas sem foto
+    await SeedDataService.GarantirImagemPrincipalAcomodacoes(services);
         await SeedDataService.AtualizarQuantidadeMaximaHospedes(services);
         await SeedDataService.CriarImagensAcomodacoes(services.GetRequiredService<ApplicationDbContext>());
     }
