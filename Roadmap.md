@@ -95,13 +95,13 @@
 
 ## Bugs ou Melhoras
 
-1. Endpoint /Reservas/Delete: Ao tentar excluir uma reserva como Administrador, o site não funciona corretamente. Dropshadow bootstrap
+1. Endpoint /Reservas/Delete: Ao tentar excluir uma reserva como Administrador, o site não funciona corretamente. Dropshadow bootstrap - Luiz
 
-2. Ao tentar excluir um usuário como Administrador o site buga. Dropshadow bootstrap
+2. Ao tentar excluir um usuário como Administrador o site buga. Dropshadow bootstrap - Luiz
 
 3. Ao editar ele sobreescreve as regras de capacidade e noites mínimas.
 
-4. Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap
+4. Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz
 
 5. **Horário do check-in** - apenas data é exibida, não hora específica
 
