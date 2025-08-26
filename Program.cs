@@ -33,6 +33,9 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddControllersWithViews();
 
+// Registrar serviços personalizados
+builder.Services.AddScoped<IEmpresaService, EmpresaService>();
+
 var app = builder.Build();
 
 // Seed de dados inicial

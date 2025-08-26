@@ -127,9 +127,18 @@
             </div>
             <div class="col-lg-6">
                 <div class="about-content">
-                    <h2 class="section-title text-start">Sobre o Sereno Hotel</h2>
-                    <p class="lead">Um refúgio de luxo onde a elegância contemporânea encontra a hospitalidade tradicional.</p>
-                    <p>Fundado em 2005, o Sereno Hotel nasceu da paixão por oferecer experiências memoráveis de hospedagem. Localizado em uma área privilegiada, nosso hotel oferece não apenas acomodações de alto padrão, mas também um ambiente que convida ao relaxamento e reconexão.</p>
+                    @if (ViewBag.Empresa != null)
+                    {
+                        <h2 class="section-title text-start">Sobre @ViewBag.Empresa.Nome</h2>
+                        <p class="lead">@(ViewBag.Empresa.Slogan ?? "Um refúgio de luxo onde a elegância contemporânea encontra a hospitalidade tradicional.")</p>
+                        <p>@(ViewBag.Empresa.DescricaoSobre ?? "Fundado em 2005, o nosso hotel nasceu da paixão por oferecer experiências memoráveis de hospedagem. Localizado em uma área privilegiada, nosso hotel oferece não apenas acomodações de alto padrão, mas também um ambiente que convida ao relaxamento e reconexão.")</p>
+                    }
+                    else
+                    {
+                        <h2 class="section-title text-start">Sobre o Hotel</h2>
+                        <p class="lead">Um refúgio de luxo onde a elegância contemporânea encontra a hospitalidade tradicional.</p>
+                        <p>Nosso hotel oferece experiências memoráveis de hospedagem. Localizado em uma área privilegiada, oferecemos não apenas acomodações de alto padrão, mas também um ambiente que convida ao relaxamento e reconexão.</p>
+                    }
                     
                     <div class="about-features">
                         <div class="feature-item">

@@ -1,0 +1,238 @@
+@model GerenciadorHotel.ViewModels.EmpresaViewModel
+
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Criar Empresa" : "Editar Empresa";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+                    <p class="text-muted mb-0">Configure as informações da sua empresa</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                    </a>
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Corrija os erros abaixo:</h6>
+                    <div asp-validation-summary="All" class="mb-0"></div>
+                </div>
+            }
+
+            <form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Ativo" />
+
+                <!-- Informações Básicas -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-building me-2"></i>Informações Básicas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Nome" class="form-label"></label>
+                                    <input asp-for="Nome" class="form-control" placeholder="Nome da empresa" />
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="NomeResumido" class="form-label"></label>
+                                    <input asp-for="NomeResumido" class="form-control" placeholder="Nome resumido para exibição" />
+                                    <span asp-validation-for="NomeResumido" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="AnoFundacao" class="form-label"></label>
+                                    <input asp-for="AnoFundacao" class="form-control" type="number" min="1800" max="2100" />
+                                    <span asp-validation-for="AnoFundacao" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="LogoUrl" class="form-label"></label>
+                                    <input asp-for="LogoUrl" class="form-control" placeholder="https://exemplo.com/logo.jpg" />
+                                    <span asp-validation-for="LogoUrl" class="text-danger"></span>
+                                    <div class="form-text">URL da imagem da logo da empresa</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Slogan" class="form-label"></label>
+                                    <input asp-for="Slogan" class="form-control" placeholder="Slogan da empresa" />
+                                    <span asp-validation-for="Slogan" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label asp-for="DescricaoBreve" class="form-label"></label>
+                                    <textarea asp-for="DescricaoBreve" class="form-control" rows="3" placeholder="Descrição breve da empresa..."></textarea>
+                                    <span asp-validation-for="DescricaoBreve" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="DescricaoSobre" class="form-label"></label>
+                                    <textarea asp-for="DescricaoSobre" class="form-control" rows="5" placeholder="Descrição completa sobre a empresa..."></textarea>
+                                    <span asp-validation-for="DescricaoSobre" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações de Contato -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-phone me-2"></i>Informações de Contato
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Telefone" class="form-label"></label>
+                                    <input asp-for="Telefone" class="form-control" placeholder="+55 (11) 1234-5678" />
+                                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="WhatsApp" class="form-label"></label>
+                                    <input asp-for="WhatsApp" class="form-control" placeholder="+55 (11) 99999-9999" />
+                                    <span asp-validation-for="WhatsApp" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label"></label>
+                                    <input asp-for="Email" class="form-control" type="email" placeholder="contato@empresa.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Website" class="form-label"></label>
+                                    <input asp-for="Website" class="form-control" placeholder="https://www.empresa.com" />
+                                    <span asp-validation-for="Website" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="HorarioCheckin" class="form-label"></label>
+                                    <input asp-for="HorarioCheckin" class="form-control" placeholder="14:00" />
+                                    <span asp-validation-for="HorarioCheckin" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="HorarioCheckout" class="form-label"></label>
+                                    <input asp-for="HorarioCheckout" class="form-control" placeholder="12:00" />
+                                    <span asp-validation-for="HorarioCheckout" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endereço -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-map-marker-alt me-2"></i>Endereço
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Endereco" class="form-label"></label>
+                                    <input asp-for="Endereco" class="form-control" placeholder="Rua, Avenida, etc." />
+                                    <span asp-validation-for="Endereco" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Cidade" class="form-label"></label>
+                                    <input asp-for="Cidade" class="form-control" placeholder="Cidade" />
+                                    <span asp-validation-for="Cidade" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Estado" class="form-label"></label>
+                                    <input asp-for="Estado" class="form-control" placeholder="Estado/UF" />
+                                    <span asp-validation-for="Estado" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="CEP" class="form-label"></label>
+                                    <input asp-for="CEP" class="form-control" placeholder="12345-678" />
+                                    <span asp-validation-for="CEP" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Pais" class="form-label"></label>
+                                    <input asp-for="Pais" class="form-control" placeholder="País" />
+                                    <span asp-validation-for="Pais" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Redes Sociais -->
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-share-alt me-2"></i>Redes Sociais
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Facebook" class="form-label"></label>
+                                    <input asp-for="Facebook" class="form-control" placeholder="https://facebook.com/empresa" />
+                                    <span asp-validation-for="Facebook" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="Instagram" class="form-label"></label>
+                                    <input asp-for="Instagram" class="form-control" placeholder="https://instagram.com/empresa" />
+                                    <span asp-validation-for="Instagram" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Twitter" class="form-label"></label>
+                                    <input asp-for="Twitter" class="form-control" placeholder="https://twitter.com/empresa" />
+                                    <span asp-validation-for="Twitter" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label asp-for="LinkedIn" class="form-label"></label>
+                                    <input asp-for="LinkedIn" class="form-control" placeholder="https://linkedin.com/company/empresa" />
+                                    <span asp-validation-for="LinkedIn" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="d-flex justify-content-between">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>@(Model.Id == 0 ? "Criar Empresa" : "Salvar Alterações")
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
