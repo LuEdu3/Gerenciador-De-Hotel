@@ -40,19 +40,85 @@
             <td>@item.DataCheckIn.ToString("dd/MM/yyyy")</td>
             <td>@item.DataCheckOut.ToString("dd/MM/yyyy")</td>
             <td>@item.Status.GetDisplayName()</td>
-                <td>@item.Status.GetDisplayName()</td>
             <td>@item.ValorTotal.ToString("C")</td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id" class="btn-details btn-details-sm">
                     <i class="bi bi-eye"></i> Detalhes
                 </a>
                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Excluir</a>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.Id">
+                    <i class="bi bi-trash"></i> Excluir
+                </button>
             </td>
         </tr>
     }
     </tbody>
 </table>
+
+@* Renderizar modais fora da tabela para evitar problemas de layout *@
+@foreach (var item in Model)
+{
+    <!-- Modal de Confirmação de Exclusão -->
+    <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@item.Id" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel-@item.Id">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir esta reserva?</p>
+                    <div class="alert alert-warning">
+                        <strong>Hóspede:</strong> @item.NomeCompleto<br>
+                        <strong>Acomodação:</strong> @item.Acomodacao?.Nome<br>
+                        <strong>Check-in:</strong> @item.DataCheckIn.ToString("dd/MM/yyyy")<br>
+                        <strong>Check-out:</strong> @item.DataCheckOut.ToString("dd/MM/yyyy")<br>
+                        <strong>Valor:</strong> @item.ValorTotal.ToString("C")
+                    </div>
+                    <p class="text-muted small">Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Sanitização e ajustes dos modais para evitar drop shadow/backdrop residual
+        document.addEventListener('DOMContentLoaded', function () {
+            function sanitizeModalArtifacts() {
+                document.querySelectorAll('.modal-backdrop').forEach(function (b) { b.remove(); });
+                document.body.classList.remove('modal-open');
+                // Remover estilos inline que o Bootstrap pode aplicar ao body
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('paddingRight');
+            }
+
+            var modals = document.querySelectorAll('.modal');
+            modals.forEach(function (modal) {
+                modal.addEventListener('show.bs.modal', function () {
+                    // Garantir z-index correto e limpar possíveis resíduos antes de abrir
+                    this.style.zIndex = '1056';
+                    sanitizeModalArtifacts();
+                });
+
+                modal.addEventListener('shown.bs.modal', function () {
+                    // Caso algum backdrop tenha sido adicionado por scripts externos, remova
+                    sanitizeModalArtifacts();
+                });
+
+                modal.addEventListener('hidden.bs.modal', function () {
+                    // Limpeza completa ao fechar
+                    sanitizeModalArtifacts();
+                });
+            });
+        });
+    </script>
 }

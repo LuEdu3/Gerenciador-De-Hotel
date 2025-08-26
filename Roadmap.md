@@ -95,18 +95,33 @@
 
 ## Bugs ou Melhoras
 
-1. Endpoint /Reservas/Delete: Ao tentar excluir uma reserva como Administrador, o site não funciona corretamente. Dropshadow bootstrap - Luiz
+1. ✅ Endpoint /Reservas/Delete: Ao tentar excluir uma reserva como Administrador, o site não funciona corretamente. Dropshadow bootstrap - Luiz
 
-2. Ao tentar excluir um usuário como Administrador o site buga. Dropshadow bootstrap - Luiz
+2. ✅Ao tentar excluir um usuário como Administrador o site buga. Dropshadow bootstrap - Luiz
 
 3. Ao editar ele sobreescreve as regras de capacidade e noites mínimas.
 
-4. Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz
+4. ✅ Ao tentar excluir uma reserva como usuario o site buga. Dropshadow bootstrap - Luiz 
 
 5. **Horário do check-in** - apenas data é exibida, não hora específica
 
 6. Diminuir fonte da descrição
 
 7. **Navbar não fecha no mobile**
+
+8. Não existem esses endpoints
+
+http://localhost:5116/Usuarios/DeleteConfirmed
+Failed to load resource: the server responded with a status of 404 ()
+
+
+http://localhost:5116/Reservas/DeleteConfirmed/8
+
+2 erros, o primeiro ao tentar excluir um usuario como administrador, o segundo tentar cancelar uma reserva como usuarios
+
+
+http://localhost:5116/Reservas/DeleteConfirmed/9 esse é ao tentar excuir uma reserva como administrador
+
+9. Amenidades não estão salvando - Luiz
 
 Futuramente. Ao tentar resetar a senha de um usuário como Administrador o site buga. Dropshadow bootstrap

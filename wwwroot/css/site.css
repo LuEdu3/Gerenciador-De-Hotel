@@ -23,6 +23,19 @@
             z-index: 1056 !important;
         }
 
+        .modal-backdrop {
+            z-index: 1055 !important;
+        }
+
+        /* Garantir que modais funcionem corretamente */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal.show .modal-dialog {
+            transform: none;
+        }
+
         main {
             position: relative;
             z-index: 1;

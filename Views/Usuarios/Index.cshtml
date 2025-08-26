@@ -178,18 +178,18 @@
                                     </a>
                                     <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn @(item.Ativo ? "btn-outline-warning" : "btn-outline-success")" 
-                                                title="@(item.Ativo ? "Desativar" : "Ativar")"
-                                                data-bs-toggle="modal" data-bs-target="#modalToggleStatus-@item.Id" type="button">
+                    <button type="button" class="btn @(item.Ativo ? "btn-outline-warning" : "btn-outline-success")" 
+                        title="@(item.Ativo ? "Desativar" : "Ativar")"
+                        onclick="openToggleStatusModal('@item.Id')">
                                             <i class="bi @(item.Ativo ? "bi-pause" : "bi-play")"></i>
                                         </button>
                                     </form>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Excluir" data-bs-toggle="modal" data-bs-target="#modalDelete-@item.Id">
+                                    <button type="button" class="btn btn-outline-danger" title="Excluir" onclick="openDeleteModal('@item.Id')">
                                         <i class="bi bi-trash"></i>
-                                    </a>
+                                    </button>
                                 </div>
                                 <!-- Modal Toggle Status -->
-                                <div class="modal fade" id="modalToggleStatus-@item.Id" tabindex="-1" aria-labelledby="modalToggleStatusLabel-@item.Id" aria-hidden="true">
+                                <div class="modal fade" id="modalToggleStatus-@item.Id" tabindex="-1" aria-labelledby="modalToggleStatusLabel-@item.Id" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
                                   <div class="modal-dialog">
                                     <div class="modal-content">
                                       <div class="modal-header">
@@ -210,7 +210,7 @@
                                   </div>
                                 </div>
                                 <!-- Modal Delete -->
-                                <div class="modal fade" id="modalDelete-@item.Id" tabindex="-1" aria-labelledby="modalDeleteLabel-@item.Id" aria-hidden="true">
+                                <div class="modal fade" id="modalDelete-@item.Id" tabindex="-1" aria-labelledby="modalDeleteLabel-@item.Id" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
                                   <div class="modal-dialog">
                                     <div class="modal-content">
                                       <div class="modal-header">
@@ -222,7 +222,7 @@
                                       </div>
                                       <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        <form asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" class="d-inline">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="btn btn-danger">Sim, Excluir</button>
                                         </form>
@@ -276,3 +276,84 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Sanitização e inicialização: evitar backdrop e resíduos
+        document.addEventListener('DOMContentLoaded', function () {
+            // Esconder quaisquer modais "show" residuais ao entrar
+            document.querySelectorAll('.modal.show').forEach(function (m) {
+                try { bootstrap.Modal.getOrCreateInstance(m).hide(); } catch (e) { /* noop */ }
+            });
+            // Remover backdrops órfãos e resetar body
+            document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('paddingRight');
+
+            // Inicializar modais desta página sem backdrop
+            document.querySelectorAll('[id^="modalToggleStatus-"]').forEach(function (el) {
+                try {
+                    bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    el.addEventListener('shown.bs.modal', function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    });
+                } catch (e) { /* noop */ }
+            });
+            document.querySelectorAll('[id^="modalDelete-"]').forEach(function (el) {
+                try {
+                    bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    el.addEventListener('shown.bs.modal', function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    });
+                } catch (e) { /* noop */ }
+            });
+
+            // Expor funções para abrir os modais via JS (sem backdrop)
+            window.openToggleStatusModal = function (id) {
+                var el = document.getElementById('modalToggleStatus-' + id);
+                if (!el) return;
+                try {
+                    var modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    modal.show();
+                    setTimeout(function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    }, 0);
+                } catch (e) { /* noop */ }
+            };
+            window.openDeleteModal = function (id) {
+                var el = document.getElementById('modalDelete-' + id);
+                if (!el) return;
+                try {
+                    var modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    modal.show();
+                    setTimeout(function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    }, 0);
+                } catch (e) { /* noop */ }
+            };
+        });
+        // Limpeza adicional ao voltar via histórico
+        window.addEventListener('pageshow', function () {
+            document.querySelectorAll('.modal.show').forEach(function (m) {
+                try { bootstrap.Modal.getOrCreateInstance(m).hide(); } catch (e) { /* noop */ }
+            });
+            document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('paddingRight');
+        });
+    </script>
+}
