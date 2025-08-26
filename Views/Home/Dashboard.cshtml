@@ -10,7 +10,18 @@
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </h1>
                 <div class="text-muted">
-                    Bem-vindo, <strong>@User.Identity?.Name</strong>
+                    @if (User.IsInRole("Administrador"))
+                    {
+                        <span>Bem-vindo, <strong>Administrador</strong></span>
+                    }
+                    else if (User.IsInRole("Recepcionista"))
+                    {
+                        <span>Bem-vindo, <strong>Recepcionista</strong></span>
+                    }
+                    else
+                    {
+                        <span>Bem-vindo, <strong>@User.Identity?.Name</strong></span>
+                    }
                 </div>
             </div>
         </div>
