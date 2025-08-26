@@ -306,6 +306,23 @@ namespace GerenciadorHotel.Controllers
                     ModelState.AddModelError("DataCheckIn", "A data de check-in não pode ser anterior à data atual.");
                 }
 
+                // Validação de capacidade máxima de hóspedes
+                var acomodacaoSelecionada = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+                if (acomodacaoSelecionada != null && acomodacaoSelecionada.QuantidadeMaximaHospedes > 0 && reserva.NumeroHospedes > acomodacaoSelecionada.QuantidadeMaximaHospedes)
+                {
+                    ModelState.AddModelError("NumeroHospedes", $"A acomodação selecionada suporta no máximo {acomodacaoSelecionada.QuantidadeMaximaHospedes} hóspedes.");
+                }
+
+                // Validação do mínimo de noites
+                if (acomodacaoSelecionada != null && acomodacaoSelecionada.MinimoNoites > 0)
+                {
+                    var quantidadeNoitesVal = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
+                    if (quantidadeNoitesVal < acomodacaoSelecionada.MinimoNoites)
+                    {
+                        ModelState.AddModelError("DataCheckOut", $"A acomodação exige reserva mínima de {acomodacaoSelecionada.MinimoNoites} noite(s).");
+                    }
+                }
+
                 // Se houve erro nas datas, retorna para a view com os selects repovidados
                 if (!ModelState.IsValid)
                 {
@@ -338,7 +355,7 @@ namespace GerenciadorHotel.Controllers
                     reservaOriginal.PedidosEspeciais = reserva.PedidosEspeciais;
                     reservaOriginal.Status = reserva.Status;
                     // Recalcular ValorTotal com base na acomodação e número de noites
-                    var acomodacao = await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
+                    var acomodacao = acomodacaoSelecionada ?? await _context.Acomodacoes.FindAsync(reserva.AcomodacaoId);
                     if (acomodacao != null)
                     {
                         var quantidadeNoites = (reserva.DataCheckOut - reserva.DataCheckIn).Days;
