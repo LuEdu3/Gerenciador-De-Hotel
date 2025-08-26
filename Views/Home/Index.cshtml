@@ -73,16 +73,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- Controles do carrossel -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Anterior</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Próximo</span>
-    </button>
 </div>
 
 <main class="accommodations">
@@ -206,8 +196,16 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <div class="about-img">
-                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Sobre o Sereno Hotel">
+                <div class="about-video">
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/I8iT0OJ7Zd4?rel=0&modestbranding=1&controls=1&showinfo=0" 
+                            title="Vídeo sobre a Quinta do Ypuã" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-6">
@@ -224,40 +222,6 @@
                         <p class="lead">Natureza, conforto e simplicidade</p>
                         <p>O Ypuã tem tudo a ver com a natureza, dá para sentir a energia do lugar. Oferecemos um recanto de aconchego e lazer, em ambiente rústico e agradável. Ideal para quem gosta de fugir da rotina e procura um local de paz para descansar e curtir a natureza.</p>
                     }
-                    
-                    <div class="about-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-medal"></i>
-                            </div>
-                            <div>
-                                <h5>Excelência em Serviço</h5>
-                                <p>Premiado por 5 anos consecutivos como melhor hotel de luxo da região.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-utensils"></i>
-                            </div>
-                            <div>
-                                <h5>Gastronomia Exclusiva</h5>
-                                <p>Restaurante com estrela Michelin e cardápio sazonal com ingredientes locais.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-spa"></i>
-                            </div>
-                            <div>
-                                <h5>Spa & Bem-estar</h5>
-                                <p>Centro de bem-estar com tratamentos exclusivos e terapias relaxantes.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-accent">Conheça Nossa História</a>
                 </div>
             </div>
         </div>

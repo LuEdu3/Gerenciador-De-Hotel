@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using GerenciadorHotel.Services
+@inject IEmpresaService EmpresaService
+@{
+    var empresa = await EmpresaService.GetEmpresaAtivaAsync();
+}
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -46,24 +51,10 @@
                                     <i class="bi bi-people me-1"></i>Usuários
                                 </a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button"
-                                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                    <i class="bi bi-gear-fill me-1"></i>
-                                    Mais Opções
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-modern @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" ? "active" : "")" asp-controller="Empresa" asp-action="Index">
+                                    <i class="bi bi-building me-1"></i>Gerenciar Empresa
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <a class="dropdown-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empresa" ? "active" : "")" asp-controller="Empresa" asp-action="Index">
-                                            <i class="bi bi-building me-2"></i>Gerenciar Empresa
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#">
-                                            <i class="bi bi-stars me-2"></i>Gerenciar Amenidades
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
                             <!-- Botão Sair para Administrador -->
                             <li class="nav-item d-none d-lg-block">
@@ -202,14 +193,14 @@
                 <!-- Logo e Sobre -->
                 <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                     <div class="footer-brand d-flex align-items-center mb-3">
-                        <h2 class="navbar-brand-modern m-0">Sereno<span>Hotel</span></h2>
+                        @await Component.InvokeAsync("EmpresaInfo")
                     </div>
-                    <p class="mb-3">O Sereno Hotel oferece uma experiência única de hospedagem, combinando luxo contemporâneo com um serviço personalizado e atenção aos detalhes.</p>
+                    <p class="mb-3">A pousada Quinta do Ypuã oferece ao seus clientes um recanto de aconchego e lazer, em ambiente rústico e agradável. Ideal para quem gosta de fugir da rotina e procura um local de paz para descansar e curtir a natureza.</p>
                     <div class="social-icons">
-                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-tripadvisor"></i></a>
+                        <a href="https://exemplo.com" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://exemplo.com" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="https://exemplo.com" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="https://exemplo.com" class="text-white"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
                 <!-- Links Rápidos -->
@@ -238,40 +229,34 @@
                     <ul class="list-unstyled">
                         <li class="mb-3 d-flex">
                             <i class="fas fa-map-marker-alt me-3" style="color: var(--accent-color);"></i>
-                            <span>Av. Beira Mar, 1234 - Praia do Sereno, BR</span>
+                            <span>Estrada Ipua, nº 6<br>Laguna, SC - Brasil<br>CEP: 00000-000</span>
                         </li>
                         <li class="mb-3 d-flex">
                             <i class="fas fa-phone me-3" style="color: var(--accent-color);"></i>
-                            <span>+55 (48) 3333-4444</span>
+                            <span>+55 (00) 88790-000</span>
                         </li>
                         <li class="mb-3 d-flex">
                             <i class="fas fa-envelope me-3" style="color: var(--accent-color);"></i>
-                            <span>contato@serenohotel.com</span>
+                            <span>pousadaquintadoypua@gmail.com</span>
                         </li>
                         <li class="d-flex">
                             <i class="fas fa-clock me-3" style="color: var(--accent-color);"></i>
-                            <span>24h por dia, 7 dias por semana</span>
+                            <span>Check-in: 14:00<br>Check-out: 12:00</span>
                         </li>
                     </ul>
                 </div>
-                <!-- Newsletter -->
+                <!-- Informações Adicionais -->
                 <div class="col-lg-3 col-md-6">
-                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Newsletter</h5>
-                    <p class="mb-3">Assine nossa newsletter para receber ofertas exclusivas e novidades.</p>
-                    <form class="mb-3">
-                        <div class="input-group">
-                            <input type="email" class="form-control" placeholder="Seu e-mail" aria-label="Seu e-mail">
-                            <button class="btn btn-accent" type="submit">Assinar</button>
-                        </div>
-                    </form>
-                    <div class="payment-methods">
-                        <p class="small mb-2">Métodos de pagamento:</p>
-                        <div class="d-flex flex-wrap">
-                            <i class="fab fa-cc-visa fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
-                            <i class="fab fa-cc-mastercard fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
-                            <i class="fab fa-cc-amex fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
-                            <i class="fab fa-cc-paypal fa-2x me-2 mb-2" style="color: #f5f5dc;"></i>
-                        </div>
+                    <h5 class="text-uppercase mb-4" style="color: var(--accent-color);">Natureza & Conforto</h5>
+                    <p class="mb-3">Fundada em 2005, oferecemos uma experiência única em contato com a natureza.</p>
+                    <div class="mb-3">
+                        <h6 class="text-uppercase" style="color: var(--accent-color);">Nosso Diferencial:</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-1">• Ambiente rústico e agradável</li>
+                            <li class="mb-1">• Contato direto com a natureza</li>
+                            <li class="mb-1">• Paz e tranquilidade</li>
+                            <li class="mb-1">• Simplicidade e conforto</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -279,7 +264,7 @@
             <!-- Rodapé inferior -->
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <p class="small mb-0">&copy; 2023 Sereno Hotel. Todos os direitos reservados.</p>
+                    <p class="small mb-0">&copy; 2005-@DateTime.Now.Year Quinta do Ypuã. Todos os direitos reservados.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <ul class="list-inline small mb-0">
