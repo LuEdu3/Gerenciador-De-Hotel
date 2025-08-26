@@ -154,12 +154,11 @@ namespace GerenciadorHotel.Services
         {
             try
             {
-                // Desativar outras empresas se existirem
-                var empresasExistentes = await _context.Empresas.Where(e => e.Ativo).ToListAsync();
-                foreach (var emp in empresasExistentes)
+                // Bloquear criação se já existir alguma empresa (política: apenas uma empresa padrão)
+                var existeQualquer = await _context.Empresas.AnyAsync();
+                if (existeQualquer)
                 {
-                    emp.Ativo = false;
-                    emp.DataAtualizacao = DateTime.Now;
+                    return false;
                 }
 
                 empresa.Ativo = true;

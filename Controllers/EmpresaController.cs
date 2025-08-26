@@ -32,8 +32,15 @@ namespace GerenciadorHotel.Controllers
         }
 
         // GET: Empresa/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var existente = await _empresaService.GetEmpresaAtivaAsync();
+            if (existente != null)
+            {
+                TempData["Info"] = "Já existe uma empresa ativa. Você só pode editar as informações.";
+                return RedirectToAction(nameof(Edit));
+            }
+
             var viewModel = new EmpresaViewModel();
             return View(viewModel);
         }
@@ -43,6 +50,14 @@ namespace GerenciadorHotel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EmpresaViewModel viewModel)
         {
+            // Bloquear criação se já existir qualquer empresa ativa
+            var existente = await _empresaService.GetEmpresaAtivaAsync();
+            if (existente != null)
+            {
+                TempData["Info"] = "Já existe uma empresa ativa. Você só pode editar as informações.";
+                return RedirectToAction(nameof(Edit));
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(viewModel);

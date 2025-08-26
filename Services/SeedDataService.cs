@@ -7,6 +7,13 @@ namespace GerenciadorHotel.Services
 {
     public static class SeedDataService
     {
+        public static async Task SeedEmpresaBase(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await SeedEmpresaBase(context);
+        }
+
         public static async Task SeedRolesAndAdminUser(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -193,6 +200,67 @@ namespace GerenciadorHotel.Services
             else
             {
                 Console.WriteLine("⚠️ Amenidades já existem no banco, pulando seed para preservar dados existentes.");
+            }
+        }
+
+        private static async Task SeedEmpresaBase(ApplicationDbContext context)
+        {
+            // Se já existe uma empresa ativa, não faz nada (preserva dados configurados pelo usuário)
+            var existeAtiva = await context.Empresas.AnyAsync(e => e.Ativo);
+            if (existeAtiva)
+            {
+                Console.WriteLine("ℹ️ Empresa ativa já existe. Mantendo configuração atual.");
+                return;
+            }
+
+            // Caso não exista nenhuma ativa, cria uma empresa base
+            var existeAlguma = await context.Empresas.AnyAsync();
+            if (!existeAlguma)
+            {
+                var empresaBase = new Empresa
+                {
+                    Nome = "Quinta do Ypuã",
+                    NomeResumido = "Ypuã",
+                    LogoUrl = "",
+                    Slogan = "Natureza, conforto e simplicidade",
+                    DescricaoBreve = "Hospedagem rústica com charme e contato com a natureza.",
+                    DescricaoSobre = "A Quinta do Ypuã oferece experiências únicas em hospedagem, unindo conforto e natureza.",
+                    AnoFundacao = DateTime.Now.Year,
+                    Telefone = "+55 (00) 00000-0000",
+                    WhatsApp = "+55 (00) 00000-0000",
+                    Email = "contato@ypua.com",
+                    Endereco = "Estrada Rural, Km 0",
+                    Cidade = "Cidade",
+                    Estado = "UF",
+                    CEP = "00000-000",
+                    Pais = "Brasil",
+                    Website = "https://exemplo.com",
+                    Facebook = "",
+                    Instagram = "",
+                    Twitter = "",
+                    LinkedIn = "",
+                    HorarioCheckin = "14:00",
+                    HorarioCheckout = "12:00",
+                    Ativo = true,
+                    DataCriacao = DateTime.Now
+                };
+
+                await context.Empresas.AddAsync(empresaBase);
+                await context.SaveChangesAsync();
+                Console.WriteLine("✅ Empresa base criada e ativada.");
+                return;
+            }
+
+            // Existem empresas, porém nenhuma ativa: ativa a mais recente
+            var empresaMaisRecente = await context.Empresas
+                .OrderByDescending(e => e.DataCriacao)
+                .FirstOrDefaultAsync();
+            if (empresaMaisRecente != null)
+            {
+                empresaMaisRecente.Ativo = true;
+                empresaMaisRecente.DataAtualizacao = DateTime.Now;
+                await context.SaveChangesAsync();
+                Console.WriteLine($"✅ Empresa '{empresaMaisRecente.Nome}' ativada como padrão.");
             }
         }
 
