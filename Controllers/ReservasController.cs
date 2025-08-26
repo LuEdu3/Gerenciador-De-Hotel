@@ -17,6 +17,45 @@ namespace GerenciadorHotel.Controllers
             _context = context;
         }
 
+        // Compat: GET /Reservas/DeleteConfirmed/{id} -> redireciona para a tela de confirmação padrão
+        [HttpGet("Reservas/DeleteConfirmed/{id:int}")]
+        [Authorize]
+        public IActionResult DeleteConfirmedGet(int id)
+        {
+            return RedirectToAction("Delete", new { id });
+        }
+
+        // Compat: POST /Reservas/DeleteConfirmed/{id} -> executa a exclusão
+        [HttpPost("Reservas/DeleteConfirmed/{id:int}")]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> DeleteConfirmedRoute(int id)
+        {
+            var reserva = await _context.Reservas.FindAsync(id);
+            if (reserva == null)
+            {
+                return NotFound();
+            }
+
+            // Se for hóspede, só pode excluir a própria reserva
+            if (User.IsInRole("Hospede"))
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                if (reserva.UserId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
+            _context.Reservas.Remove(reserva);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Reserva excluída com sucesso!";
+
+            if (User.IsInRole("Hospede"))
+                return RedirectToAction("MinhasReservas");
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Reservas
         [Authorize] // Permite qualquer usuário autenticado
         public async Task<IActionResult> Index()
