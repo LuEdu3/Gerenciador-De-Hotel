@@ -158,6 +158,13 @@ namespace GerenciadorHotel.Services
             await SeedAcomodacaoAmenidadesPrivate(context);
         }
 
+        public static async Task GarantirImagemPrincipalAcomodacoes(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<GerenciadorHotel.Data.ApplicationDbContext>();
+            await GarantirImagemPrincipalAcomodacoesPrivate(context);
+        }
+
         private static async Task SeedAmenidadesPrivate(ApplicationDbContext context)
         {
             // Só inserir amenidades se a tabela estiver vazia
@@ -347,13 +354,18 @@ namespace GerenciadorHotel.Services
                             QuantidadeMaximaHospedes = dto.QuantidadeMaximaHospedes > 0 ? dto.QuantidadeMaximaHospedes : 1,
                             Preco = dto.Preco,
                             MinimoNoites = dto.MinimoNoites > 0 ? dto.MinimoNoites : 1,
-                            ImagemPrincipalUrl = dto.ImagemPrincipalUrl,
+                            ImagemPrincipalUrl = string.IsNullOrWhiteSpace(dto.ImagemPrincipalUrl) ? null : dto.ImagemPrincipalUrl,
                             Ativa = dto.Ativa,
                             HoraCheckIn = TryParseHora(dto.HoraCheckIn ?? "14:00", new TimeSpan(14,0,0)),
                             HoraCheckOut = TryParseHora(dto.HoraCheckOut ?? "10:00", new TimeSpan(10,0,0)),
                             Status = StatusAcomodacao.Disponivel,
                             DataCriacao = DateTime.Now
                         };
+                        // Fallback de imagem para nomes conhecidos
+                        if (string.IsNullOrEmpty(nova.ImagemPrincipalUrl))
+                        {
+                            nova.ImagemPrincipalUrl = ObterImagemPadraoPorNome(nova.Nome);
+                        }
                         await context.Acomodacoes.AddAsync(nova);
                         await context.SaveChangesAsync();
                         existente = nova;
@@ -370,6 +382,11 @@ namespace GerenciadorHotel.Services
                         existente.MinimoNoites = dto.MinimoNoites > 0 ? dto.MinimoNoites : existente.MinimoNoites;
                         existente.HoraCheckIn = TryParseHora(dto.HoraCheckIn ?? "14:00", existente.HoraCheckIn);
                         existente.HoraCheckOut = TryParseHora(dto.HoraCheckOut ?? "10:00", existente.HoraCheckOut);
+                        // Se backup não traz imagem e a existente está vazia, aplicar fallback
+                        if (string.IsNullOrWhiteSpace(dto.ImagemPrincipalUrl) && string.IsNullOrWhiteSpace(existente.ImagemPrincipalUrl))
+                        {
+                            existente.ImagemPrincipalUrl = ObterImagemPadraoPorNome(existente.Nome) ?? existente.ImagemPrincipalUrl;
+                        }
                         existente.DataAtualizacao = DateTime.Now;
                         atualizadas++;
                     }
@@ -409,6 +426,45 @@ namespace GerenciadorHotel.Services
             {
                 Console.WriteLine($"❌ Falha ao importar backup de acomodações: {ex.Message}");
             }
+        }
+
+        private static async Task GarantirImagemPrincipalAcomodacoesPrivate(ApplicationDbContext context)
+        {
+            var semImagem = await context.Acomodacoes
+                .Where(a => a.Ativa && (a.ImagemPrincipalUrl == null || a.ImagemPrincipalUrl == ""))
+                .ToListAsync();
+
+            int atualizadas = 0;
+            foreach (var a in semImagem)
+            {
+                var fallback = ObterImagemPadraoPorNome(a.Nome);
+                if (!string.IsNullOrEmpty(fallback))
+                {
+                    a.ImagemPrincipalUrl = fallback;
+                    a.DataAtualizacao = DateTime.Now;
+                    atualizadas++;
+                }
+            }
+
+            if (atualizadas > 0)
+            {
+                await context.SaveChangesAsync();
+                Console.WriteLine($"🖼️ Imagem principal preenchida para {atualizadas} acomodação(ões) sem foto.");
+            }
+        }
+
+        private static string? ObterImagemPadraoPorNome(string nome)
+        {
+            return nome switch
+            {
+                "Domo" => "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
+                "Charrua (Bus)" => "https://static.wixstatic.com/media/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_5580c08771c841089ccc440a82c2f298~mv2.jpeg",
+                "Suíte com Cozinha" => "https://static.wixstatic.com/media/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_bfc66e6435f34c23bfd60e2fccb3d499~mv2.jpg",
+                "Chalé Família" => "https://static.wixstatic.com/media/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_d943676e56f24781b4aad20256b75eef~mv2.jpg",
+                "Cabana" => "https://static.wixstatic.com/media/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_23a56936773e4f7f812d0543c078138c~mv2.jpg",
+                "Estacionamento para Overlanders" => "https://static.wixstatic.com/media/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_f4b318355c704575a4a6917c1a2f7401~mv2.jpg",
+                _ => null
+            };
         }
 
         private static async Task ForcarAtualizacaoEmpresaBasePrivate(ApplicationDbContext context)
@@ -654,7 +710,7 @@ namespace GerenciadorHotel.Services
                         Preco = 590.00m,
                         MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
-                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_442829334f1b4dd1879b3231151437a3~mv2.jpg",
+                        ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg/v1/fill/w_649,h_408,q_85,usm_0.66_1.00_0.01/b87f83_0db328063a8c4b4ea1bb3dff437e8e46~mv2.jpeg",
                         Ativa = true,
                         DataCriacao = DateTime.Now
                     },
@@ -708,7 +764,7 @@ namespace GerenciadorHotel.Services
                         QuantidadeCamasSolteiro = 1,
                         QuantidadeMaximaHospedes = 3,
                         Preco = 490.00m,
-                        MinimoNoites = 1,
+                        MinimoNoites = 2,
                         Status = StatusAcomodacao.Disponivel,
                         ImagemPrincipalUrl = "https://static.wixstatic.com/media/b87f83_cabana_example.jpg",
                         Ativa = true,

@@ -53,6 +53,8 @@ using (var scope = app.Services.CreateScope())
     // Garante as acomodações padrão caso não existam
     await SeedDataService.LimparEInserirAcomodacoesQuintaYpua(services);
     await SeedDataService.SeedAcomodacaoAmenidades(services);
+    // Garante imagem principal para acomodações conhecidas sem foto
+    await SeedDataService.GarantirImagemPrincipalAcomodacoes(services);
         await SeedDataService.AtualizarQuantidadeMaximaHospedes(services);
         await SeedDataService.CriarImagensAcomodacoes(services.GetRequiredService<ApplicationDbContext>());
     }
