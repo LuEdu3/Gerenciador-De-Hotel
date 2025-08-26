@@ -1,0 +1,16 @@
+[
+  {
+    "Nome": "Domo",
+    "Descricao": "",
+    "QuantidadeCamasCasal": 1,
+    "QuantidadeCamasSolteiro": 0,
+    "QuantidadeMaximaHospedes": 3,
+    "Preco": 280.00,
+    "MinimoNoites": 2,
+    "ImagemPrincipalUrl": "",
+    "Ativa": true,
+    "HoraCheckIn": "14:00",
+    "HoraCheckOut": "10:00",
+    "Amenidades": ["Wi-Fi", "Ar-condicionado", "TV", "Ducha"]
+  }
+]

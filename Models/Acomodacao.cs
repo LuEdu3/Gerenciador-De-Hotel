@@ -73,7 +73,7 @@ namespace GerenciadorHotel.Models
     [Required]
     [Display(Name = "Horário de Check-out")]
     [DataType(DataType.Time)]
-    public TimeSpan HoraCheckOut { get; set; } = new TimeSpan(12, 0, 0);
+    public TimeSpan HoraCheckOut { get; set; } = new TimeSpan(10, 0, 0);
 
         
         [Range(1, 20, ErrorMessage = "A quantidade máxima de hóspedes deve ser entre 1 e 20")]
