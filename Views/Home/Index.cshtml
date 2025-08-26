@@ -85,14 +85,9 @@
             <h4 class="filter-title">Filtrar Acomodações</h4>
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="TipoAcomodacao" class="form-label">Tipo de Acomodação</label>
-                    <select class="form-select" id="TipoAcomodacao" name="TipoAcomodacao">
-                        <option value="">Todos</option>
-                        @foreach (var tipo in ViewBag.TiposAcomodacao)
-                        {
-                            <option value="@tipo">@tipo</option>
-                        }
-                    </select>
+                    <label for="NomeAcomodacao" class="form-label">Nome da Acomodação</label>
+                    <input type="text" class="form-control" id="NomeAcomodacao" name="NomeAcomodacao" 
+                           placeholder="Digite o nome da acomodação..." value="@ViewBag.FiltroNome">
                 </div>
                 <div class="col-md-3">
                     <label for="FaixaPreco" class="form-label">Faixa de Preço</label>

@@ -21,14 +21,9 @@
             <h4 class="filter-title">Filtrar Acomodações</h4>
             <div class="row g-3">
                 <div class="col-md-3">
-                    <label for="TipoAcomodacao" class="form-label">Tipo de Acomodação</label>
-                    <select class="form-select" id="TipoAcomodacao" name="TipoAcomodacao">
-                        <option value="">Todos</option>
-                        @foreach (var tipo in ViewBag.TiposAcomodacao)
-                        {
-                            <option value="@tipo" selected="@(ViewBag.FiltroTipo == tipo)">@tipo</option>
-                        }
-                    </select>
+                    <label for="NomeAcomodacao" class="form-label">Nome da Acomodação</label>
+                    <input type="text" class="form-control" id="NomeAcomodacao" name="NomeAcomodacao" 
+                           placeholder="Digite o nome da acomodação..." value="@ViewBag.FiltroNome">
                 </div>
                 <div class="col-md-3">
                     <label for="FaixaPreco" class="form-label">Faixa de Preço</label>
@@ -131,7 +126,7 @@
                             @if (ViewBag.CurrentPage > 1)
                             {
                                 <li class="page-item">
-                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = ViewBag.CurrentPage - 1, TipoAcomodacao = ViewBag.FiltroTipo, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })" aria-label="Anterior">
+                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = ViewBag.CurrentPage - 1, NomeAcomodacao = ViewBag.FiltroNome, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })" aria-label="Anterior">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
@@ -140,14 +135,14 @@
                             @for (int i = 1; i <= ViewBag.TotalPages; i++)
                             {
                                 <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = i, TipoAcomodacao = ViewBag.FiltroTipo, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })">@i</a>
+                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = i, NomeAcomodacao = ViewBag.FiltroNome, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })">@i</a>
                                 </li>
                             }
 
                             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                             {
                                 <li class="page-item">
-                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = ViewBag.CurrentPage + 1, TipoAcomodacao = ViewBag.FiltroTipo, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })" aria-label="Próxima">
+                                    <a class="page-link" href="@Url.Action("Acomodacao", "Home", new { page = ViewBag.CurrentPage + 1, NomeAcomodacao = ViewBag.FiltroNome, FaixaPreco = ViewBag.FiltroPreco, Capacidade = ViewBag.FiltroCapacidade })" aria-label="Próxima">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
