@@ -1,0 +1,10 @@
+bin/
+obj/
+.vscode/
+.git/
+**/*.user
+**/*.csproj.user
+**/*.suo
+**/*.cache
+**/*.log
+wwwroot/imagens/

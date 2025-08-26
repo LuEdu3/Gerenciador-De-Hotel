@@ -3,11 +3,39 @@ using Microsoft.EntityFrameworkCore;
 using GerenciadorHotel.Data;
 using GerenciadorHotel.Models;
 using GerenciadorHotel.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Bind a porta do ambiente (Railway define PORT)
+var portEnv = Environment.GetEnvironmentVariable("PORT");
+if (int.TryParse(portEnv, out var port))
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(port);
+    });
+}
+
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Monta a connection string a partir das variáveis do Railway, se existirem
+string BuildConnectionString()
+{
+    var host = Environment.GetEnvironmentVariable("mysql.railway.internal");
+    var db = Environment.GetEnvironmentVariable("railway");
+    var user = Environment.GetEnvironmentVariable("root");
+    var pwd = Environment.GetEnvironmentVariable("zxdGCGxLDnGKJFkiereMhzuENaKyFrxn");
+    var portVar = Environment.GetEnvironmentVariable("3306");
+    if (!string.IsNullOrWhiteSpace(host) && !string.IsNullOrWhiteSpace(db) && !string.IsNullOrWhiteSpace(user) && !string.IsNullOrWhiteSpace(pwd))
+    {
+        var mysqlPort = string.IsNullOrWhiteSpace(portVar) ? "3306" : portVar;
+        return $"Server={host};Port={mysqlPort};Database={db};Uid={user};Pwd={pwd};SslMode=Preferred;";
+    }
+    // fallback para appsettings
+    return builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+}
+
+var connectionString = BuildConnectionString();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySQL(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -38,12 +66,22 @@ builder.Services.AddScoped<IEmpresaService, EmpresaService>();
 
 var app = builder.Build();
 
-// Seed de dados inicial
+// Aplicar headers de proxy (X-Forwarded-*) quando atrás de proxy (Railway)
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// Seed de dados inicial e migrações
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
+        // Aplica migrações automaticamente (útil em produção no Railway)
+        var db = services.GetRequiredService<ApplicationDbContext>();
+        await db.Database.MigrateAsync();
+
         await SeedDataService.SeedRolesAndAdminUser(services);
     await SeedDataService.SeedPaises(services);
     await SeedDataService.SeedAmenidades(services);
