@@ -1,0 +1,55 @@
+@model IEnumerable<GerenciadorHotel.Models.Acomodacao>
+@{
+    ViewData["Title"] = "Acomodações";
+}
+<h2>Acomodações Disponíveis</h2>
+<hr />
+<div class="row">
+    @foreach (var acomodacao in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="@acomodacao.ImagemPrincipalUrl" class="card-img-top" alt="Imagem da acomodação" style="max-height:200px;object-fit:cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">@acomodacao.Nome</h5>
+                    <p class="card-text">@acomodacao.Descricao</p>
+                    <ul class="list-unstyled">
+                        <li><strong>Preço:</strong> @acomodacao.Preco.ToString("C")</li>
+                        <li><strong>Capacidade:</strong> @acomodacao.QuantidadeMaximaHospedes hóspede@(acomodacao.QuantidadeMaximaHospedes > 1 ? "s" : "")</li>
+                        <hr class="my-2" />
+                        <li class="d-flex justify-content-between">
+                            <div>
+                                <span class="text-muted">Check-in</span><br />
+                                <span class="fw-bold">@acomodacao.HoraCheckIn.ToString(@"hh\\:mm")</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-muted">Check-out</span><br />
+                                <span class="fw-bold">@acomodacao.HoraCheckOut.ToString(@"hh\\:mm")</span>
+                            </div>
+                        </li>
+                        <li>
+                            <strong>Camas:</strong>
+                            @if (acomodacao.QuantidadeCamasSolteiro > 0)
+                            {
+                                <span>@acomodacao.QuantidadeCamasSolteiro cama@(acomodacao.QuantidadeCamasSolteiro > 1 ? "s" : "") de solteiro</span>
+                            }
+                            @if (acomodacao.QuantidadeCamasSolteiro > 0 && acomodacao.QuantidadeCamasCasal > 0)
+                            {
+                                <span> </span>
+                            }
+                            @if (acomodacao.QuantidadeCamasCasal > 0)
+                            {
+                                <span>@acomodacao.QuantidadeCamasCasal cama@(acomodacao.QuantidadeCamasCasal > 1 ? "s" : "") de casal</span>
+                            }
+                        </li>
+                        <li><strong>Status:</strong> @acomodacao.Status</li>
+                    </ul>
+                    <a asp-controller="Reservas" asp-action="Create" asp-route-acomodacaoId="@acomodacao.Id" class="btn btn-primary">Reservar</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

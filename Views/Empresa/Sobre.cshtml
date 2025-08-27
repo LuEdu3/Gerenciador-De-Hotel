@@ -1,0 +1,543 @@
+@model GerenciadorHotel.ViewModels.EmpresaViewModel
+
+@{
+    ViewData["Title"] = "Sobre - " + (Model?.Nome ?? "Nossa Empresa");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Section -->
+<section class="hero-modern">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                @if (!string.IsNullOrEmpty(Model?.LogoUrl))
+                {
+                    <div class="mb-4">
+                        <img src="@Model.LogoUrl" alt="@Model.Nome" class="hero-logo">
+                    </div>
+                }
+                <h1 class="hero-title">@Model?.Nome</h1>
+                @if (!string.IsNullOrEmpty(Model?.Slogan))
+                {
+                    <p class="hero-subtitle">@Model.Slogan</p>
+                }
+                @if (Model?.AnoFundacao.HasValue == true)
+                {
+                    <div class="hero-badge">
+                        <span class="badge bg-accent text-dark px-3 py-2">
+                            <i class="bi bi-calendar4-event me-2"></i>Fundada em @Model.AnoFundacao
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="about-content">
+    <div class="container">
+        <!-- Nossa História -->
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="text-center mb-5">
+                    <h2 class="section-title">Nossa História</h2>
+                    <div class="section-divider mx-auto"></div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model?.DescricaoSobre))
+                {
+                    <div class="content-text">
+                        @if (!string.IsNullOrEmpty(Model?.DescricaoBreve))
+                        {
+                            <p class="lead text-muted mb-4">@Model.DescricaoBreve</p>
+                        }
+                        <div class="description-content">
+                            @Html.Raw(Model?.DescricaoSobre?.Replace("\n", "<br>") ?? "")
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="content-text">
+                        @if (!string.IsNullOrEmpty(Model?.DescricaoBreve))
+                        {
+                            <p class="lead text-muted mb-4">@Model.DescricaoBreve</p>
+                        }
+                        else
+                        {
+                            <p class="lead text-muted mb-4">A pousada Quinta do Ypuã oferece ao seus clientes um recanto de aconchego e lazer, em ambiente rústico e agradável. Ideal para quem gosta de fugir da rotina e procura um local de paz para descansar e curtir a natureza.</p>
+                        }
+                        <p class="text-muted">
+                            O Ypuã tem tudo a ver com a natureza, dá para sentir a energia do lugar. Eu me preocupo se você vai comer bem, dormir bem e se vai se sentir em casa. Vou te mostrar onde encontrar os melhores frutos do mar, onde curtir a melhor praia e as melhores ondas. Mas se você não quiser fazer nada eu também conheço o melhor lugar.
+                        </p>
+                        <p class="text-muted">
+                            Fundada em 2005, nossa pousada está localizada na Estrada Ipua, nº 6, em Laguna, SC, oferecendo natureza, conforto e simplicidade para todos os nossos hóspedes.
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Informações de Contato -->
+        <div class="row mb-5">
+            <div class="col-lg-10 mx-auto">
+                <div class="text-center mb-5">
+                    <h3 class="section-title">Entre em Contato</h3>
+                    <p class="text-muted">Estamos aqui para atendê-lo da melhor forma</p>
+                    <div class="section-divider mx-auto"></div>
+                </div>
+
+                <div class="row g-4">
+                    @if (!string.IsNullOrEmpty(Model?.Endereco) || !string.IsNullOrEmpty(Model?.Cidade))
+                    {
+                        <div class="col-md-6">
+                            <div class="contact-card">
+                                <div class="contact-icon">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <h5>Localização</h5>
+                                <p class="text-muted">
+                                    @if (!string.IsNullOrEmpty(Model?.Endereco))
+                                    {
+                                        @Model.Endereco<br>
+                                    }
+                                    @Model?.Cidade, @Model?.Estado @Model?.CEP<br>
+                                    @Model?.Pais
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model?.Telefone) || !string.IsNullOrEmpty(Model?.WhatsApp))
+                    {
+                        <div class="col-md-6">
+                            <div class="contact-card">
+                                <div class="contact-icon">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
+                                <h5>Telefone</h5>
+                                <p class="text-muted">
+                                    @if (!string.IsNullOrEmpty(Model?.Telefone))
+                                    {
+                                        <a href="tel:@Model.Telefone" class="text-decoration-none text-primary">@Model.Telefone</a><br>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model?.WhatsApp))
+                                    {
+                                        <a href="https://wa.me/@Model.WhatsApp.Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "")" 
+                                           class="text-decoration-none text-success" target="_blank">
+                                            <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                                        </a>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model?.Email))
+                    {
+                        <div class="col-md-6">
+                            <div class="contact-card">
+                                <div class="contact-icon">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </div>
+                                <h5>E-mail</h5>
+                                <p class="text-muted">
+                                    <a href="mailto:@Model.Email" class="text-decoration-none text-primary">@Model.Email</a>
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model?.HorarioCheckin) || !string.IsNullOrEmpty(Model?.HorarioCheckout))
+                    {
+                        <div class="col-md-6">
+                            <div class="contact-card">
+                                <div class="contact-icon">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <h5>Horários</h5>
+                                <p class="text-muted">
+                                    @if (!string.IsNullOrEmpty(Model?.HorarioCheckin))
+                                    {
+                                        <strong>Check-in:</strong> @Model.HorarioCheckin<br>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model?.HorarioCheckout))
+                                    {
+                                        <strong>Check-out:</strong> @Model.HorarioCheckout
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Galeria de Fotos -->
+        @if (ViewBag.FotosGaleria != null && ((IEnumerable<dynamic>)ViewBag.FotosGaleria).Any())
+        {
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <div class="text-center mb-5">
+                        <h3 class="section-title">Nossa Galeria</h3>
+                        <p class="text-muted">Conheça nossos espaços e instalações</p>
+                        <div class="section-divider mx-auto"></div>
+                    </div>
+
+                    <!-- Grid de Fotos Responsivo -->
+                    <div class="photo-gallery">
+                        <div class="row g-4">
+                            @{
+                                var fotos = (IEnumerable<dynamic>)ViewBag.FotosGaleria;
+                                var fotosList = fotos.ToList();
+                            }
+                            
+                            @for (int i = 0; i < fotosList.Count && i < 9; i++)
+                            {
+                                var foto = fotosList[i];
+                                var colClass = i == 0 ? "col-lg-6 col-md-12" : "col-lg-3 col-md-6";
+
+                                <div class="@colClass">
+                                    <div class="gallery-item">
+                                        <img src="@foto.FotoUrl" 
+                                             alt="@(foto.AltText ?? foto.Descricao ?? "Foto da galeria")" 
+                                             class="gallery-img"
+                                             data-bs-toggle="modal" 
+                                             data-bs-target="#galleryModal" 
+                                             data-bs-slide="@i">
+                                        <div class="gallery-overlay">
+                                            <i class="bi bi-zoom-in"></i>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(foto.Descricao))
+                                        {
+                                            <div class="gallery-caption">
+                                                <p>@foto.Descricao</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        @if (fotosList.Count > 9)
+                        {
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-primary" onclick="showMorePhotos()">
+                                    <i class="bi bi-images me-2"></i>Ver Mais Fotos (@(fotosList.Count - 9) restantes)
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal da Galeria -->
+            <div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title text-white" id="galleryModalLabel">Galeria de Fotos</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-0">
+                            <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    @for (int i = 0; i < fotosList.Count; i++)
+                                    {
+                                        var foto = fotosList[i];
+                                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                                            <img src="@foto.FotoUrl" 
+                                                 class="d-block w-100" 
+                                                 alt="@(foto.AltText ?? foto.Descricao ?? "Foto da galeria")"
+                                                 style="max-height: 70vh; object-fit: contain;">
+                                            @if (!string.IsNullOrEmpty(foto.Descricao))
+                                            {
+                                                <div class="carousel-caption d-block">
+                                                    <p class="mb-0">@foto.Descricao</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                                @if (fotosList.Count > 1)
+                                {
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Anterior</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Próximo</span>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Redes Sociais -->
+        @if (!string.IsNullOrEmpty(Model?.Facebook) || !string.IsNullOrEmpty(Model?.Instagram) || !string.IsNullOrEmpty(Model?.Twitter) || !string.IsNullOrEmpty(Model?.LinkedIn) || !string.IsNullOrEmpty(Model?.Website))
+        {
+            <div class="row mt-5">
+                <div class="col-12 text-center">
+                    <div class="social-section">
+                        <h5 class="mb-3">Siga-nos nas Redes Sociais</h5>
+                        <div class="social-links">
+                            @if (!string.IsNullOrEmpty(Model?.Website))
+                            {
+                                <a href="@Model.Website" class="social-link" target="_blank" rel="noopener">
+                                    <i class="bi bi-globe"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(Model?.Facebook))
+                            {
+                                <a href="@Model.Facebook" class="social-link" target="_blank" rel="noopener">
+                                    <i class="bi bi-facebook"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(Model?.Instagram))
+                            {
+                                <a href="@Model.Instagram" class="social-link" target="_blank" rel="noopener">
+                                    <i class="bi bi-instagram"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(Model?.Twitter))
+                            {
+                                <a href="@Model.Twitter" class="social-link" target="_blank" rel="noopener">
+                                    <i class="bi bi-twitter"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(Model?.LinkedIn))
+                            {
+                                <a href="@Model.LinkedIn" class="social-link" target="_blank" rel="noopener">
+                                    <i class="bi bi-linkedin"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</main>
+
+<style>
+    /* Estilos específicos para a página Sobre usando as variáveis CSS do site */
+    .hero-logo {
+        max-height: 80px;
+        filter: brightness(1.2);
+    }
+
+    .hero-badge .badge {
+        background-color: var(--accent-color) !important;
+        color: var(--dark-gray) !important;
+        font-weight: 500;
+    }
+
+    .about-content {
+        padding: 80px 0;
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .section-divider {
+        height: 3px;
+        width: 80px;
+        background: var(--accent-color);
+        border-radius: 2px;
+        margin-bottom: 2rem;
+    }
+
+    .content-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    .contact-card {
+        text-align: center;
+        padding: 2rem 1.5rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid var(--light-gray);
+        height: 100%;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .contact-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        background: var(--secondary-color);
+        border-radius: 50%;
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+    }
+
+    .contact-card h5 {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover {
+        transform: scale(1.02);
+    }
+
+    .gallery-img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .gallery-item:first-child .gallery-img {
+        height: 400px;
+    }
+
+    .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(126, 39, 38, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        color: white;
+        font-size: 2rem;
+    }
+
+    .gallery-item:hover .gallery-overlay {
+        opacity: 1;
+    }
+
+    .gallery-caption {
+        padding: 1rem;
+        background: white;
+        text-align: center;
+    }
+
+    .gallery-caption p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--dark-gray);
+    }
+
+    .social-section {
+        padding: 3rem 0;
+        background: var(--light-gray);
+        border-radius: 10px;
+        margin: 2rem 0;
+    }
+
+    .social-section h5 {
+        font-family: 'Playfair Display', serif;
+        color: var(--primary-color);
+    }
+
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1.2rem;
+    }
+
+    .social-link:hover {
+        background: var(--accent-color);
+        color: var(--dark-gray);
+        transform: translateY(-3px);
+    }
+
+    @@media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .gallery-img,
+        .gallery-item:first-child .gallery-img {
+            height: 200px;
+        }
+        
+        .contact-card {
+            margin-bottom: 1rem;
+        }
+        
+        .social-links {
+            gap: 0.5rem;
+        }
+        
+        .social-link {
+            width: 45px;
+            height: 45px;
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<script>
+    // Função para mostrar mais fotos (pode ser implementada para carregar via AJAX)
+    function showMorePhotos() {
+        // Implementar carregamento dinâmico de mais fotos se necessário
+        alert('Funcionalidade para carregar mais fotos pode ser implementada aqui');
+    }
+
+    // Configurar modal da galeria para abrir na foto clicada
+    document.addEventListener('DOMContentLoaded', function() {
+        const galleryModal = document.getElementById('galleryModal');
+        if (galleryModal) {
+            galleryModal.addEventListener('show.bs.modal', function (event) {
+                const slideNumber = event.relatedTarget.getAttribute('data-bs-slide');
+                if (slideNumber) {
+                    const carousel = document.getElementById('galleryCarousel');
+                    const bsCarousel = new bootstrap.Carousel(carousel);
+                    bsCarousel.to(parseInt(slideNumber));
+                }
+            });
+        }
+    });
+</script>

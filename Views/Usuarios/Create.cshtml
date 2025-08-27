@@ -1,0 +1,109 @@
+@model GerenciadorHotel.ViewModels.CriarUsuarioViewModel
+
+@{
+    ViewData["Title"] = "Criar Usuário";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-person-plus"></i> @ViewData["Title"]</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Nome" class="form-control" placeholder="Nome" />
+                                <label asp-for="Nome"></label>
+                                <span asp-validation-for="Nome" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Sobrenome" class="form-control" placeholder="Sobrenome" />
+                                <label asp-for="Sobrenome"></label>
+                                <span asp-validation-for="Sobrenome" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="email@exemplo.com" />
+                        <label asp-for="Email"></label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Senha" class="form-control" placeholder="Senha" />
+                                <label asp-for="Senha"></label>
+                                <span asp-validation-for="Senha" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="ConfirmarSenha" class="form-control" placeholder="Confirmar Senha" />
+                                <label asp-for="ConfirmarSenha"></label>
+                                <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select asp-for="NivelAcesso" class="form-select" asp-items="Html.GetEnumSelectList<GerenciadorHotel.Models.NivelAcesso>()">
+                            <option value="">Selecione o nível de acesso</option>
+                        </select>
+                        <label asp-for="NivelAcesso"></label>
+                        <span asp-validation-for="NivelAcesso" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check"></i> Criar Usuário
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Informações</h5>
+            </div>
+            <div class="card-body">
+                <h6>Níveis de Acesso:</h6>
+                <ul class="list-unstyled">
+                    <li><span class="badge bg-danger">Administrador</span> - Acesso total ao sistema</li>
+                    <li><span class="badge bg-warning text-dark">Recepcionista</span> - Gerencia reservas e hóspedes</li>
+                    <li><span class="badge bg-info">Hóspede</span> - Acesso limitado às próprias reservas</li>
+                </ul>
+                
+                <hr>
+                
+                <h6>Requisitos da Senha:</h6>
+                <ul class="small">
+                    <li>Mínimo de 6 caracteres</li>
+                    <li>Pelo menos 1 dígito</li>
+                </ul>
+                
+                <div class="alert alert-info small mt-3">
+                    <i class="bi bi-lightbulb"></i> O usuário será criado com email já confirmado e status ativo.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

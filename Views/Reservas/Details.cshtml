@@ -1,0 +1,69 @@
+@model GerenciadorHotel.Models.Reserva
+@{
+    ViewData["Title"] = "Detalhes da Reserva";
+}
+<h2>Detalhes da Reserva</h2>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-5">Nome do Hóspede</dt>
+            <dd class="col-sm-7">@Model.NomeCompleto</dd>
+            <dt class="col-sm-5">Email</dt>
+            <dd class="col-sm-7">@Model.Email</dd>
+            <dt class="col-sm-5">Telefone</dt>
+            <dd class="col-sm-7">@Model.Telefone</dd>
+            <dt class="col-sm-5">País</dt>
+            <dd class="col-sm-7">@Model.Pais?.Nome</dd>
+            <dt class="col-sm-5">Acomodação</dt>
+            <dd class="col-sm-7">@Model.Acomodacao?.Nome</dd>
+            <dt class="col-sm-5">Camas de Solteiro</dt>
+            <dd class="col-sm-7">@Model.Acomodacao?.QuantidadeCamasSolteiro</dd>
+            <dt class="col-sm-5">Camas de Casal</dt>
+            <dd class="col-sm-7">@Model.Acomodacao?.QuantidadeCamasCasal</dd>
+            <dt class="col-sm-5">Check-in</dt>
+            <dd class="col-sm-7">@Model.DataCheckIn.ToString("dd/MM/yyyy")</dd>
+            <dt class="col-sm-5">Check-out</dt>
+            <dd class="col-sm-7">@Model.DataCheckOut.ToString("dd/MM/yyyy")</dd>
+            <dt class="col-sm-5">Número de Hóspedes</dt>
+            <dd class="col-sm-7">@Model.NumeroHospedes</dd>
+            <dt class="col-sm-5">Pedidos Especiais</dt>
+            <dd class="col-sm-7">@Model.PedidosEspeciais</dd>
+            <dt class="col-sm-5">Status</dt>
+                <dd class="col-sm-7">@Model.Status.GetDisplayName()</dd>
+            <dt class="col-sm-5">Valor Total</dt>
+            <dd class="col-sm-7">@Model.ValorTotal.ToString("C")</dd>
+            <dt class="col-sm-5">Observações</dt>
+            <dd class="col-sm-7">@Model.Observacoes</dd>
+        </dl>
+    </div>
+    <div class="col-md-6">
+        <h4>Ações</h4>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mb-2">Editar</a>
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+            <button type="submit" class="btn btn-danger mb-2" onclick="return confirm('Tem certeza que deseja excluir esta reserva?');">Excluir</button>
+        </form>
+        @if (Model.Status == GerenciadorHotel.Models.StatusReserva.Confirmada)
+        {
+            <form asp-action="CheckIn" method="post" class="mb-2">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-success">Realizar Check-in</button>
+            </form>
+        }
+        @if (Model.Status == GerenciadorHotel.Models.StatusReserva.CheckInRealizado)
+        {
+            <form asp-action="CheckOut" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">Realizar Check-out</button>
+            </form>
+        }
+        @if (User.IsInRole("Hospede"))
+        {
+            <a asp-action="MinhasReservas" class="btn btn-secondary">Voltar</a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+        }
+    </div>
+</div>

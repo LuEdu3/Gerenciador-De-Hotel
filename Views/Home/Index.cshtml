@@ -1,0 +1,239 @@
+﻿@using GerenciadorHotel.Models
+@model IEnumerable<Acomodacao>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- Carrossel Hero -->
+<div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="4000">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    
+    <div class="carousel-inner">
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+            <img src="https://static.wixstatic.com/media/b87f83_579ca8506aae4096b4ce90218e1ef239~mv2.jpg/v1/fill/w_1107,h_748,q_90,enc_avif,quality_auto/b87f83_579ca8506aae4096b4ce90218e1ef239~mv2.jpg" 
+                 class="d-block w-100 carousel-image" alt="Vista externa do hotel">
+            <div class="carousel-caption">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h1 class="hero-title">Descubra o Luxo da Hospitalidade Autêntica</h1>
+                            <p class="hero-subtitle">O Quinta do Ypuã combina elegância contemporânea com um serviço personalizado para criar experiências memoráveis.</p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-carousel-primary btn-lg px-4 py-3">Ver Acomodações</a>
+                                <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-carousel-secondary btn-lg px-4 py-3">Sobre Nós</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+            <img src="https://static.wixstatic.com/media/b87f83_56923e1bbcc74419b614629e2930f9f8~mv2.jpg/v1/fill/w_1107,h_748,q_90,enc_avif,quality_auto/b87f83_56923e1bbcc74419b614629e2930f9f8~mv2.jpg" 
+                 class="d-block w-100 carousel-image" alt="Interior do hotel">
+            <div class="carousel-caption">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h1 class="hero-title">Conforto e Elegância em Cada Detalhe</h1>
+                            <p class="hero-subtitle">Nossas instalações foram cuidadosamente projetadas para proporcionar máximo conforto e sofisticação.</p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-carousel-primary btn-lg px-4 py-3">Ver Acomodações</a>
+                                <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-carousel-secondary btn-lg px-4 py-3">Sobre Nós</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3 -->
+        <div class="carousel-item">
+            <img src="https://static.wixstatic.com/media/b87f83_5d8d3cfa379e45f4b83dfdbd44b72882~mv2.jpg/v1/fill/w_980,h_748,q_90,enc_avif,quality_auto/b87f83_5d8d3cfa379e45f4b83dfdbd44b72882~mv2.jpg" 
+                 class="d-block w-100 carousel-image" alt="Área de lazer do hotel">
+            <div class="carousel-caption">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h1 class="hero-title">Experiências Únicas Aguardam por Você</h1>
+                            <p class="hero-subtitle">Desfrute de momentos inesquecíveis em um ambiente que combina natureza, luxo e tranquilidade.</p>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-carousel-primary btn-lg px-4 py-3">Ver Acomodações</a>
+                                <a href="@Url.Action("Sobre", "Empresa")" class="btn btn-carousel-secondary btn-lg px-4 py-3">Sobre Nós</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<main class="accommodations">
+    <div class="container">
+        <h2 class="section-title">Nossas Acomodações</h2>
+        <p class="text-center mb-5">Conheça nossos espaços cuidadosamente projetados para seu conforto</p>
+        
+        <!-- Filtros -->
+        <form asp-controller="Home" asp-action="Acomodacao" method="get" class="filter-section">
+            <h4 class="filter-title">Filtrar Acomodações</h4>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="NomeAcomodacao" class="form-label">Nome da Acomodação</label>
+                    <input type="text" class="form-control" id="NomeAcomodacao" name="NomeAcomodacao" 
+                           placeholder="Digite o nome da acomodação..." value="@ViewBag.FiltroNome">
+                </div>
+                <div class="col-md-3">
+                    <label for="FaixaPreco" class="form-label">Faixa de Preço</label>
+                    <select class="form-select" id="FaixaPreco" name="FaixaPreco">
+                        <option value="">Todos</option>
+                        <option value="0-300">Até R$ 300</option>
+                        <option value="300-600">R$ 300 - R$ 600</option>
+                        <option value="600-900">R$ 600 - R$ 900</option>
+                        <option value="900-9999">Acima de R$ 900</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="Capacidade" class="form-label">Capacidade</label>
+                    <select class="form-select" id="Capacidade" name="Capacidade">
+                        <option value="">Todos</option>
+                        <option value="1">1 Pessoa</option>
+                        <option value="2">2 Pessoas</option>
+                        <option value="3-4">3-4 Pessoas</option>
+                        <option value="5">Família (5+)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-accent w-100">Aplicar Filtros</button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Cards de Acomodações -->
+        <div class="row">
+            @foreach (var acomodacao in Model.Take(3))
+            {
+                <div class="col-lg-4 col-md-6 mb-4 d-flex">
+                    <div class="room-card">
+                        @if (!string.IsNullOrEmpty(acomodacao.ImagemPrincipalUrl))
+                        {
+                            <img src="@acomodacao.ImagemPrincipalUrl" alt="@acomodacao.Nome">
+                        }
+                        else if (acomodacao.Imagens != null && acomodacao.Imagens.Any())
+                        {
+                            <img src="@acomodacao.Imagens.First().ImagemUrl" alt="@acomodacao.Nome">
+                        }
+                        else
+                        {
+                            <img src="~/images/no-image.jpg" alt="@acomodacao.Nome">
+                        }
+                        <div class="room-card-body">
+                            <h3 class="room-title">@acomodacao.Nome</h3>
+                            <div class="room-price">R$ @acomodacao.Preco.ToString("N2") <small>/noite</small></div>
+                            <div class="room-features">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <div>
+                                        @if (acomodacao.QuantidadeCamasSolteiro > 0)
+                                        {
+                                            <span>@acomodacao.QuantidadeCamasSolteiro cama(s) de solteiro</span>
+                                        }
+                                        @if (acomodacao.QuantidadeCamasCasal > 0)
+                                        {
+                                            <span>@acomodacao.QuantidadeCamasCasal cama(s) de casal</span>
+                                        }
+                                    </div>
+                                    <div>
+                                        <span>Min. @acomodacao.MinimoNoites noite@(acomodacao.MinimoNoites > 1 ? "s" : "")</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <!-- Número do quarto removido -->
+                                    </div>
+                                    <div>
+                                        <span>
+                                            @(
+                                                acomodacao.QuantidadeMaximaHospedes == 0
+                                                    ? "Acomoda: hóspedes ilimitados"
+                                                    : $"Acomoda: {acomodacao.QuantidadeMaximaHospedes} hóspede{(acomodacao.QuantidadeMaximaHospedes > 1 ? "s" : "")}"
+                                            )
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>@acomodacao.Descricao</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-room" onclick="handleReservaClick(event, @acomodacao.Id)">Reservar</button>
+                                <a href="@Url.Action("DetalhesAcomodacao", "Home", new { id = acomodacao.Id })" class="btn-details-outline">
+                                    <i class="bi bi-eye"></i> Detalhes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="@Url.Action("Acomodacao", "Home")" class="btn btn-outline-primary btn-lg">Ver Todas as Acomodações</a>
+        </div>
+    </div>
+</main>
+
+<!-- Seção Sobre -->
+<section class="about-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="about-video">
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/I8iT0OJ7Zd4?rel=0&modestbranding=1&controls=1&showinfo=0" 
+                            title="Vídeo sobre a Quinta do Ypuã" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-content">
+                    @if (ViewBag.Empresa != null)
+                    {
+                        <h2 class="section-title text-start">Sobre @ViewBag.Empresa.Nome</h2>
+                        <p class="lead">@(ViewBag.Empresa.Slogan ?? "Natureza, conforto e simplicidade")</p>
+                        <p>@(ViewBag.Empresa.DescricaoSobre ?? "O Ypuã tem tudo a ver com a natureza, dá para sentir a energia do lugar. Eu me preocupo se você vai comer bem, dormir bem e se vai se sentir em casa. Vou te mostrar onde encontrar os melhores frutos do mar, onde curtir a melhor praia e as melhores ondas. Mas se você não quiser fazer nada eu também conheço o melhor lugar.")</p>
+                    }
+                    else
+                    {
+                        <h2 class="section-title text-start">Sobre a Quinta do Ypuã</h2>
+                        <p class="lead">Natureza, conforto e simplicidade</p>
+                        <p>O Ypuã tem tudo a ver com a natureza, dá para sentir a energia do lugar. Oferecemos um recanto de aconchego e lazer, em ambiente rústico e agradável. Ideal para quem gosta de fugir da rotina e procura um local de paz para descansar e curtir a natureza.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar o carrossel
+        const heroCarousel = document.getElementById('heroCarousel');
+        if (heroCarousel) {
+            const carousel = new bootstrap.Carousel(heroCarousel, {
+                interval: 4000,
+                wrap: true,
+                pause: 'hover',
+                ride: 'carousel'
+            });
+        }
+    });
+</script>

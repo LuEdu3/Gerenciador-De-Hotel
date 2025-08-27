@@ -1,0 +1,206 @@
+@model GerenciadorHotel.Models.Acomodacao
+
+@{
+    ViewData["Title"] = "Confirmar Exclusão";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-trash"></i> @ViewData["Title"]</h1>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="alert alert-danger">
+        <h4><i class="bi bi-exclamation-triangle"></i> Atenção!</h4>
+        <p class="mb-0">Você está prestes a excluir permanentemente esta acomodação. Esta ação não pode ser desfeita.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="bi bi-house-door"></i> Dados da Acomodação a ser Excluída</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.Nome)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.Nome)
+                        </dd>
+
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.Descricao)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.Descricao)
+                        </dd>
+
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.Status)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @{
+                                var statusClass = Model.Status switch
+                                {
+                                    GerenciadorHotel.Models.StatusAcomodacao.Disponivel => "success",
+                                    GerenciadorHotel.Models.StatusAcomodacao.Ocupada => "danger",
+                                    GerenciadorHotel.Models.StatusAcomodacao.Manutencao => "warning",
+                                    GerenciadorHotel.Models.StatusAcomodacao.ForaDeServico => "dark",
+                                    _ => "secondary"
+                                };
+                            }
+                            <span class="badge bg-@statusClass">@Html.DisplayFor(model => model.Status)</span>
+                        </dd>
+
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.QuantidadeCamasSolteiro)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.QuantidadeCamasSolteiro)
+                        </dd>
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.QuantidadeCamasCasal)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.QuantidadeCamasCasal)
+                        </dd>
+
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.Preco)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.Preco, "{0:C}")
+                        </dd>
+
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.MinimoNoites)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.MinimoNoites)
+                        </dd>
+
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.Ativa)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Ativa)
+                            {
+                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Ativa</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Inativa</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">
+                            @Html.DisplayNameFor(model => model.DataCriacao)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @Html.DisplayFor(model => model.DataCriacao, "{0:dd/MM/yyyy HH:mm}")
+                        </dd>
+
+                        @if (Model.DataAtualizacao.HasValue)
+                        {
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.DataAtualizacao)
+                            </dt>
+                            <dd class="col-sm-9">
+                                @Html.DisplayFor(model => model.DataAtualizacao, "{0:dd/MM/yyyy HH:mm}")
+                            </dd>
+                        }
+                    </dl>
+
+                    @if (Model.AcomodacaoAmenidades?.Any() == true)
+                    {
+                        <hr>
+                        <h6><i class="bi bi-star"></i> Comodidades Associadas:</h6>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            @foreach (var amenidadeRelacao in Model.AcomodacaoAmenidades)
+                            {
+                                <span class="badge bg-info">
+                                    <i class="bi bi-check"></i> @amenidadeRelacao.Amenidade.Nome
+                                </span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.ImagemPrincipalUrl))
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="bi bi-camera"></i> Imagem Principal</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="@Model.ImagemPrincipalUrl" alt="@Model.Nome" class="img-fluid rounded">
+                    </div>
+                </div>
+            }
+
+            <div class="card mt-3">
+                <div class="card-header bg-warning">
+                    <h6><i class="bi bi-exclamation-triangle"></i> Impacto da Exclusão</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning small">
+                        <strong>O que será excluído:</strong>
+                        <ul class="mb-2 mt-2">
+                            <li>Todos os dados da acomodação</li>
+                            <li>Associações com comodidades</li>
+                            <li>Imagens relacionadas</li>
+                        </ul>
+                        
+                        <strong>Importante:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Reservas existentes podem ser afetadas</li>
+                            <li>Histórico de pagamentos será mantido</li>
+                            <li>Esta ação é irreversível</li>
+                        </ul>
+                    </div>
+
+                    @if (Model.Reservas?.Any() == true)
+                    {
+                        <div class="alert alert-danger small">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Atenção:</strong> Esta acomodação possui @Model.Reservas.Count() reserva(s) associada(s).
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h5 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Confirmação de Exclusão</h5>
+                    <p class="text-muted">Tem certeza de que deseja excluir permanentemente a acomodação "<strong>@Model.Nome</strong>"?</p>
+                    
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn-details-outline me-md-2">
+                                <i class="bi bi-eye"></i> Visualizar Detalhes
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">
+                                <i class="bi bi-x"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('ATENÇÃO: Esta ação é irreversível! Confirma a exclusão da acomodação?')">
+                                <i class="bi bi-trash"></i> Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

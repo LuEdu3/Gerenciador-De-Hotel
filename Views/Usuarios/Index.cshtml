@@ -1,0 +1,359 @@
+@model IEnumerable<GerenciadorHotel.ViewModels.UsuarioListViewModel>
+
+@{
+    ViewData["Title"] = "Gerenciar Usuários";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-people"></i> @ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Novo Usuário
+    </a>
+</div>
+
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["Sucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["Erro"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<form method="get" class="mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <input type="text" name="busca" value="@Context.Request.Query["busca"]" class="form-control" placeholder="Buscar por nome ou email..." />
+        </div>
+        <div class="col-md-2">
+            @{
+                var nivelAcessoSel = Context.Request.Query["nivelAcesso"].ToString();
+            }
+            <select name="nivelAcesso" class="form-select">
+                @if (string.IsNullOrEmpty(nivelAcessoSel)) {
+                    <option value="" selected>Todos os níveis</option>
+                } else {
+                    <option value="">Todos os níveis</option>
+                }
+                @if (nivelAcessoSel == "Administrador") {
+                    <option value="Administrador" selected>Administrador</option>
+                } else {
+                    <option value="Administrador">Administrador</option>
+                }
+                @if (nivelAcessoSel == "Recepcionista") {
+                    <option value="Recepcionista" selected>Recepcionista</option>
+                } else {
+                    <option value="Recepcionista">Recepcionista</option>
+                }
+                @if (nivelAcessoSel == "Hospede") {
+                    <option value="Hospede" selected>Hóspede</option>
+                } else {
+                    <option value="Hospede">Hóspede</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            @{
+                var statusSel = Context.Request.Query["status"].ToString();
+            }
+            <select name="status" class="form-select">
+                @if (string.IsNullOrEmpty(statusSel)) {
+                    <option value="" selected>Todos</option>
+                } else {
+                    <option value="">Todos</option>
+                }
+                @if (statusSel == "ativo") {
+                    <option value="ativo" selected>Ativo</option>
+                } else {
+                    <option value="ativo">Ativo</option>
+                }
+                @if (statusSel == "inativo") {
+                    <option value="inativo" selected>Inativo</option>
+                } else {
+                    <option value="inativo">Inativo</option>
+                }
+            </select>
+        </div>
+    <!-- Removido campo de busca duplicado -->
+    </div>
+
+</form>
+<script>
+    // AJAX para filtro em tempo real sem recarregar a página
+    const filtroForm = document.querySelector('form[method="get"]');
+    const buscaInput = filtroForm.querySelector('input[name="busca"]');
+    let debounceTimer;
+    function atualizarTabelaUsuarios(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const novaTabela = doc.querySelector('.table-responsive');
+        const tabelaAtual = document.querySelector('.table-responsive');
+        if (novaTabela && tabelaAtual) {
+            tabelaAtual.innerHTML = novaTabela.innerHTML;
+        }
+    }
+    function enviarFiltroAjax() {
+        const url = filtroForm.action + '?' + new URLSearchParams(new FormData(filtroForm)).toString();
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(resp => resp.text())
+            .then(html => atualizarTabelaUsuarios(html));
+    }
+    if (buscaInput) {
+        buscaInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                enviarFiltroAjax();
+            }, 400);
+        });
+    }
+    filtroForm.querySelectorAll('select').forEach(function (select) {
+        select.addEventListener('change', function () {
+            enviarFiltroAjax();
+        });
+    });
+</script>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome Completo</th>
+                        <th>Email</th>
+                        <th>Nível de Acesso</th>
+                        <th>Status</th>
+                        <th>Data de Cadastro</th>
+                        <th>Último Login</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="@(item.Ativo ? "" : "table-secondary")">
+                            <td>
+                                <strong>@item.NomeCompleto</strong>
+                                @if (!item.Ativo)
+                                {
+                                    <span class="badge bg-secondary ms-2">Inativo</span>
+                                }
+                            </td>
+                            <td>@item.Email</td>
+                            <td>
+                                <span class="badge @(item.NivelAcesso switch {
+                                    GerenciadorHotel.Models.NivelAcesso.Administrador => "bg-danger",
+                                    GerenciadorHotel.Models.NivelAcesso.Recepcionista => "bg-warning text-dark",
+                                    _ => "bg-info"
+                                })">
+                                    @item.NivelAcesso.ToString()
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.Ativo)
+                                {
+                                    <span class="badge bg-success">Ativo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inativo</span>
+                                }
+                            </td>
+                            <td>@item.DataCadastro.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.UltimoLogin?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-details-outline btn-details-outline-sm" title="Detalhes">
+                                        <i class="bi bi-eye"></i> Detalhes
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                    <button type="button" class="btn @(item.Ativo ? "btn-outline-warning" : "btn-outline-success")" 
+                        title="@(item.Ativo ? "Desativar" : "Ativar")"
+                        onclick="openToggleStatusModal('@item.Id')">
+                                            <i class="bi @(item.Ativo ? "bi-pause" : "bi-play")"></i>
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-outline-danger" title="Excluir" onclick="openDeleteModal('@item.Id')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                <!-- Modal Toggle Status -->
+                                <div class="modal fade" id="modalToggleStatus-@item.Id" tabindex="-1" aria-labelledby="modalToggleStatusLabel-@item.Id" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="modalToggleStatusLabel-@item.Id">Confirmação</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        Tem certeza que deseja @(item.Ativo ? "desativar" : "ativar") o usuário <strong>@item.NomeCompleto</strong>?
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn @(item.Ativo ? "btn-warning" : "btn-success")">Sim, @(item.Ativo ? "Desativar" : "Ativar")</button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- Modal Delete -->
+                                <div class="modal fade" id="modalDelete-@item.Id" tabindex="-1" aria-labelledby="modalDeleteLabel-@item.Id" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="modalDeleteLabel-@item.Id">Confirmação de Exclusão</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                        Tem certeza que deseja excluir o usuário <strong>@item.NomeCompleto</strong>?
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form asp-action="DeleteConfirmed" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-4">
+                <i class="bi bi-people display-1 text-muted"></i>
+                <h4 class="text-muted mt-3">Nenhum usuário encontrado</h4>
+                <p class="text-muted">Clique em "Novo Usuário" para cadastrar o primeiro usuário.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5><i class="bi bi-people"></i> Total de Usuários</h5>
+                    <h2>@Model.Count()</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5><i class="bi bi-person-check"></i> Usuários Ativos</h5>
+                    <h2>@Model.Count(u => u.Ativo)</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5><i class="bi bi-shield-exclamation"></i> Administradores</h5>
+                    <h2>@Model.Count(u => u.NivelAcesso == GerenciadorHotel.Models.NivelAcesso.Administrador)</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Sanitização e inicialização: evitar backdrop e resíduos
+        document.addEventListener('DOMContentLoaded', function () {
+            // Esconder quaisquer modais "show" residuais ao entrar
+            document.querySelectorAll('.modal.show').forEach(function (m) {
+                try { bootstrap.Modal.getOrCreateInstance(m).hide(); } catch (e) { /* noop */ }
+            });
+            // Remover backdrops órfãos e resetar body
+            document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('paddingRight');
+
+            // Inicializar modais desta página sem backdrop
+            document.querySelectorAll('[id^="modalToggleStatus-"]').forEach(function (el) {
+                try {
+                    bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    el.addEventListener('shown.bs.modal', function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    });
+                } catch (e) { /* noop */ }
+            });
+            document.querySelectorAll('[id^="modalDelete-"]').forEach(function (el) {
+                try {
+                    bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    el.addEventListener('shown.bs.modal', function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    });
+                } catch (e) { /* noop */ }
+            });
+
+            // Expor funções para abrir os modais via JS (sem backdrop)
+            window.openToggleStatusModal = function (id) {
+                var el = document.getElementById('modalToggleStatus-' + id);
+                if (!el) return;
+                try {
+                    var modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    modal.show();
+                    setTimeout(function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    }, 0);
+                } catch (e) { /* noop */ }
+            };
+            window.openDeleteModal = function (id) {
+                var el = document.getElementById('modalDelete-' + id);
+                if (!el) return;
+                try {
+                    var modal = bootstrap.Modal.getOrCreateInstance(el, { backdrop: false, keyboard: true });
+                    modal.show();
+                    setTimeout(function(){
+                        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('paddingRight');
+                    }, 0);
+                } catch (e) { /* noop */ }
+            };
+        });
+        // Limpeza adicional ao voltar via histórico
+        window.addEventListener('pageshow', function () {
+            document.querySelectorAll('.modal.show').forEach(function (m) {
+                try { bootstrap.Modal.getOrCreateInstance(m).hide(); } catch (e) { /* noop */ }
+            });
+            document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('paddingRight');
+        });
+    </script>
+}

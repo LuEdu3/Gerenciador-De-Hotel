@@ -1,0 +1,459 @@
+@model List<GerenciadorHotel.Models.EmpresaFoto>
+@using GerenciadorHotel.Extensions
+
+@{
+    ViewData["Title"] = "Gerenciar Fotos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">Gerenciar Fotos da Empresa</h1>
+                    <p class="text-muted mb-0">@ViewBag.EmpresaNome</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("AdicionarFoto")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Adicionar Foto
+                    </a>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                    </a>
+                </div>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (Model.Any())
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-images me-2"></i>Fotos da Empresa (@Model.Count)
+                        </h5>
+                        <small class="text-muted">Arraste as fotos para reordená-las</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="fotos-container" class="row">
+                            @foreach (var foto in Model.OrderBy(f => f.Tipo).ThenBy(f => f.Ordem))
+                            {
+                                <div class="col-md-4 col-lg-3 mb-4 foto-item" data-id="@foto.Id">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <div class="position-relative overflow-hidden">
+                                            <img src="@foto.FotoUrl" alt="@foto.AltText" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                            <div class="position-absolute top-0 end-0 p-2">
+                                                <span class="badge bg-primary shadow-sm">@foto.Tipo.GetDisplayName()</span>
+                                            </div>
+                                            <div class="position-absolute bottom-0 start-0 p-2">
+                                                <span class="badge bg-dark shadow-sm">Ordem: @foto.Ordem</span>
+                                            </div>
+                                            @if (!foto.Ativo)
+                                            {
+                                                <div class="position-absolute top-0 start-0 p-2">
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-eye-slash me-1"></i>Inativa
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="card-body p-3 flex-grow-1">
+                                            <h6 class="card-title mb-2 text-truncate">
+                                                @(foto.Descricao ?? "Sem descrição")
+                                            </h6>
+                                            <div class="small text-muted">
+                                                @if (!string.IsNullOrEmpty(foto.AltText))
+                                                {
+                                                    <div class="mb-1">
+                                                        <i class="fas fa-universal-access me-1"></i>
+                                                        <strong>Alt:</strong> <span class="text-truncate d-inline-block" style="max-width: 120px;">@foto.AltText</span>
+                                                    </div>
+                                                }
+                                                <div class="mb-1">
+                                                    <i class="fas fa-tag me-1"></i>
+                                                    <strong>Tipo:</strong> @foto.Tipo.GetDisplayName()
+                                                </div>
+                                                <div>
+                                                    <i class="fas fa-toggle-@(foto.Ativo ? "on text-success" : "off text-danger") me-1"></i>
+                                                    <strong>Status:</strong> @(foto.Ativo ? "Ativa" : "Inativa")
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer p-2">
+                                            <div class="btn-group w-100" role="group">
+                                                <a href="@Url.Action("EditarFoto", new { id = foto.Id })" 
+                                                   class="btn btn-outline-primary btn-sm" 
+                                                   title="Editar foto">
+                                                    <i class="fas fa-edit me-1"></i>Editar
+                                                </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                        onclick="confirmarExclusao(@foto.Id)"
+                                                        title="Excluir foto">
+                                                    <i class="fas fa-trash me-1"></i>Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhuma foto cadastrada</h5>
+                    <p class="text-muted">Clique no botão "Adicionar Foto" para começar.</p>
+                    <a href="@Url.Action("AdicionarFoto")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Adicionar Primeira Foto
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1" aria-labelledby="modalExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExclusaoLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <h6>Tem certeza que deseja excluir esta foto?</h6>
+                    <p class="text-muted small mb-0">Esta ação não pode ser desfeita.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <form id="formExclusao" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        // Variável global para controlar o modal
+        let modalExclusao = null;
+
+        // Função para confirmar exclusão
+        function confirmarExclusao(id) {
+            // Limpar qualquer backdrop residual antes de abrir o modal
+            limparBackdrops();
+            
+            const form = document.getElementById('formExclusao');
+            form.action = '@Url.Action("ExcluirFoto")/' + id;
+            
+            // Obter ou criar instância do modal SEM BACKDROP
+            const modalElement = document.getElementById('modalExclusao');
+            if (!modalExclusao) {
+                modalExclusao = new bootstrap.Modal(modalElement, {
+                    backdrop: false,  // DESABILITAR BACKDROP COMPLETAMENTE
+                    keyboard: true,
+                    focus: true
+                });
+            }
+            
+            modalExclusao.show();
+        }
+
+        // Função para limpar backdrops residuais
+        function limparBackdrops() {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('padding-right');
+            document.body.style.removeProperty('overflow');
+        }
+
+        // Função de emergência para forçar fechamento completo
+        function forcarFechamentoModal() {
+            // Fechar modal se estiver aberto
+            if (modalExclusao) {
+                modalExclusao.hide();
+            }
+            
+            // Fechar todos os modais Bootstrap
+            const modals = document.querySelectorAll('.modal.show');
+            modals.forEach(modal => {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+            
+            // Limpeza forçada
+            setTimeout(() => {
+                limparBackdrops();
+                // Remove classes do body que possam ter ficado
+                document.body.className = document.body.className.replace(/modal-[^\s]*/g, '');
+            }, 200);
+        }
+
+        // Adicionar ao window para debug (pode ser removido em produção)
+        window.forcarFechamentoModal = forcarFechamentoModal;
+
+        // Implementar drag and drop para reordenação
+        document.addEventListener('DOMContentLoaded', function() {
+            // Limpar backdrops ao carregar a página
+            limparBackdrops();
+            
+            // INTERCEPTAR E BLOQUEAR CRIAÇÃO DE BACKDROP
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1 && node.classList && node.classList.contains('modal-backdrop')) {
+                            console.log('Backdrop detectado e removido!');
+                            node.remove();
+                        }
+                    });
+                });
+            });
+            
+            // Observar mudanças no body para capturar backdrops
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            
+            // Configurar eventos do modal uma única vez
+            const modalElement = document.getElementById('modalExclusao');
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    // Aguardar um pouco antes de limpar para garantir que o Bootstrap termine
+                    setTimeout(limparBackdrops, 100);
+                });
+                
+                modalElement.addEventListener('show.bs.modal', function () {
+                    // Limpar qualquer backdrop residual antes de mostrar
+                    limparBackdrops();
+                });
+                
+                modalElement.addEventListener('shown.bs.modal', function () {
+                    // Limpeza adicional após mostrar
+                    setTimeout(limparBackdrops, 50);
+                });
+                
+                // Evento adicional para quando o modal é escondido por qualquer motivo
+                modalElement.addEventListener('hide.bs.modal', function () {
+                    setTimeout(limparBackdrops, 50);
+                });
+            }
+            
+            // Adicionar listener global para detectar cliques fora de modais
+            document.addEventListener('click', function(event) {
+                // Se clicou em um backdrop, garantir limpeza
+                if (event.target.classList.contains('modal-backdrop')) {
+                    setTimeout(limparBackdrops, 200);
+                }
+            });
+            
+            // Listener para ESC key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    setTimeout(limparBackdrops, 100);
+                }
+            });
+            
+            const container = document.getElementById('fotos-container');
+            if (container && container.children.length > 1) {
+                new Sortable(container, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    onEnd: function (evt) {
+                        const items = container.querySelectorAll('.foto-item');
+                        const idsOrdenados = Array.from(items).map(item => parseInt(item.dataset.id));
+                        
+                        // Enviar nova ordem para o servidor
+                        fetch('@Url.Action("ReordenarFotos")', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify(idsOrdenados)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Atualizar números de ordem na interface
+                                items.forEach((item, index) => {
+                                    const badge = item.querySelector('.badge.bg-dark');
+                                    if (badge) {
+                                        badge.textContent = 'Ordem: ' + (index + 1);
+                                    }
+                                });
+                                
+                                // Mostrar mensagem de sucesso
+                                showToast('Ordem das fotos atualizada com sucesso!', 'success');
+                            } else {
+                                showToast('Erro ao reordenar fotos', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro:', error);
+                            showToast('Erro ao reordenar fotos', 'error');
+                        });
+                    }
+                });
+            }
+        });
+
+        // Função para mostrar toast
+        function showToast(message, type) {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Criar container de toast se não existir
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            // Remover o elemento após ser escondido
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+    </script>
+
+    <style>
+        .sortable-ghost {
+            opacity: 0.4;
+        }
+        
+        .sortable-chosen {
+            cursor: grabbing;
+        }
+        
+        .sortable-drag {
+            opacity: 0.8;
+        }
+        
+        .foto-item {
+            cursor: grab;
+            transition: transform 0.2s ease;
+        }
+        
+        .foto-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .foto-item:active {
+            cursor: grabbing;
+        }
+        
+        .card-img-top {
+            transition: transform 0.3s ease;
+        }
+        
+        .foto-item:hover .card-img-top {
+            transform: scale(1.02);
+        }
+        
+        /* IMPEDIR BACKDROP COMPLETAMENTE */
+        .modal-backdrop {
+            display: none !important;
+        }
+        
+        /* Criar nosso próprio efeito visual sem backdrop */
+        .modal.show {
+            background-color: rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .modal.show .modal-dialog {
+            background-color: transparent;
+        }
+        
+        .modal.show .modal-content {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: none;
+        }
+        
+        /* Garantir z-index correto */
+        .modal {
+            z-index: 1050 !important;
+        }
+        
+        /* Forçar remoção de qualquer backdrop */
+        body .modal-backdrop,
+        body.modal-open .modal-backdrop,
+        .modal-backdrop.fade,
+        .modal-backdrop.show {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+        }
+        
+        /* Estilização dos botões */
+        .btn-group .btn {
+            border-radius: 0;
+        }
+        
+        .btn-group .btn:first-child {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+        
+        .btn-group .btn:last-child {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+        
+        .card-footer .btn-group {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+    </style>
+}

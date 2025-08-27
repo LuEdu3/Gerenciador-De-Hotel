@@ -1,0 +1,357 @@
+@model GerenciadorHotel.Models.Acomodacao
+
+@{
+    ViewData["Title"] = "Editar Acomodação";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-pencil"></i> @ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-house-door"></i> Informações da Acomodação</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="DataCriacao" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Nome" class="form-control" placeholder="Nome da Acomodação" />
+                                <label asp-for="Nome"></label>
+                                <span asp-validation-for="Nome" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select asp-for="Status" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<GerenciadorHotel.Models.StatusAcomodacao>()">
+                                </select>
+                                <label asp-for="Status"></label>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea asp-for="Descricao" class="form-control" placeholder="Descrição"
+                            style="height: 100px"></textarea>
+                        <label asp-for="Descricao"></label>
+                        <span asp-validation-for="Descricao" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <!-- Removido campo QuantidadeCamas -->
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="QuantidadeCamasSolteiro" class="form-control"
+                                    placeholder="Camas de Solteiro" type="number" min="0" max="10" />
+                                <label asp-for="QuantidadeCamasSolteiro"></label>
+                                <span asp-validation-for="QuantidadeCamasSolteiro" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="QuantidadeCamasCasal" class="form-control" placeholder="Camas de Casal"
+                                    type="number" min="0" max="10" />
+                                <label asp-for="QuantidadeCamasCasal"></label>
+                                <span asp-validation-for="QuantidadeCamasCasal" class="text-danger"></span>
+                            </div>
+                        </div>
+                            <div class="col-md-4">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="QuantidadeMaximaHospedes" class="form-control" placeholder="Máximo de Hóspedes"
+                                        type="number" min="1" max="20" />
+                                    <label asp-for="QuantidadeMaximaHospedes"></label>
+                                    <span asp-validation-for="QuantidadeMaximaHospedes" class="text-danger"></span>
+                                </div>
+                            </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Preco" class="form-control" placeholder="Preço por Noite" type="number"
+                                    step="0.01" min="0.01" max="9999.99" />
+                                <label asp-for="Preco"></label>
+                                <span asp-validation-for="Preco" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="MinimoNoites" class="form-control" placeholder="Quantidade mínima de noites" type="number" min="1" max="30" />
+                                <label asp-for="MinimoNoites">Quantidade mínima de noites</label>
+                                <span asp-validation-for="MinimoNoites" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="HoraCheckIn" class="form-control" type="time" />
+                                <label asp-for="HoraCheckIn"></label>
+                                <span asp-validation-for="HoraCheckIn" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="HoraCheckOut" class="form-control" type="time" />
+                                <label asp-for="HoraCheckOut"></label>
+                                <span asp-validation-for="HoraCheckOut" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="ImagemPrincipalUrl" class="form-control"
+                            placeholder="URL da Imagem Principal" />
+                        <label asp-for="ImagemPrincipalUrl"></label>
+                        <span asp-validation-for="ImagemPrincipalUrl" class="text-danger"></span>
+                        <div class="form-text">Cole a URL de uma imagem para a acomodação</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fotos da Acomodação (mínimo 1, máximo 10)</label>
+                        <input type="file" name="Imagens" id="Imagens" class="form-control" accept="image/*" multiple />
+                        <small class="form-text text-muted">Faça upload de novas imagens para adicionar ao
+                            carousel.</small>
+                        <span class="text-danger" id="imagemErro"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fotos adicionais da acomodação</label>
+                        <input type="text" name="ImagensAcomodacao[0]" class="form-control mb-2"
+                            placeholder="URL da Foto 1" />
+                        <input type="text" name="ImagensAcomodacao[1]" class="form-control mb-2"
+                            placeholder="URL da Foto 2" />
+                        <input type="text" name="ImagensAcomodacao[2]" class="form-control mb-2"
+                            placeholder="URL da Foto 3" />
+                        <input type="text" name="ImagensAcomodacao[3]" class="form-control mb-2"
+                            placeholder="URL da Foto 4" />
+                        <input type="text" name="ImagensAcomodacao[4]" class="form-control mb-2"
+                            placeholder="URL da Foto 5" />
+                        <small class="form-text text-muted">Cole URLs de imagens para adicionar ao carousel
+                            (opcional).</small>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" asp-for="Ativa" />
+                        <label class="form-check-label" asp-for="Ativa">
+                            Acomodação Ativa
+                        </label>
+                        <span asp-validation-for="Ativa" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Amenidades</label>
+                        <div class="row">
+                            @{
+                                var amenidades = ViewBag.Amenidades as List<GerenciadorHotel.Models.Amenidade> ?? new
+                                List<GerenciadorHotel.Models.Amenidade>();
+                                var selecionadas = new HashSet<int>(Model.AcomodacaoAmenidades?.Select(aa => aa.AmenidadeId)
+                                ?? Enumerable.Empty<int>());
+                                foreach (var am in amenidades)
+                                {
+                                    var isChecked = selecionadas.Contains(am.Id) ? "checked" : "";
+                                    var iconClass = am.Nome.ToLower() switch
+                                    {
+                                        "wi-fi" => "bi bi-wifi text-dark",
+                                        "ar-condicionado" => "bi bi-thermometer-half text-dark",
+                                        "tv" => "bi bi-tv text-dark",
+                                        "frigobar" => "bi bi-snow2 text-dark",
+                                        "ducha" => "bi bi-droplet text-dark",
+                                        "banheira" => "bi bi-water text-dark",
+                                        "cozinha" => "bi bi-house-gear text-dark",
+                                        "toalha" => "bi bi-clipboard-check text-dark",
+                                        _ => "bi bi-check-circle text-dark"
+                                    };
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="AmenidadesSelecionadas"
+                                                value="@am.Id" id="amenidade_@am.Id" @Html.Raw(isChecked) />
+                                            <label class="form-check-label" for="amenidade_@am.Id">
+                                                <i class="@iconClass" style="margin-right:6px;"></i>
+                                                @am.Nome
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn-details-outline me-md-2">
+                            <i class="bi bi-eye"></i> Visualizar Detalhes
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-x"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-camera"></i> Preview da Imagem</h5>
+            </div>
+            <div class="card-body text-center">
+                @if (!string.IsNullOrEmpty(Model.ImagemPrincipalUrl))
+                {
+                    <img src="@Model.ImagemPrincipalUrl" alt="Preview" class="img-fluid rounded" style="max-height: 200px;"
+                        id="image-preview">
+                }
+                else
+                {
+                    <div class="bg-light border rounded p-4" id="image-preview">
+                        <i class="bi bi-image display-4 text-muted"></i>
+                        <p class="text-muted mt-2">Preview da imagem aparecerá aqui</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Gerenciamento de imagens já enviadas -->
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-images"></i> Imagens da Acomodação</h6>
+                <small class="text-muted">@((Model.Imagens?.Count ?? 0)) arquivo(s)</small>
+            </div>
+            <div class="card-body">
+                @if (Model.Imagens != null && Model.Imagens.Any())
+                {
+                    var imagensOrdenadas = Model.Imagens.OrderBy(i => i.Ordem).ToList();
+                    <div class="list-group small">
+                        @foreach (var img in imagensOrdenadas)
+                        {
+                            var isPrincipal = !string.IsNullOrEmpty(Model.ImagemPrincipalUrl) && img.ImagemUrl ==
+                            Model.ImagemPrincipalUrl;
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center" style="gap:10px;">
+                                    <img src="@img.ImagemUrl" alt="thumb"
+                                        style="width:56px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #e5e5e5;" />
+                                    <div>
+                                        <div class="fw-semibold text-truncate" style="max-width: 220px;">
+                                            @img.ImagemUrl
+                                        </div>
+                                        <div class="text-muted">Ordem: @img.Ordem @if (isPrincipal){
+                                        <span
+                                                class="badge bg-success ms-2"><i class="bi bi-star-fill"></i> Principal</span>
+                                    }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center" style="gap:6px;">
+                                @if (!isPrincipal)
+                                {
+                                    <form asp-action="DefinirImagemPrincipal" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@img.Id" />
+                                        <input type="hidden" name="acomodacaoId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-star"></i> Definir principal
+                                        </button>
+                                    </form>
+                                }
+                                <form asp-action="RemoverImagem" method="post" class="d-inline"
+                                    onsubmit="return confirm('Remover esta imagem?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@img.Id" />
+                                    <input type="hidden" name="acomodacaoId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+                                }
+                                else
+                {
+                    <div class="text-muted">Nenhuma imagem enviada ainda.</div>
+                }
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="bi bi-info-circle"></i> Informações</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info small">
+                    <strong>Dicas:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Use imagens com boa qualidade e resolução adequada</li>
+                        <li>O preço será exibido por noite</li>
+                        <li>Status "Manutenção" impede novas reservas</li>
+                        <li>Acomodações inativas não aparecem para hóspedes</li>
+                    </ul>
+                </div>
+
+                <div class="mb-2">
+                    <small><strong>Criado em:</strong></small><br>
+                    <small class="text-muted">@Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+
+                @if (Model.DataAtualizacao.HasValue)
+                {
+                    <div>
+                        <small><strong>Última atualização:</strong></small><br>
+                        <small class="text-muted">@Model.DataAtualizacao.Value.ToString("dd/MM/yyyy HH:mm")</small>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Preview da imagem quando a URL é alterada
+        document.getElementById('ImagemPrincipalUrl').addEventListener('input', function () {
+            var url = this.value;
+            var preview = document.getElementById('image-preview');
+
+            if (url) {
+                preview.innerHTML = '<img src="' + url + '" alt="Preview" class="img-fluid rounded" style="max-height: 200px;" onerror="this.style.display=\'none\'">';
+            } else {
+                preview.innerHTML = '<div class="bg-light border rounded p-4"><i class="bi bi-image display-4 text-muted"></i><p class="text-muted mt-2">Preview da imagem aparecerá aqui</p></div>';
+            }
+        });
+
+        // preview das imagens selecionadas (mostra a primeira selecionada)
+        var imagensInput = document.getElementById('Imagens');
+        if (imagensInput) {
+            imagensInput.addEventListener('change', function (e) {
+                var files = e.target.files;
+                var preview = document.getElementById('image-preview');
+                if (files && files.length > 0) {
+                    var reader = new FileReader();
+                    reader.onload = function (ev) {
+                        preview.innerHTML = '<img src="' + ev.target.result + '" class="img-fluid rounded" style="max-height:200px">';
+                    };
+                    reader.readAsDataURL(files[0]);
+                }
+            });
+        }
+    </script>
+}

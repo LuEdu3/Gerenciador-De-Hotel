@@ -1,0 +1,67 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Cadastro";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h2>Criar nova conta</h2>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Nome" class="form-control" aria-required="true" placeholder="João" />
+                <label asp-for="Input.Nome">Nome</label>
+                <span asp-validation-for="Input.Nome" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Sobrenome" class="form-control" aria-required="true" placeholder="Silva" />
+                <label asp-for="Input.Sobrenome">Sobrenome</label>
+                <span asp-validation-for="Input.Sobrenome" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nome@exemplo.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="senha" />
+                <label asp-for="Input.Password">Senha</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="senha" />
+                <label asp-for="Input.ConfirmPassword">Confirmar Senha</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Você está se cadastrando como <strong>Hóspede</strong>. 
+                Para outras funções, entre em contato com a administração.
+            </div>
+            
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Cadastrar como Hóspede</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <section>
+            <h3>Já possui uma conta?</h3>
+            <hr />
+            <p>
+                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Fazer login</a>
+            </p>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
