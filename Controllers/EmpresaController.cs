@@ -138,11 +138,154 @@ namespace GerenciadorHotel.Controllers
                 return RedirectToAction(nameof(Create));
             }
 
-            var fotos = await _empresaService.GetFotosPorTipoAsync(TipoFotoEmpresa.Galeria);
+            var fotos = await _empresaService.GetTodasFotosAsync();
             ViewBag.EmpresaId = empresa.Id;
             ViewBag.EmpresaNome = empresa.Nome;
             
             return View(fotos);
+        }
+
+        // GET: Empresa/AdicionarFoto
+        public async Task<IActionResult> AdicionarFoto()
+        {
+            var empresa = await _empresaService.GetEmpresaAtivaAsync();
+            
+            if (empresa == null)
+            {
+                return RedirectToAction(nameof(Create));
+            }
+
+            var viewModel = new EmpresaFotoViewModel
+            {
+                EmpresaId = empresa.Id
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Empresa/AdicionarFoto
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AdicionarFoto(EmpresaFotoViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var foto = new EmpresaFoto
+            {
+                EmpresaId = viewModel.EmpresaId,
+                FotoUrl = viewModel.FotoUrl,
+                Descricao = viewModel.Descricao,
+                AltText = viewModel.AltText,
+                Ordem = viewModel.Ordem,
+                Tipo = viewModel.Tipo,
+                Ativo = viewModel.Ativo
+            };
+
+            var sucesso = await _empresaService.AdicionarFotoAsync(foto);
+
+            if (sucesso)
+            {
+                TempData["Success"] = "Foto adicionada com sucesso!";
+                return RedirectToAction(nameof(Fotos));
+            }
+
+            TempData["Error"] = "Erro ao adicionar foto. Tente novamente.";
+            return View(viewModel);
+        }
+
+        // GET: Empresa/EditarFoto/5
+        public async Task<IActionResult> EditarFoto(int id)
+        {
+            var foto = await _empresaService.GetFotoPorIdAsync(id);
+            
+            if (foto == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new EmpresaFotoViewModel
+            {
+                Id = foto.Id,
+                EmpresaId = foto.EmpresaId,
+                FotoUrl = foto.FotoUrl ?? string.Empty,
+                Descricao = foto.Descricao,
+                AltText = foto.AltText,
+                Ordem = foto.Ordem,
+                Tipo = foto.Tipo,
+                Ativo = foto.Ativo
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Empresa/EditarFoto/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarFoto(int id, EmpresaFotoViewModel viewModel)
+        {
+            if (id != viewModel.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var foto = new EmpresaFoto
+            {
+                Id = viewModel.Id,
+                EmpresaId = viewModel.EmpresaId,
+                FotoUrl = viewModel.FotoUrl,
+                Descricao = viewModel.Descricao,
+                AltText = viewModel.AltText,
+                Ordem = viewModel.Ordem,
+                Tipo = viewModel.Tipo,
+                Ativo = viewModel.Ativo
+            };
+
+            var sucesso = await _empresaService.AtualizarFotoAsync(foto);
+
+            if (sucesso)
+            {
+                TempData["Success"] = "Foto atualizada com sucesso!";
+                return RedirectToAction(nameof(Fotos));
+            }
+
+            TempData["Error"] = "Erro ao atualizar foto. Tente novamente.";
+            return View(viewModel);
+        }
+
+        // POST: Empresa/ExcluirFoto/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirFoto(int id)
+        {
+            var sucesso = await _empresaService.ExcluirFotoAsync(id);
+
+            if (sucesso)
+            {
+                TempData["Success"] = "Foto excluída com sucesso!";
+            }
+            else
+            {
+                TempData["Error"] = "Erro ao excluir foto. Tente novamente.";
+            }
+
+            return RedirectToAction(nameof(Fotos));
+        }
+
+        // POST: Empresa/ReordenarFotos
+        [HttpPost]
+        public async Task<IActionResult> ReordenarFotos([FromBody] List<int> idsOrdenados)
+        {
+            var sucesso = await _empresaService.ReordenarFotosAsync(idsOrdenados);
+            
+            return Json(new { success = sucesso });
         }
 
         // GET: Empresa/Servicos

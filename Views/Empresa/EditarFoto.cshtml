@@ -1,0 +1,169 @@
+@model GerenciadorHotel.ViewModels.EmpresaFotoViewModel
+@using GerenciadorHotel.Extensions
+
+@{
+    ViewData["Title"] = "Editar Foto";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Editar Foto
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditarFoto" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="EmpresaId" type="hidden" />
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="FotoUrl" class="form-label"></label>
+                                <input asp-for="FotoUrl" class="form-control" placeholder="https://exemplo.com/foto.jpg" />
+                                <div class="form-text">URL completa da imagem (deve ser acessível publicamente)</div>
+                                <span asp-validation-for="FotoUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Descricao" class="form-label"></label>
+                                <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descrição da foto..."></textarea>
+                                <span asp-validation-for="Descricao" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="AltText" class="form-label"></label>
+                                <input asp-for="AltText" class="form-control" placeholder="Texto alternativo para acessibilidade" />
+                                <div class="form-text">Importante para acessibilidade</div>
+                                <span asp-validation-for="AltText" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Tipo" class="form-label"></label>
+                                <select asp-for="Tipo" class="form-select">
+                                    @foreach (var tipo in Enum.GetValues<GerenciadorHotel.Models.TipoFotoEmpresa>())
+                                    {
+                                        <option value="@tipo" selected="@(tipo == Model.Tipo)">@tipo.GetDisplayName()</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Tipo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Ordem" class="form-label"></label>
+                                <input asp-for="Ordem" type="number" class="form-control" min="0" />
+                                <div class="form-text">0 = adicionar no final</div>
+                                <span asp-validation-for="Ordem" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="form-check">
+                                    <input asp-for="Ativo" class="form-check-input" />
+                                    <label asp-for="Ativo" class="form-check-label">
+                                        Foto ativa
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview da imagem -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Preview da Imagem</label>
+                                <div id="preview-container" class="border rounded p-3 text-center bg-light" style="min-height: 200px;">
+                                    <div id="preview-placeholder" class="text-muted">
+                                        <i class="fas fa-image fa-3x mb-2"></i>
+                                        <p>Digite uma URL válida para ver o preview</p>
+                                    </div>
+                                    <img id="preview-image" src="@Model.FotoUrl" alt="Preview" class="img-fluid rounded" style="max-height: 300px;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="@Url.Action("Fotos")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.getElementById('FotoUrl');
+            const previewImage = document.getElementById('preview-image');
+            const previewPlaceholder = document.getElementById('preview-placeholder');
+            
+            function updatePreview() {
+                const url = urlInput.value.trim();
+                
+                if (url && isValidUrl(url)) {
+                    previewImage.src = url;
+                    previewImage.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    
+                    // Verificar se a imagem carrega
+                    previewImage.onload = function() {
+                        // Imagem carregou com sucesso
+                    };
+                    
+                    previewImage.onerror = function() {
+                        // Erro ao carregar imagem
+                        previewImage.style.display = 'none';
+                        previewPlaceholder.style.display = 'block';
+                        previewPlaceholder.innerHTML = `
+                            <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                            <p class="text-warning">Não foi possível carregar a imagem desta URL</p>
+                        `;
+                    };
+                } else {
+                    previewImage.style.display = 'none';
+                    previewPlaceholder.style.display = 'block';
+                    previewPlaceholder.innerHTML = `
+                        <i class="fas fa-image fa-3x mb-2"></i>
+                        <p>Digite uma URL válida para ver o preview</p>
+                    `;
+                }
+            }
+            
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+            
+            // Atualizar preview quando URL mudar
+            urlInput.addEventListener('input', updatePreview);
+            urlInput.addEventListener('blur', updatePreview);
+            
+            // Verificar URL inicial
+            if (urlInput.value) {
+                updatePreview();
+            }
+        });
+    </script>
+}
