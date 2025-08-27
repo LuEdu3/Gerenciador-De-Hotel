@@ -1,0 +1,250 @@
+@model List<GerenciadorHotel.Models.EmpresaFoto>
+@using GerenciadorHotel.Extensions
+
+@{
+    ViewData["Title"] = "Gerenciar Fotos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">Gerenciar Fotos da Empresa</h1>
+                    <p class="text-muted mb-0">@ViewBag.EmpresaNome</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("AdicionarFoto")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Adicionar Foto
+                    </a>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                    </a>
+                </div>
+            </div>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (Model.Any())
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-images me-2"></i>Fotos da Empresa (@Model.Count)
+                        </h5>
+                        <small class="text-muted">Arraste as fotos para reordená-las</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="fotos-container" class="row">
+                            @foreach (var foto in Model.OrderBy(f => f.Tipo).ThenBy(f => f.Ordem))
+                            {
+                                <div class="col-md-4 col-lg-3 mb-4 foto-item" data-id="@foto.Id">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="position-relative">
+                                            <img src="@foto.FotoUrl" alt="@foto.AltText" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                            <div class="position-absolute top-0 end-0 p-2">
+                                                <span class="badge bg-primary">@foto.Tipo.GetDisplayName()</span>
+                                            </div>
+                                            <div class="position-absolute bottom-0 start-0 p-2">
+                                                <span class="badge bg-dark">Ordem: @foto.Ordem</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <h6 class="card-title">@(foto.Descricao ?? "Sem descrição")</h6>
+                                            <p class="card-text small text-muted">
+                                                @if (!string.IsNullOrEmpty(foto.AltText))
+                                                {
+                                                    <strong>Alt:</strong> @foto.AltText<br />
+                                                }
+                                                <strong>Tipo:</strong> @foto.Tipo.GetDisplayName()<br />
+                                                <strong>Ativo:</strong> @(foto.Ativo ? "Sim" : "Não")
+                                            </p>
+                                        </div>
+                                        <div class="card-footer p-2">
+                                            <div class="btn-group w-100" role="group">
+                                                <a href="@Url.Action("EditarFoto", new { id = foto.Id })" 
+                                                   class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                        onclick="confirmarExclusao(@foto.Id)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhuma foto cadastrada</h5>
+                    <p class="text-muted">Clique no botão "Adicionar Foto" para começar.</p>
+                    <a href="@Url.Action("AdicionarFoto")" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Adicionar Primeira Foto
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir esta foto?</p>
+                <p class="text-muted small">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        // Função para confirmar exclusão
+        function confirmarExclusao(id) {
+            const form = document.getElementById('formExclusao');
+            form.action = '@Url.Action("ExcluirFoto")/' + id;
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalExclusao'));
+            modal.show();
+        }
+
+        // Implementar drag and drop para reordenação
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('fotos-container');
+            if (container && container.children.length > 1) {
+                new Sortable(container, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    onEnd: function (evt) {
+                        const items = container.querySelectorAll('.foto-item');
+                        const idsOrdenados = Array.from(items).map(item => parseInt(item.dataset.id));
+                        
+                        // Enviar nova ordem para o servidor
+                        fetch('@Url.Action("ReordenarFotos")', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify(idsOrdenados)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Atualizar números de ordem na interface
+                                items.forEach((item, index) => {
+                                    const badge = item.querySelector('.badge.bg-dark');
+                                    if (badge) {
+                                        badge.textContent = 'Ordem: ' + (index + 1);
+                                    }
+                                });
+                                
+                                // Mostrar mensagem de sucesso
+                                showToast('Ordem das fotos atualizada com sucesso!', 'success');
+                            } else {
+                                showToast('Erro ao reordenar fotos', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro:', error);
+                            showToast('Erro ao reordenar fotos', 'error');
+                        });
+                    }
+                });
+            }
+        });
+
+        // Função para mostrar toast
+        function showToast(message, type) {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Criar container de toast se não existir
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            // Remover o elemento após ser escondido
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+    </script>
+
+    <style>
+        .sortable-ghost {
+            opacity: 0.4;
+        }
+        
+        .sortable-chosen {
+            cursor: grabbing;
+        }
+        
+        .sortable-drag {
+            opacity: 0.8;
+        }
+        
+        .foto-item {
+            cursor: grab;
+        }
+        
+        .foto-item:active {
+            cursor: grabbing;
+        }
+    </style>
+}
