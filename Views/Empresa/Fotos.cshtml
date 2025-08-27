@@ -165,45 +165,129 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
+        // Variável global para controlar o modal
+        let modalExclusao = null;
+
         // Função para confirmar exclusão
         function confirmarExclusao(id) {
+            // Limpar qualquer backdrop residual antes de abrir o modal
+            limparBackdrops();
+            
             const form = document.getElementById('formExclusao');
             form.action = '@Url.Action("ExcluirFoto")/' + id;
             
-            // Usar Bootstrap 5 modal API
+            // Obter ou criar instância do modal SEM BACKDROP
             const modalElement = document.getElementById('modalExclusao');
-            const modal = new bootstrap.Modal(modalElement, {
-                backdrop: true,
-                keyboard: true,
-                focus: true
-            });
-            modal.show();
+            if (!modalExclusao) {
+                modalExclusao = new bootstrap.Modal(modalElement, {
+                    backdrop: false,  // DESABILITAR BACKDROP COMPLETAMENTE
+                    keyboard: true,
+                    focus: true
+                });
+            }
             
-            // Garantir que o backdrop seja removido quando o modal for fechado
-            modalElement.addEventListener('hidden.bs.modal', function () {
-                // Remove qualquer backdrop residual
-                const backdrop = document.querySelector('.modal-backdrop');
-                if (backdrop) {
-                    backdrop.remove();
-                }
-                // Restaurar scroll do body
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('padding-right');
-            });
+            modalExclusao.show();
         }
+
+        // Função para limpar backdrops residuais
+        function limparBackdrops() {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('padding-right');
+            document.body.style.removeProperty('overflow');
+        }
+
+        // Função de emergência para forçar fechamento completo
+        function forcarFechamentoModal() {
+            // Fechar modal se estiver aberto
+            if (modalExclusao) {
+                modalExclusao.hide();
+            }
+            
+            // Fechar todos os modais Bootstrap
+            const modals = document.querySelectorAll('.modal.show');
+            modals.forEach(modal => {
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            });
+            
+            // Limpeza forçada
+            setTimeout(() => {
+                limparBackdrops();
+                // Remove classes do body que possam ter ficado
+                document.body.className = document.body.className.replace(/modal-[^\s]*/g, '');
+            }, 200);
+        }
+
+        // Adicionar ao window para debug (pode ser removido em produção)
+        window.forcarFechamentoModal = forcarFechamentoModal;
 
         // Implementar drag and drop para reordenação
         document.addEventListener('DOMContentLoaded', function() {
-            // Função para limpar modais órfãos (previne backdrop residual)
-            function limparModalsOrfaos() {
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(backdrop => backdrop.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('padding-right');
+            // Limpar backdrops ao carregar a página
+            limparBackdrops();
+            
+            // INTERCEPTAR E BLOQUEAR CRIAÇÃO DE BACKDROP
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1 && node.classList && node.classList.contains('modal-backdrop')) {
+                            console.log('Backdrop detectado e removido!');
+                            node.remove();
+                        }
+                    });
+                });
+            });
+            
+            // Observar mudanças no body para capturar backdrops
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            
+            // Configurar eventos do modal uma única vez
+            const modalElement = document.getElementById('modalExclusao');
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    // Aguardar um pouco antes de limpar para garantir que o Bootstrap termine
+                    setTimeout(limparBackdrops, 100);
+                });
+                
+                modalElement.addEventListener('show.bs.modal', function () {
+                    // Limpar qualquer backdrop residual antes de mostrar
+                    limparBackdrops();
+                });
+                
+                modalElement.addEventListener('shown.bs.modal', function () {
+                    // Limpeza adicional após mostrar
+                    setTimeout(limparBackdrops, 50);
+                });
+                
+                // Evento adicional para quando o modal é escondido por qualquer motivo
+                modalElement.addEventListener('hide.bs.modal', function () {
+                    setTimeout(limparBackdrops, 50);
+                });
             }
             
-            // Limpar ao carregar a página
-            limparModalsOrfaos();
+            // Adicionar listener global para detectar cliques fora de modais
+            document.addEventListener('click', function(event) {
+                // Se clicou em um backdrop, garantir limpeza
+                if (event.target.classList.contains('modal-backdrop')) {
+                    setTimeout(limparBackdrops, 200);
+                }
+            });
+            
+            // Listener para ESC key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    setTimeout(limparBackdrops, 100);
+                }
+            });
             
             const container = document.getElementById('fotos-container');
             if (container && container.children.length > 1) {
@@ -319,13 +403,38 @@
             transform: scale(1.02);
         }
         
-        /* Garantir que o modal funcione corretamente */
+        /* IMPEDIR BACKDROP COMPLETAMENTE */
         .modal-backdrop {
-            z-index: 1040;
+            display: none !important;
         }
         
+        /* Criar nosso próprio efeito visual sem backdrop */
+        .modal.show {
+            background-color: rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .modal.show .modal-dialog {
+            background-color: transparent;
+        }
+        
+        .modal.show .modal-content {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: none;
+        }
+        
+        /* Garantir z-index correto */
         .modal {
-            z-index: 1050;
+            z-index: 1050 !important;
+        }
+        
+        /* Forçar remoção de qualquer backdrop */
+        body .modal-backdrop,
+        body.modal-open .modal-backdrop,
+        .modal-backdrop.fade,
+        .modal-backdrop.show {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
         }
         
         /* Estilização dos botões */
