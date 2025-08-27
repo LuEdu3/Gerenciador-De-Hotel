@@ -54,36 +54,57 @@
                             @foreach (var foto in Model.OrderBy(f => f.Tipo).ThenBy(f => f.Ordem))
                             {
                                 <div class="col-md-4 col-lg-3 mb-4 foto-item" data-id="@foto.Id">
-                                    <div class="card h-100 shadow-sm">
-                                        <div class="position-relative">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <div class="position-relative overflow-hidden">
                                             <img src="@foto.FotoUrl" alt="@foto.AltText" class="card-img-top" style="height: 200px; object-fit: cover;">
                                             <div class="position-absolute top-0 end-0 p-2">
-                                                <span class="badge bg-primary">@foto.Tipo.GetDisplayName()</span>
+                                                <span class="badge bg-primary shadow-sm">@foto.Tipo.GetDisplayName()</span>
                                             </div>
                                             <div class="position-absolute bottom-0 start-0 p-2">
-                                                <span class="badge bg-dark">Ordem: @foto.Ordem</span>
+                                                <span class="badge bg-dark shadow-sm">Ordem: @foto.Ordem</span>
                                             </div>
+                                            @if (!foto.Ativo)
+                                            {
+                                                <div class="position-absolute top-0 start-0 p-2">
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-eye-slash me-1"></i>Inativa
+                                                    </span>
+                                                </div>
+                                            }
                                         </div>
-                                        <div class="card-body p-3">
-                                            <h6 class="card-title">@(foto.Descricao ?? "Sem descrição")</h6>
-                                            <p class="card-text small text-muted">
+                                        <div class="card-body p-3 flex-grow-1">
+                                            <h6 class="card-title mb-2 text-truncate">
+                                                @(foto.Descricao ?? "Sem descrição")
+                                            </h6>
+                                            <div class="small text-muted">
                                                 @if (!string.IsNullOrEmpty(foto.AltText))
                                                 {
-                                                    <strong>Alt:</strong> @foto.AltText<br />
+                                                    <div class="mb-1">
+                                                        <i class="fas fa-universal-access me-1"></i>
+                                                        <strong>Alt:</strong> <span class="text-truncate d-inline-block" style="max-width: 120px;">@foto.AltText</span>
+                                                    </div>
                                                 }
-                                                <strong>Tipo:</strong> @foto.Tipo.GetDisplayName()<br />
-                                                <strong>Ativo:</strong> @(foto.Ativo ? "Sim" : "Não")
-                                            </p>
+                                                <div class="mb-1">
+                                                    <i class="fas fa-tag me-1"></i>
+                                                    <strong>Tipo:</strong> @foto.Tipo.GetDisplayName()
+                                                </div>
+                                                <div>
+                                                    <i class="fas fa-toggle-@(foto.Ativo ? "on text-success" : "off text-danger") me-1"></i>
+                                                    <strong>Status:</strong> @(foto.Ativo ? "Ativa" : "Inativa")
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="card-footer p-2">
                                             <div class="btn-group w-100" role="group">
                                                 <a href="@Url.Action("EditarFoto", new { id = foto.Id })" 
-                                                   class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-edit"></i>
+                                                   class="btn btn-outline-primary btn-sm" 
+                                                   title="Editar foto">
+                                                    <i class="fas fa-edit me-1"></i>Editar
                                                 </a>
                                                 <button type="button" class="btn btn-outline-danger btn-sm" 
-                                                        onclick="confirmarExclusao(@foto.Id)">
-                                                    <i class="fas fa-trash"></i>
+                                                        onclick="confirmarExclusao(@foto.Id)"
+                                                        title="Excluir foto">
+                                                    <i class="fas fa-trash me-1"></i>Excluir
                                                 </button>
                                             </div>
                                         </div>
@@ -110,22 +131,31 @@
 </div>
 
 <!-- Modal de Confirmação de Exclusão -->
-<div class="modal fade" id="modalExclusao" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade" id="modalExclusao" tabindex="-1" aria-labelledby="modalExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Confirmar Exclusão</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="modalExclusaoLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja excluir esta foto?</p>
-                <p class="text-muted small">Esta ação não pode ser desfeita.</p>
+                <div class="text-center">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <h6>Tem certeza que deseja excluir esta foto?</h6>
+                    <p class="text-muted small mb-0">Esta ação não pode ser desfeita.</p>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
                 <form id="formExclusao" method="post" style="display: inline;">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">Excluir</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Excluir
+                    </button>
                 </form>
             </div>
         </div>
@@ -140,12 +170,41 @@
             const form = document.getElementById('formExclusao');
             form.action = '@Url.Action("ExcluirFoto")/' + id;
             
-            const modal = new bootstrap.Modal(document.getElementById('modalExclusao'));
+            // Usar Bootstrap 5 modal API
+            const modalElement = document.getElementById('modalExclusao');
+            const modal = new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true,
+                focus: true
+            });
             modal.show();
+            
+            // Garantir que o backdrop seja removido quando o modal for fechado
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                // Remove qualquer backdrop residual
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                // Restaurar scroll do body
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+            });
         }
 
         // Implementar drag and drop para reordenação
         document.addEventListener('DOMContentLoaded', function() {
+            // Função para limpar modais órfãos (previne backdrop residual)
+            function limparModalsOrfaos() {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => backdrop.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+            }
+            
+            // Limpar ao carregar a página
+            limparModalsOrfaos();
+            
             const container = document.getElementById('fotos-container');
             if (container && container.children.length > 1) {
                 new Sortable(container, {
@@ -241,10 +300,51 @@
         
         .foto-item {
             cursor: grab;
+            transition: transform 0.2s ease;
+        }
+        
+        .foto-item:hover {
+            transform: translateY(-2px);
         }
         
         .foto-item:active {
             cursor: grabbing;
+        }
+        
+        .card-img-top {
+            transition: transform 0.3s ease;
+        }
+        
+        .foto-item:hover .card-img-top {
+            transform: scale(1.02);
+        }
+        
+        /* Garantir que o modal funcione corretamente */
+        .modal-backdrop {
+            z-index: 1040;
+        }
+        
+        .modal {
+            z-index: 1050;
+        }
+        
+        /* Estilização dos botões */
+        .btn-group .btn {
+            border-radius: 0;
+        }
+        
+        .btn-group .btn:first-child {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+        
+        .btn-group .btn:last-child {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+        
+        .card-footer .btn-group {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
         }
     </style>
 }
